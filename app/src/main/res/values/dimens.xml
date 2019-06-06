@@ -6,4 +6,5 @@
     <dimen name="textSizeXtraSmaller">8sp</dimen>
     <dimen name="large_margin_xtra">60</dimen>
     <dimen name="small_margin">5dp</dimen>
+    <dimen name="textSizeSmall">11</dimen>
 </resources>
