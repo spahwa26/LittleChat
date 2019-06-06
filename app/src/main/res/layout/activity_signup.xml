@@ -31,6 +31,16 @@
                 android:imeOptions="actionDone"
                 android:inputType="textPassword" />
 
+
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Confirm Password"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword" />
+
         <Button
                 android:id="@+id/btnSignUp"
                 android:layout_width="wrap_content"
@@ -41,10 +51,5 @@
     </LinearLayout>
 
 
-    <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
 
 </RelativeLayout>

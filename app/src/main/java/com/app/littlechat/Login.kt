@@ -7,9 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_login.*
 
 class Login : AppCompatActivity() {
@@ -19,6 +17,12 @@ class Login : AppCompatActivity() {
 
 
     lateinit var activity: Activity
+
+    private val TAG = "Login"
+
+
+    private lateinit var database: DatabaseReference
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +38,8 @@ class Login : AppCompatActivity() {
     fun init() {
 
         mAuth = FirebaseAuth.getInstance()
+
+        database = FirebaseDatabase.getInstance().reference
 
         activity = this@Login
     }
@@ -109,8 +115,8 @@ class Login : AppCompatActivity() {
     private fun checkNameNumber(userId: String, email: String?, name: String) {
 
         FirebaseDatabase.getInstance().getReference().child("users/$userId")
-            .addListenerForSingleValueEvent(object : ValueEventListener() {
-                fun onDataChange(dataSnapshot: DataSnapshot) {
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     CommonUtilities.hideProgressWheel()
                     if (dataSnapshot.getValue() != null) {
                         try {
@@ -126,15 +132,24 @@ class Login : AppCompatActivity() {
                         }
 
                     } else {
-                        showMobilePopup(userId, email, name)
+                        showMobilePopup(userId, email?:"", name)
                     }
                 }
 
-                fun onCancelled(databaseError: DatabaseError) {
+                override fun onCancelled(databaseError: DatabaseError) {
                     Log.d(TAG, "onCancelled: ")
                     CommonUtilities.hideProgressWheel()
                 }
             })
     }
+
+
+    private fun showMobilePopup(userId: String, email: String, name: String) {
+        startActivity(
+            Intent(activity, Profile::class.java).putExtra("uid", userId)
+                .putExtra("email", email).putExtra("name", name)
+        )
+    }
+
 
 }

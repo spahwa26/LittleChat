@@ -83,15 +83,13 @@
 
                 <Button
                         android:id="@+id/btn_login"
-                        style="?android:attr/borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_marginTop="@dimen/large_margin_xtra"
                         android:layout_marginBottom="@dimen/small_margin"
                         android:layout_weight="1"
                         android:text="@string/login"
-                        android:textAllCaps="true"
-                        android:textColor="@android:color/white" />
+                        android:textAllCaps="true" />
 
 
                 <RelativeLayout
@@ -167,14 +165,14 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.facebook.login.widget.LoginButton
-            android:id="@+id/login_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"
-            android:visibility="gone" />
+    <!--<com.facebook.login.widget.LoginButton-->
+            <!--android:id="@+id/login_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:layout_marginTop="30dp"-->
+            <!--android:layout_marginBottom="30dp"-->
+            <!--android:visibility="gone" />-->
 
 
 

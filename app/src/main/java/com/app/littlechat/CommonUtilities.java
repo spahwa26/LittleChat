@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.text.SpannableString;
@@ -21,6 +23,52 @@ public class CommonUtilities {
 
     private static Dialog dialog;
 
+
+    public static void putString(Activity activity, String name, String value)
+    {
+        SharedPreferences preferences=activity.getSharedPreferences(BuildConfig.APPLICATION_ID,Context.MODE_PRIVATE);
+
+        preferences.edit().putString(name,value).apply();
+    }
+
+    public static String getString(Activity activity, String name)
+    {
+        SharedPreferences preferences=activity.getSharedPreferences(BuildConfig.APPLICATION_ID,Context.MODE_PRIVATE);
+
+        return  preferences.getString(name,"");
+    }
+
+    public static void clearPrefrences(Activity activity)
+    {
+        SharedPreferences preferences=activity.getSharedPreferences(BuildConfig.APPLICATION_ID,Context.MODE_PRIVATE);
+
+        preferences.edit().clear().apply();
+    }
+
+
+    public static void showLogoutPopup(final Activity activity) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+
+        alert.setCancelable(true);
+
+        alert.setMessage("Do you want to logout?");
+
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                clearPrefrences(activity);
+                activity.startActivity(new Intent(activity,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+        });
+
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });
+
+
+        alert.show();
+    }
 
     public static void showToast(Activity activity, String message) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();

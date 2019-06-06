@@ -20,16 +20,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activity = this@MainActivity
 
-
-
-        var auth = FirebaseAuth.getInstance()
-
-        if (auth.currentUser != null)
+        if (CommonUtilities.getString(activity, "isLoggedIn").equals("yes"))
             startActivity(
-                Intent(
-                    activity,
-                    HomeScreen::class.java
-                ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                Intent(activity, HomeScreen::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         else {
 
