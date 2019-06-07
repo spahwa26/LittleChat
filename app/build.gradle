@@ -8,9 +8,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.app.littlechat"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
+        vectorDrawables.useSupportLibrary = true
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

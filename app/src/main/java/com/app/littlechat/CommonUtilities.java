@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
@@ -104,6 +106,14 @@ public class CommonUtilities {
 
         alert.show();
     }
+
+    public static void setLayoutManager(RecyclerView view, RecyclerView.LayoutManager manager) {
+        RecyclerView.LayoutManager mLayoutManager1 = manager;
+        view.setLayoutManager(mLayoutManager1);
+        view.setItemAnimator(new DefaultItemAnimator());
+        view.setNestedScrollingEnabled(false);
+    }
+
 
 
     public static void showProgressWheel(Context context) {

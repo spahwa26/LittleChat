@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     private fun generateKeyHash() {
         try {
             val info = packageManager.getPackageInfo(
-                "com.seraphic.housetag",
+                BuildConfig.APPLICATION_ID,
                 PackageManager.GET_SIGNATURES
             )
             for (signature in info.signatures) {
