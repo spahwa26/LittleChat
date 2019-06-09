@@ -35,7 +35,8 @@ class UsersAdapter : RecyclerView.Adapter<UsersAdapter.MyViewHolder>() {
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.tvName.text = list.get(position).name
         holder.tvEmail.text = list.get(position).email
-        Picasso.get().load(list.get(position).image).placeholder(R.mipmap.ic_launcher).into(holder.ivImage)
+        if (!list.get(position).image.isEmpty())
+            Picasso.get().load(list.get(position).image).placeholder(R.mipmap.ic_launcher).into(holder.ivImage)
 
         holder.itemView.setOnClickListener { appInterface.handleEvent(position, 0, null) }
     }

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
-import com.app.littlechat.pojo.Friends
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.Continuation
@@ -35,7 +34,8 @@ class Profile : AppCompatActivity() {
     private var email: String = ""
     private var userID: String = ""
     private var imagePath: String = ""
-    lateinit var user: User
+    lateinit var otherUser: User
+    lateinit var myData: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +62,13 @@ class Profile : AppCompatActivity() {
 
         if (intent.hasExtra("data")) {
             userID = mAuth?.getCurrentUser()!!.uid
-            user = intent.getParcelableExtra("data")
-            et_name.setText(user.name)
-            et_email.setText(user.email)
-            et_phone.setText(user.phone_number)
-            Picasso.get().load(user.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+            getUserDetail(false)
+            otherUser = intent.getParcelableExtra("data")
+            et_name.setText(otherUser.name)
+            et_email.setText(otherUser.email)
+            et_phone.setText(otherUser.phone_number)
+            if (!otherUser.image.isEmpty())
+                Picasso.get().load(otherUser.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
 
             et_name.isFocusable = false
             et_email.isFocusable = false
@@ -92,7 +94,7 @@ class Profile : AppCompatActivity() {
         } else {
             userID = mAuth?.getCurrentUser()!!.uid
 
-            getUserDetail()
+            getUserDetail(true)
 
             btn_submit.visibility = VISIBLE
             btn_submit.text = "Update"
@@ -159,19 +161,18 @@ class Profile : AppCompatActivity() {
     //////////////////////////////////////////////////////Firebase Calls///////////////////////////////////////////////////////////
 
 
-
     private fun sendRequest() {
         CommonUtilities.showProgressWheel(activity)
-        mDatabase?.child(Constants.REQUESTS)?.child(userID)?.child(user.id)?.setValue(
-                Friends(user.id, user.name, user.email, user.phone_number, user.image, Constants.SENT)
+        mDatabase?.child(Constants.REQUESTS)?.child(userID)?.child(otherUser.id)?.setValue(
+                User(otherUser.id, otherUser.name, otherUser.email, otherUser.phone_number, otherUser.image, Constants.SENT)
         )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
                 CommonUtilities.showToast(activity, "Request Sent")
-                mDatabase?.child(Constants.REQUESTS)?.child(user.id)?.child(userID)?.setValue(
-                    Friends(user.id, user.name, user.email, user.phone_number, user.image, Constants.SENT)
+                mDatabase?.child(Constants.REQUESTS)?.child(otherUser.id)?.child(userID)?.setValue(
+                        User(myData.id, myData.name, myData.email, myData.phone_number, myData.image, Constants.RECEIVED)
                 )
-                btn_send.visibility= GONE
+                btn_send.visibility = GONE
                 btn_cancel.visibility = VISIBLE
             } else
                 CommonUtilities.showAlert(activity, task.exception!!.message, false)
@@ -183,12 +184,12 @@ class Profile : AppCompatActivity() {
 
     private fun cancelRequest() {
         CommonUtilities.showProgressWheel(activity)
-        mDatabase?.child(Constants.REQUESTS)?.child(userID)?.child(user.id)?.removeValue()?.addOnCompleteListener { task ->
+        mDatabase?.child(Constants.REQUESTS)?.child(userID)?.child(otherUser.id)?.removeValue()?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
-                mDatabase?.child(Constants.REQUESTS)?.child(user.id)?.child(userID)?.removeValue()
+                mDatabase?.child(Constants.REQUESTS)?.child(otherUser.id)?.child(userID)?.removeValue()
                 CommonUtilities.showToast(activity, "Request Canceled")
-                btn_send.visibility= VISIBLE
+                btn_send.visibility = VISIBLE
                 btn_cancel.visibility = GONE
             } else
                 CommonUtilities.showAlert(activity, task.exception!!.message, false)
@@ -200,15 +201,15 @@ class Profile : AppCompatActivity() {
 
     private fun findUserInRequestList() {
         CommonUtilities.showProgressWheel(activity)
-        val ref = FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS).child(userID).child(user.id)
+        val ref = FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS).child(userID).child(otherUser.id)
         ref.addValueEventListener(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                         if (dataSnapshot.getValue() != null) {
                             CommonUtilities.hideProgressWheel()
-                            val data = dataSnapshot.getValue(Friends::class.java)
-                                    ?: Friends("", "", "", "", "", "")
+                            val data = dataSnapshot.getValue(User::class.java)
+                                    ?: User("", "", "", "", "", "")
                             if (data.status.equals(Constants.RECEIVED))
                                 btn_accept.visibility = VISIBLE
                             else
@@ -225,7 +226,7 @@ class Profile : AppCompatActivity() {
     }
 
     private fun findUserFriendList() {
-        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID).child(user.id)
+        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID).child(otherUser.id)
         ref.addListenerForSingleValueEvent(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -233,8 +234,8 @@ class Profile : AppCompatActivity() {
                         CommonUtilities.hideProgressWheel()
 
                         if (dataSnapshot.getValue() != null) {
-                            val data = dataSnapshot.getValue(Friends::class.java)
-                                    ?: Friends("", "", "", "", "", "")
+                            val data = dataSnapshot.getValue(User::class.java)
+                                    ?: User("", "", "", "", "", "")
                             btn_message.visibility = VISIBLE
                         } else
                             btn_send.visibility = VISIBLE
@@ -252,7 +253,7 @@ class Profile : AppCompatActivity() {
 
         CommonUtilities.showProgressWheel(activity)
         mDatabase?.child("users")?.child(userID)?.setValue(
-                User(userID, et_name.getText().toString(), et_email.getText().toString(), et_phone.getText().toString(), imagePath)
+                User(userID, et_name.getText().toString(), et_email.getText().toString(), et_phone.getText().toString(), imagePath, "")
         )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
@@ -274,31 +275,36 @@ class Profile : AppCompatActivity() {
         }
     }
 
-    private fun getUserDetail() {
-        CommonUtilities.showProgressWheel(activity)
+    private fun getUserDetail(showProgress: Boolean) {
+        if (showProgress)
+            CommonUtilities.showProgressWheel(activity)
         val ref = FirebaseDatabase.getInstance().reference.child("users").child(userID)
         ref.addListenerForSingleValueEvent(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                        CommonUtilities.hideProgressWheel()
-
                         val pojo = dataSnapshot.getValue<User>(User::class.java)
 
-                        et_name.setText(pojo?.name)
+                        if (showProgress) {
+                            CommonUtilities.hideProgressWheel()
 
-                        et_email.setText(pojo?.email)
+                            et_name.setText(pojo?.name)
 
-                        et_phone.setText(pojo?.phone_number)
+                            et_email.setText(pojo?.email)
 
-                        et_email.setEnabled(false)
+                            et_phone.setText(pojo?.phone_number)
 
-                        Picasso.get().load(pojo?.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+                            et_email.setEnabled(false)
+                            if (! pojo?.image.equals(""))
+                                Picasso.get().load(pojo?.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+                        } else
+                            myData = pojo!!
 
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        CommonUtilities.hideProgressWheel()
+                        if (showProgress)
+                            CommonUtilities.hideProgressWheel()
                         //handle databaseError
                     }
                 })

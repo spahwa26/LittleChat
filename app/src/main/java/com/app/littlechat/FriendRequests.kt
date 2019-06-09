@@ -3,12 +3,11 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.RequestsAdapter
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.pojo.Friends
+import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -20,7 +19,7 @@ class FriendRequests : AppCompatActivity(), AppInterface {
     lateinit var activity: Activity
     private lateinit var database: DatabaseReference
 
-    internal var requestList = ArrayList<Friends>()
+    internal var requestList = ArrayList<User>()
 
     lateinit var adapter: RequestsAdapter
 
@@ -65,8 +64,8 @@ class FriendRequests : AppCompatActivity(), AppInterface {
                             for (user in dataSnapshot.children) {
                                 if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid))
                                     requestList.add(
-                                        user.getValue(Friends::class.java)
-                                            ?: Friends("", "", "", "", "", "")
+                                        user.getValue(User::class.java)
+                                            ?: User("", "", "", "", "", "")
                                     )
                             }
 
@@ -91,7 +90,7 @@ class FriendRequests : AppCompatActivity(), AppInterface {
         CommonUtilities.showProgressWheel(activity)
         val user = requestList.get(pos)
         FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(userID)?.child(user.id)?.setValue(
-            Friends(user.id, user.name, user.email, user.phone_number, user.image, Constants.ACCEPTED)
+            User(user.id, user.name, user.email, user.phone_number, user.image, Constants.ACCEPTED)
         )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
@@ -107,11 +106,12 @@ class FriendRequests : AppCompatActivity(), AppInterface {
 
     private fun cancelRequest(pos: Int) {
         CommonUtilities.showProgressWheel(activity)
-        FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS)?.child(userID)?.child(requestList.get(pos).id)
+        val id = requestList.get(pos).id
+        FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS)?.child(userID)?.child(id)
             ?.removeValue()?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
-                FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS)?.child(requestList.get(pos).id)?.child(userID)?.removeValue()
+                FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS)?.child(id)?.child(userID)?.removeValue()
             } else
                 CommonUtilities.showAlert(activity, task.exception!!.message, false)
         }?.addOnFailureListener { e ->
@@ -124,7 +124,7 @@ class FriendRequests : AppCompatActivity(), AppInterface {
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
 
         when (act) {
-            0 -> startActivity(Intent(this, FindFriends::class.java))
+            0 ->  startActivity(Intent(this@FriendRequests, Profile::class.java).putExtra("data", requestList.get(pos)))
 
             -1 -> acceptRequest(pos)
 

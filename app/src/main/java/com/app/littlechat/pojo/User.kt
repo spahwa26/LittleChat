@@ -15,15 +15,17 @@ class User : Parcelable{
     var email:String=""
     var phone_number:String=""
     var image:String=""
+    var status:String=""
 
     constructor()
 
-    constructor(id: String, name: String, email: String, phone_number: String, image: String) {
+    constructor(id: String, name: String, email: String, phone_number: String, image: String, status: String) {
         this.id=id
         this.name = name
         this.email = email
         this.phone_number = phone_number
         this.image=image
+        this.status=status
     }
 
 
@@ -32,7 +34,9 @@ class User : Parcelable{
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
-            parcel.readString())
+            parcel.readString(),
+            parcel.readString()
+    )
 
     override fun writeToParcel(p0: Parcel, p1: Int) {
         p0.writeString(id)
@@ -40,6 +44,7 @@ class User : Parcelable{
         p0.writeString(email)
         p0.writeString(phone_number)
         p0.writeString(image)
+        p0.writeString(status)
     }
 
 
@@ -54,7 +59,7 @@ class User : Parcelable{
     }
 
     override fun describeContents(): Int {
-       Log.w("describeContents", "")
+        Log.w("describeContents", "")
         return 0
     }
 

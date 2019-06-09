@@ -2,26 +2,28 @@ package com.app.littlechat
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.littlechat.adapter.RequestsAdapter
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.pojo.Friends
+import com.app.littlechat.pojo.User
+import com.app.littlechat.utility.Constants
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_home_screen.*
-import java.util.ArrayList
+import java.util.*
 
 class HomeScreen : AppCompatActivity(), AppInterface {
 
     lateinit var activity: Activity
 
-    internal var requestList = ArrayList<Friends>()
+    internal var friendList = ArrayList<User>()
 
     lateinit var adapter: UsersAdapter
 
@@ -41,14 +43,47 @@ class HomeScreen : AppCompatActivity(), AppInterface {
         activity = this
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
         adapter = UsersAdapter()
-        adapter.setData(this@HomeScreen, requestList, this)
+        adapter.setData(this@HomeScreen, friendList, this)
         rvFriends.adapter = adapter
 
         CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(this))
 
-        database = FirebaseDatabase.getInstance().getReference("users")
-        getRequests()
+        getFriends()
 
+    }
+
+    private fun getFriends() {
+        CommonUtilities.showProgressWheel(activity)
+        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
+        ref.addValueEventListener(
+                object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        CommonUtilities.hideProgressWheel()
+                        friendList.clear()
+                        if (dataSnapshot.getValue() != null) {
+                            try {
+                                for (user in dataSnapshot.children) {
+                                    friendList.add(
+                                            user.getValue(User::class.java)
+                                                    ?: User("", "", "", "", "", "")
+                                    )
+                                }
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                        }
+
+                        adapter.notifyDataSetChanged()
+
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        CommonUtilities.hideProgressWheel()
+                        //handle databaseError
+                    }
+                })
     }
 
 
@@ -59,8 +94,7 @@ class HomeScreen : AppCompatActivity(), AppInterface {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
-        when (item?.itemId)
-        {
+        when (item?.itemId) {
             R.id.find_friends -> startActivity(Intent(this, FindFriends::class.java))
 
             R.id.profile -> startActivity(Intent(this, Profile::class.java))

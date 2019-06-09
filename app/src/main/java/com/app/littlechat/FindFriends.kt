@@ -91,7 +91,7 @@ class FindFriends : AppCompatActivity(), AppInterface {
                         for (user in dataSnapshot.children) {
                             if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid))
                                 usersList.add(user.getValue(User::class.java)
-                                        ?: User("", "", "", "", ""))
+                                        ?: User("", "", "", "", "",""))
                         }
 
                     } catch (e: Exception) {
