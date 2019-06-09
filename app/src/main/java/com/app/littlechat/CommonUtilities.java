@@ -7,19 +7,28 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.RecyclerView;
+import android.media.ExifInterface;
+import android.util.Log;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
 import android.view.Display;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class CommonUtilities {
 
@@ -151,4 +160,84 @@ public class CommonUtilities {
     }
 
 
+
+
+    public static String getResizedBitmap(String path, int maxSize, String fileName, Activity activity,boolean isCamera) {
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap image;
+        if(isCamera)
+            image = CommonUtilities.rotateBitmap(BitmapFactory.decodeFile(path, options),path);
+        else
+            image=BitmapFactory.decodeFile(path, options);
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+
+
+        Bitmap saveBitmap = Bitmap.createScaledBitmap(image, width, height, true);
+
+        File cacheDir = activity.getBaseContext().getCacheDir();
+
+        File saveFile = new File(cacheDir, fileName);
+
+        try {
+            FileOutputStream out = new FileOutputStream(saveFile);
+            saveBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return saveFile.getPath();
+    }
+
+
+    public static  Bitmap rotateBitmap(Bitmap realImage,String imagePath)
+    {
+        try {
+            ExifInterface exif = new ExifInterface(imagePath);
+
+            Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION));
+            if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
+
+                realImage = rotate(realImage, 90);
+            } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
+                realImage = rotate(realImage, 270);
+            } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
+                realImage = rotate(realImage, 180);
+            }
+            return realImage;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return realImage;
+    }
+
+    public static Bitmap rotate(Bitmap bitmap, int degree) {
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        Matrix mtx = new Matrix();
+        mtx.postRotate(degree);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
+    }
 }

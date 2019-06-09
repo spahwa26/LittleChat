@@ -3,10 +3,11 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -99,8 +100,10 @@ class Login : AppCompatActivity() {
                 if (task.isSuccessful) {
                     if (mAuth!!.getCurrentUser()!!.isEmailVerified)
                         checkNameNumber(mAuth!!.getCurrentUser()!!.uid, mAuth!!.getCurrentUser()!!.email, "")
+                    else if(mAuth?.currentUser?.isEmailVerified ==false)
+                        sendVerificationEmail(mAuth!!.getCurrentUser())
                     else
-                        CommonUtilities.showToast(activity, "Email is not verified.")
+                        CommonUtilities.showToast(activity, "Some error occu, Please try again.")
                 } else
                     CommonUtilities.showAlert(activity, task.exception!!.message, false)
             }
@@ -149,6 +152,27 @@ class Login : AppCompatActivity() {
             Intent(activity, Profile::class.java).putExtra("uid", userId)
                 .putExtra("email", email).putExtra("name", name)
         )
+    }
+
+
+    private fun sendVerificationEmail(user : FirebaseUser?) {
+
+
+        user!!.sendEmailVerification()
+                .addOnCompleteListener { task ->
+                    CommonUtilities.hideProgressWheel()
+                    if (task.isSuccessful) {
+                        //CommonUtilities.showToast(activity,"A verification email has been sent to "+user.getEmail()+", please verify the email then login.");
+                        //startActivity(new Intent(activity,Login.class));
+                        FirebaseAuth.getInstance().signOut()
+                        CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", false)
+                    } else {
+                        CommonUtilities.showToast(this, task.exception!!.message?:"")
+                    }
+                }.addOnFailureListener { e ->
+                    CommonUtilities.showAlert(this, e.message?:"", false)
+                    CommonUtilities.hideProgressWheel()
+                }
     }
 
 

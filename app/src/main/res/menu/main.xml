@@ -6,5 +6,13 @@
         android:title="@string/find_friends"
         android:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/friend_requests"
+          android:title="@string/friend_requests"
+          android:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/profile"
+        android:title="@string/profile"
+        android:showAsAction="ifRoom"/>
+
 
 </menu>

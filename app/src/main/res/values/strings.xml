@@ -13,4 +13,11 @@
     <string name="name">Name</string>
     <string name="phone_number">Phone Number</string>
     <string name="find_friends">Find Friends</string>
+    <string name="send_request">Send Request</string>
+    <string name="cancel_request">Cencel Request</string>
+    <string name="accept_request">Accept Request</string>
+    <string name="send_message">Send Message</string>
+    <string name="friend_requests">Friend Requests</string>
+    <string name="home">HOme</string>
+    <string name="signup">SignUp</string>
 </resources>

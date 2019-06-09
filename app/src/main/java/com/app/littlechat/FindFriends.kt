@@ -1,72 +1,121 @@
 package com.app.littlechat
 
-import android.support.v7.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.UsersAdapter
+import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_find_friends.*
-import java.util.ArrayList
+import java.util.*
 
-class FindFriends : AppCompatActivity() {
+class FindFriends : AppCompatActivity(), AppInterface {
 
     private lateinit var database: DatabaseReference
 
     internal var usersList = ArrayList<User>()
 
-    lateinit var adapter : UsersAdapter
+    lateinit var adapter: UsersAdapter
+
+    var timer: Timer? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_friends)
 
         init()
+
+        listeners()
+    }
+
+    private fun listeners() {
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                Log.e("afterTextChanged", "")
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                Log.e("beforeTextChanged", "")
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                cancelTimer()
+
+                timer = Timer()
+                timer?.schedule(object : TimerTask() {
+                    override fun run() {
+                        searchFriends(p0.toString())
+                    }
+
+                }, 600)
+            }
+
+        })
     }
 
     private fun init() {
 
 
-        adapter= UsersAdapter()
+        adapter = UsersAdapter()
+        adapter.setData(this@FindFriends, usersList, this)
+        rvUsers.adapter = adapter
 
         CommonUtilities.setLayoutManager(rvUsers, LinearLayoutManager(this))
 
-
-
-
         database = FirebaseDatabase.getInstance().getReference("users")
-        CommonUtilities.showProgressWheel(this)
-        var quaryData = database.orderByChild("name").startAt("Sh").endAt("Sh" + "\uf8ff")
 
+    }
 
-        quaryData .addValueEventListener(object : ValueEventListener {
+    private fun searchFriends(name: String) {
+
+        if (name.isEmpty()) {
+            usersList.clear()
+            runOnUiThread { adapter.notifyDataSetChanged() }
+            return
+        }
+
+        var quaryData = database.orderByChild("name").startAt(name).endAt(name + "\uf8ff")
+
+        quaryData.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                CommonUtilities.hideProgressWheel()
+                usersList.clear()
                 if (dataSnapshot.getValue() != null) {
-
-
                     try {
                         for (user in dataSnapshot.children) {
-
-                            usersList.add(user.getValue(User::class.java)?: User("","",""))
+                            if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid))
+                                usersList.add(user.getValue(User::class.java)
+                                        ?: User("", "", "", "", ""))
                         }
-                        adapter.setData(this@FindFriends, usersList)
 
-                        rvUsers.adapter=adapter
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
 
-                } else {
                 }
+
+                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.d("", "onCancelled: ")
-                CommonUtilities.hideProgressWheel()
             }
         })
+    }
 
+    private fun cancelTimer() {
+        if (timer != null)
+            timer?.cancel()
+    }
+
+
+    override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
+        startActivity(Intent(this@FindFriends, Profile::class.java).putExtra("data", usersList.get(pos)))
     }
 }
