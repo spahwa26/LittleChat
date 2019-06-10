@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import com.app.littlechat.pojo.User
+import com.app.littlechat.utility.CommonUtilities
+import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -123,19 +126,19 @@ class Login : AppCompatActivity() {
                     CommonUtilities.hideProgressWheel()
                     if (dataSnapshot.getValue() != null) {
                         try {
+                            val pojo = dataSnapshot.getValue<User>(User::class.java)
                             CommonUtilities.putString(activity, "isLoggedIn", "yes")
-                            startActivity(
-                                Intent(
-                                    activity,
-                                    HomeScreen::class.java
-                                ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
+                            setUserData(pojo)
+                            startActivity(Intent(activity, HomeScreen::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK))
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
 
                     } else {
-                        showMobilePopup(userId, email?:"", name)
+                        startActivity(
+                            Intent(activity, Profile::class.java).putExtra("uid", userId)
+                                .putExtra("email", email).putExtra("name", name)
+                        )
                     }
                 }
 
@@ -146,12 +149,13 @@ class Login : AppCompatActivity() {
             })
     }
 
-
-    private fun showMobilePopup(userId: String, email: String, name: String) {
-        startActivity(
-            Intent(activity, Profile::class.java).putExtra("uid", userId)
-                .putExtra("email", email).putExtra("name", name)
-        )
+    private fun setUserData(pojo: User?) {
+        CommonUtilities.putString(activity, Constants.ID, pojo?.id)
+        CommonUtilities.putString(activity, Constants.NAME, pojo?.name)
+        CommonUtilities.putString(activity, Constants.EMAIL, pojo?.email)
+        CommonUtilities.putString(activity, Constants.PHONE, pojo?.phone_number)
+        CommonUtilities.putString(activity, Constants.IMAGE, pojo?.image)
+        CommonUtilities.putString(activity, Constants.STATUS, pojo?.status)
     }
 
 

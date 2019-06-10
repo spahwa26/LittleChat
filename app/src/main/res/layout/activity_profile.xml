@@ -85,7 +85,6 @@
             android:imeOptions="actionNext"
             android:inputType="text"
             android:singleLine="true"
-            android:text=""
             android:textSize="@dimen/textSizeLarge" />
 
         <EditText

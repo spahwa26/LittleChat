@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
+import com.app.littlechat.utility.CommonUtilities
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_find_friends.*
@@ -70,6 +71,7 @@ class FindFriends : AppCompatActivity(), AppInterface {
         CommonUtilities.setLayoutManager(rvUsers, LinearLayoutManager(this))
 
         database = FirebaseDatabase.getInstance().getReference("users")
+
 
     }
 

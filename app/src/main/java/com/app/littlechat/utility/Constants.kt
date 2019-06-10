@@ -11,6 +11,13 @@ class Constants {
         val REQUESTS = "requests"
         val ACCEPTED = "accepted"
         val FRIENDS = "friends"
+
+        val ID="id"
+        val NAME="name"
+        val EMAIL="email"
+        val PHONE="phone"
+        val IMAGE="image"
+        val STATUS="status"
     }
 
 

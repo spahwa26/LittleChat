@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.RequestsAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
+import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -94,6 +95,7 @@ class FriendRequests : AppCompatActivity(), AppInterface {
         )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
+                FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(user.id)?.child(userID)?.setValue(CommonUtilities.getUserData(activity))
                 CommonUtilities.showToast(activity, "Request Accepted")
                 cancelRequest(pos)
             } else

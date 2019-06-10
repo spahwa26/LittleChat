@@ -10,6 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import com.app.littlechat.pojo.User
+import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
@@ -69,12 +70,10 @@ class Profile : AppCompatActivity() {
             et_phone.setText(otherUser.phone_number)
             if (!otherUser.image.isEmpty())
                 Picasso.get().load(otherUser.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
-
             et_name.isFocusable = false
             et_email.isFocusable = false
             et_phone.isFocusable = false
             ivImage.isEnabled = false
-
             findUserInRequestList()
         } else if (intent.hasExtra("name")) {
             btn_logout.setVisibility(View.GONE)
@@ -93,9 +92,7 @@ class Profile : AppCompatActivity() {
             btn_submit.visibility = VISIBLE
         } else {
             userID = mAuth?.getCurrentUser()!!.uid
-
             getUserDetail(true)
-
             btn_submit.visibility = VISIBLE
             btn_submit.text = "Update"
         }
@@ -113,15 +110,12 @@ class Profile : AppCompatActivity() {
             }
         }
         btn_logout.setOnClickListener { CommonUtilities.showLogoutPopup(activity) }
-
         ivImage.setOnClickListener {
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .start(this)
         }
-
         btn_send.setOnClickListener { sendRequest() }
-
         btn_cancel.setOnClickListener { cancelRequest() }
     }
 
@@ -156,6 +150,15 @@ class Profile : AppCompatActivity() {
                 val error = result.error
             }
         }
+    }
+
+    private fun setUserData(pojo: User?) {
+        CommonUtilities.putString(activity, Constants.ID, pojo?.id)
+        CommonUtilities.putString(activity, Constants.NAME, pojo?.name)
+        CommonUtilities.putString(activity, Constants.EMAIL, pojo?.email)
+        CommonUtilities.putString(activity, Constants.PHONE, pojo?.phone_number)
+        CommonUtilities.putString(activity, Constants.IMAGE, pojo?.image)
+        CommonUtilities.putString(activity, Constants.STATUS, pojo?.status)
     }
 
     //////////////////////////////////////////////////////Firebase Calls///////////////////////////////////////////////////////////
@@ -252,11 +255,13 @@ class Profile : AppCompatActivity() {
 
 
         CommonUtilities.showProgressWheel(activity)
-        mDatabase?.child("users")?.child(userID)?.setValue(
-                User(userID, et_name.getText().toString(), et_email.getText().toString(), et_phone.getText().toString(), imagePath, "")
-        )?.addOnCompleteListener { task ->
+
+        val user = User(userID, et_name.getText().toString(), et_email.getText().toString(), et_phone.getText().toString(), imagePath, "")
+
+        mDatabase?.child("users")?.child(userID)?.setValue(user )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
+                setUserData(user)
                 if (intent.hasExtra("name")) {
                     CommonUtilities.putString(activity, "isLoggedIn", "yes")
                     startActivity(
@@ -275,17 +280,11 @@ class Profile : AppCompatActivity() {
         }
     }
 
-    private fun getUserDetail(showProgress: Boolean) {
-        if (showProgress)
-            CommonUtilities.showProgressWheel(activity)
-        val ref = FirebaseDatabase.getInstance().reference.child("users").child(userID)
-        ref.addListenerForSingleValueEvent(
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+    private fun getUserDetail(setData: Boolean) {
 
-                        val pojo = dataSnapshot.getValue<User>(User::class.java)
+                        val pojo = CommonUtilities.getUserData(activity)
 
-                        if (showProgress) {
+                        if (setData) {
                             CommonUtilities.hideProgressWheel()
 
                             et_name.setText(pojo?.name)
@@ -294,20 +293,15 @@ class Profile : AppCompatActivity() {
 
                             et_phone.setText(pojo?.phone_number)
 
+                            imagePath=pojo?.image
+
                             et_email.setEnabled(false)
                             if (! pojo?.image.equals(""))
                                 Picasso.get().load(pojo?.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
                         } else
                             myData = pojo!!
 
-                    }
 
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        if (showProgress)
-                            CommonUtilities.hideProgressWheel()
-                        //handle databaseError
-                    }
-                })
     }
 
     private fun uploadImages() {
@@ -334,4 +328,7 @@ class Profile : AppCompatActivity() {
             }
         }
     }
+
+
+
 }
