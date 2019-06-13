@@ -3,6 +3,7 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -57,34 +58,53 @@ class HomeScreen : AppCompatActivity(), AppInterface {
         CommonUtilities.showProgressWheel(activity)
         val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
         ref.addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        CommonUtilities.hideProgressWheel()
-                        friendList.clear()
-                        if (dataSnapshot.getValue() != null) {
-                            try {
-                                for (user in dataSnapshot.children) {
-                                    friendList.add(
-                                            user.getValue(User::class.java)
-                                                    ?: User("", "", "", "", "", "")
-                                    )
-                                }
-
-                            } catch (e: Exception) {
-                                e.printStackTrace()
+            object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    CommonUtilities.hideProgressWheel()
+                    friendList.clear()
+                    if (dataSnapshot.getValue() != null) {
+                        try {
+                            for (user in dataSnapshot.children) {
+                                if (user.key.equals(dataSnapshot.children.last().key))
+                                    getUsersData(user.key ?: "",true)
+                                else
+                                    getUsersData(user.key ?: "",false)
                             }
 
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
 
+                    }
+
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    CommonUtilities.hideProgressWheel()
+                    //handle databaseError
+                }
+            })
+    }
+
+    private fun getUsersData(id: String, notify: Boolean) {
+        FirebaseDatabase.getInstance().getReference().child("users/$id")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.getValue() != null) {
+                        try {
+                            friendList.add(dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", ""))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    if(notify)
                         adapter.notifyDataSetChanged()
+                }
 
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        CommonUtilities.hideProgressWheel()
-                        //handle databaseError
-                    }
-                })
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.d("onCancelled", "onCancelled: ")
+                }
+            })
     }
 
 

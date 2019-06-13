@@ -3,6 +3,7 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.RequestsAdapter
@@ -57,17 +58,16 @@ class FriendRequests : AppCompatActivity(), AppInterface {
             object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                    CommonUtilities.hideProgressWheel()
-
                     requestList.clear()
                     if (dataSnapshot.getValue() != null) {
                         try {
                             for (user in dataSnapshot.children) {
-                                if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid))
-                                    requestList.add(
-                                        user.getValue(User::class.java)
-                                            ?: User("", "", "", "", "", "")
-                                    )
+                                if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid)) {
+                                    if (user.key.equals(dataSnapshot.children.last().key))
+                                        getUsersData(user.key ?: "", true)
+                                    else
+                                        getUsersData(user.key ?: "", false)
+                                }
                             }
 
                         } catch (e: Exception) {
@@ -76,13 +76,35 @@ class FriendRequests : AppCompatActivity(), AppInterface {
 
                     }
 
-                    adapter.notifyDataSetChanged()
+                    CommonUtilities.hideProgressWheel()
 
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
                     CommonUtilities.hideProgressWheel()
                     //handle databaseError
+                }
+            })
+    }
+
+
+    private fun getUsersData(id: String, notify: Boolean) {
+        FirebaseDatabase.getInstance().getReference().child("users/$id")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.getValue() != null) {
+                        try {
+                            requestList.add(dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", ""))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    if(notify)
+                        adapter.notifyDataSetChanged()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.d("onCancelled", "onCancelled: ")
                 }
             })
     }
