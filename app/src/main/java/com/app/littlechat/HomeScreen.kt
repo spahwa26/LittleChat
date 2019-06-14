@@ -65,16 +65,20 @@ class HomeScreen : AppCompatActivity(), AppInterface {
                     if (dataSnapshot.getValue() != null) {
                         try {
                             for (user in dataSnapshot.children) {
+                                val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
                                 if (user.key.equals(dataSnapshot.children.last().key))
-                                    getUsersData(user.key ?: "",true)
+                                    getUsersData(user.key ?: "",true, savedUser.status)
                                 else
-                                    getUsersData(user.key ?: "",false)
+                                    getUsersData(user.key ?: "",false, savedUser.status)
                             }
 
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
 
+                    }
+                    else{
+                        adapter.notifyDataSetChanged()
                     }
 
                 }
@@ -86,13 +90,15 @@ class HomeScreen : AppCompatActivity(), AppInterface {
             })
     }
 
-    private fun getUsersData(id: String, notify: Boolean) {
+    private fun getUsersData(id: String, notify: Boolean, status : String) {
         FirebaseDatabase.getInstance().getReference().child("users/$id")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.getValue() != null) {
                         try {
-                            friendList.add(dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", ""))
+                            val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                            user.status = status
+                            friendList.add(user)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }

@@ -62,11 +62,12 @@ class FriendRequests : AppCompatActivity(), AppInterface {
                     if (dataSnapshot.getValue() != null) {
                         try {
                             for (user in dataSnapshot.children) {
+                                val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
                                 if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid)) {
                                     if (user.key.equals(dataSnapshot.children.last().key))
-                                        getUsersData(user.key ?: "", true)
+                                        getUsersData(user.key ?: "", true, savedUser.status)
                                     else
-                                        getUsersData(user.key ?: "", false)
+                                        getUsersData(user.key ?: "", false, savedUser.status)
                                 }
                             }
 
@@ -74,6 +75,9 @@ class FriendRequests : AppCompatActivity(), AppInterface {
                             e.printStackTrace()
                         }
 
+                    }
+                    else{
+                        adapter.notifyDataSetChanged()
                     }
 
                     CommonUtilities.hideProgressWheel()
@@ -88,13 +92,15 @@ class FriendRequests : AppCompatActivity(), AppInterface {
     }
 
 
-    private fun getUsersData(id: String, notify: Boolean) {
+    private fun getUsersData(id: String, notify: Boolean, status : String) {
         FirebaseDatabase.getInstance().getReference().child("users/$id")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.getValue() != null) {
                         try {
-                            requestList.add(dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", ""))
+                            val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                            user.status = status
+                            requestList.add(user)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
