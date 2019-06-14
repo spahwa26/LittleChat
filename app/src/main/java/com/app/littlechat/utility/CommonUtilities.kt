@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
+import android.net.ConnectivityManager
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.UnderlineSpan
@@ -16,6 +17,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.net.ConnectivityManagerCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.BuildConfig
@@ -33,6 +35,11 @@ class CommonUtilities {
 
         private var dialog: Dialog? = null
 
+
+        fun isNetworkConnected(activity: Activity) : Boolean{
+            var cm = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            return cm.activeNetworkInfo != null
+        }
 
         fun putString(activity: Activity, name: String, value: String?) {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)

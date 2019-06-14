@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp" >
+
+    <RelativeLayout
+        android:id="@+id/rl_left"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <com.app.littlechat.utility.CircleImageView
+            android:id="@+id/ivOthersPic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true" />
+
+        <TextView
+            android:id="@+id/tvOthersMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="50dp"
+            android:minHeight="30dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:minWidth="30dp"
+            android:layout_toRightOf="@+id/ivOthersPic"
+            android:layout_centerVertical="true"
+            android:background="@drawable/chat_style_app_color"
+            android:text="hiiiiiiiiiiiiiiiiii"
+            android:textColor="@android:color/white"
+            android:textStyle="normal" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="5dp"
+        android:layout_below="@+id/rl_left">
+
+
+        <TextView
+            android:id="@+id/tvMyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/chat_style_gray"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="heloooooooo"
+            android:minHeight="30dp"
+            android:minWidth="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dp"
+            android:layout_toLeftOf="@+id/ivMyPic"
+            android:textColor="@android:color/white"
+            android:textStyle="normal"/>
+
+        <com.app.littlechat.utility.CircleImageView
+            android:id="@+id/ivMyPic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            />
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

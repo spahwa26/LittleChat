@@ -10,11 +10,11 @@ import com.google.firebase.database.IgnoreExtraProperties
 class User : Parcelable{
 
 
-    var id: String=""
-    var name: String=""
-    var email:String=""
-    var phone_number:String=""
-    var image:String=""
+    var id: String           =""
+    var name: String          =""
+    var email:String          =""
+    var phone_number:String    =""
+    var image:String         =""
     var status:String=""
 
     constructor()

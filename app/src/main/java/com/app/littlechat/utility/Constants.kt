@@ -11,6 +11,7 @@ class Constants {
         val REQUESTS = "requests"
         val ACCEPTED = "accepted"
         val FRIENDS = "friends"
+        val CHATS = "chats"
 
         val ID="id"
         val NAME="name"

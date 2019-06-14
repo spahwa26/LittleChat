@@ -128,7 +128,6 @@ class HomeScreen : AppCompatActivity(), AppInterface {
 
 
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
-
-
+        startActivity(Intent(activity, ChatScreen::class.java).putExtra("data", friendList.get(pos)))
     }
 }
