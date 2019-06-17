@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.R
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.Chat
-import com.app.littlechat.pojo.User
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.layout_chat.view.*
 
@@ -42,7 +41,7 @@ class ChatAdapter : RecyclerView.Adapter<ChatAdapter.MyViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        if (myId.equals(list.get(position).id)) {
+        if (myId.equals(list.get(position).sender_id)) {
             holder.rl_left.visibility = GONE
             holder.rl_right.visibility = VISIBLE
             holder.tvMyMessage.text = list.get(position).message

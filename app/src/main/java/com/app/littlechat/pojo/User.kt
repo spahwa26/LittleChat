@@ -16,6 +16,7 @@ class User : Parcelable{
     var phone_number:String    =""
     var image:String         =""
     var status:String=""
+    var isAdded=false
 
     constructor()
 

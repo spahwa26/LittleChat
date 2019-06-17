@@ -18,6 +18,7 @@
     <string name="accept_request">Accept Request</string>
     <string name="send_message">Send Message</string>
     <string name="friend_requests">Friend Requests</string>
-    <string name="home">HOme</string>
+    <string name="home">Home</string>
     <string name="signup">SignUp</string>
+    <string name="create_group">Create Group</string>
 </resources>

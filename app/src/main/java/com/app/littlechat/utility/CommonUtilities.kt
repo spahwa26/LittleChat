@@ -17,7 +17,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.net.ConnectivityManagerCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.BuildConfig
@@ -33,13 +32,14 @@ class CommonUtilities {
 
     companion object {
 
-        private var dialog: Dialog? = null
-
 
         fun isNetworkConnected(activity: Activity) : Boolean{
             var cm = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             return cm.activeNetworkInfo != null
         }
+
+        private var dialog: Dialog? = null
+
 
         fun putString(activity: Activity, name: String, value: String?) {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
@@ -51,6 +51,19 @@ class CommonUtilities {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
 
             return preferences.getString(name, "")
+        }
+
+
+        fun putToken(activity: Context, value: String?) {
+            val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID+"+token", Context.MODE_PRIVATE)
+
+            preferences.edit().putString("token", value).apply()
+        }
+
+        fun getToken(activity: Context): String {
+            val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID+"+token", Context.MODE_PRIVATE)
+
+            return preferences.getString("token", "")
         }
 
         fun clearPrefrences(activity: Activity) {

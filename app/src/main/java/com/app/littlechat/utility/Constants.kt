@@ -13,7 +13,7 @@ class Constants {
         val FRIENDS = "friends"
         val CHATS = "chats"
 
-        val ID="id"
+        val ID="sender_id"
         val NAME="name"
         val EMAIL="email"
         val PHONE="phone"

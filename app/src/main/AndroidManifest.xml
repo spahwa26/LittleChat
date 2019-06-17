@@ -12,8 +12,18 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ChatScreen"
-            android:theme="@style/NoActionBar">
+        <activity android:name="com.app.CreateGroup">
+        </activity>
+
+        <service android:name=".firebase.MessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <activity
+                android:name=".ChatScreen"
+                android:theme="@style/NoActionBar">
         </activity>
         <activity
                 android:name=".FriendRequests"

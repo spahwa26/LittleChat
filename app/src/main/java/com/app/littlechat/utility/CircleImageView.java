@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -24,6 +25,8 @@ import androidx.annotation.DrawableRes;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.app.littlechat.R;
+
+import java.util.ArrayList;
 
 public class CircleImageView extends AppCompatImageView {
 

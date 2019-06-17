@@ -80,7 +80,7 @@ class ChatScreen : AppCompatActivity(), AppInterface {
                 if (dataSnapshot.getValue() != null) {
                     try {
                         chatList.add(dataSnapshot.getValue(Chat::class.java)
-                                ?: Chat("", "", 0, ""))
+                                ?: Chat("", "", "", "", "", 0, ""))
 
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -120,7 +120,12 @@ class ChatScreen : AppCompatActivity(), AppInterface {
                 CommonUtilities.showToast(activity, "Please connect to internet first.")
                 return@setOnClickListener
             }
-            val chat = Chat(userID, etMessage.text.toString(), System.currentTimeMillis(), "sent")
+            val chat = Chat(userID,
+                otherUser.id,
+                CommonUtilities.getString(activity, Constants.IMAGE),
+                CommonUtilities.getString(activity, Constants.NAME),
+                etMessage.text.toString(),
+                System.currentTimeMillis(), "sent")
             sendMessage(chat)
             etMessage.setText("")
         }

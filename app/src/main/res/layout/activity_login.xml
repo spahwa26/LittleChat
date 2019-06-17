@@ -166,7 +166,7 @@
     </ScrollView>
 
     <!--<com.facebook.login.widget.LoginButton-->
-            <!--android:id="@+id/login_button"-->
+            <!--android:sender_id="@+sender_id/login_button"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_gravity="center_horizontal"-->

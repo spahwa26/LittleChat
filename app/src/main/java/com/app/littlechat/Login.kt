@@ -126,6 +126,8 @@ class Login : AppCompatActivity() {
                     CommonUtilities.hideProgressWheel()
                     if (dataSnapshot.getValue() != null) {
                         try {
+                            FirebaseDatabase.getInstance().getReference().child("users")
+                                ?.child(userId)?.child("device_token")?.setValue(CommonUtilities.getToken(activity))
                             val pojo = dataSnapshot.getValue<User>(User::class.java)
                             CommonUtilities.putString(activity, "isLoggedIn", "yes")
                             setUserData(pojo)

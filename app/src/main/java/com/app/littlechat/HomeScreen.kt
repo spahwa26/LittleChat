@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.app.CreateGroup
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
@@ -127,6 +128,8 @@ class HomeScreen : AppCompatActivity(), AppInterface {
             R.id.profile -> startActivity(Intent(this, Profile::class.java))
 
             R.id.friend_requests -> startActivity(Intent(this, FriendRequests::class.java))
+
+            R.id.create_group -> startActivity(Intent(this, CreateGroup::class.java))
         }
 
         return super.onOptionsItemSelected(item)

@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
@@ -260,8 +261,11 @@ class Profile : AppCompatActivity() {
 
         mDatabase?.child("users")?.child(userID)?.setValue(user )?.addOnCompleteListener { task ->
             CommonUtilities.hideProgressWheel()
+            task.result
             if (task.isSuccessful) {
                 setUserData(user)
+                mDatabase?.child("users")?.child(userID)?.child("device_token")
+                    ?.setValue(CommonUtilities.getToken(activity))
                 if (intent.hasExtra("name")) {
                     CommonUtilities.putString(activity, "isLoggedIn", "yes")
                     startActivity(

@@ -10,9 +10,13 @@
           android:title="@string/friend_requests"
           android:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/profile"
-        android:title="@string/profile"
+    <item android:id="@+id/create_group"
+        android:title="@string/create_group"
         android:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/profile"
+          android:title="@string/profile"
+          android:showAsAction="ifRoom"/>
 
 
 </menu>
