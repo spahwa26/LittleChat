@@ -168,7 +168,7 @@ class Login : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     CommonUtilities.hideProgressWheel()
                     if (task.isSuccessful) {
-                        //CommonUtilities.showToast(activity,"A verification email has been sent to "+otherUser.getEmail()+", please verify the email then login.");
+                        //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
                         //startActivity(new Intent(activity,Login.class));
                         FirebaseAuth.getInstance().signOut()
                         CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", false)

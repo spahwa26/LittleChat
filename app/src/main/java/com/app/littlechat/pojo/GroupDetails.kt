@@ -6,6 +6,7 @@ import android.util.Log
 
 class GroupDetails : Parcelable {
 
+    var id: String = ""
     var name: String = ""
     var image: String = ""
     var admin: String = ""
@@ -18,15 +19,18 @@ class GroupDetails : Parcelable {
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
+            parcel.readString(),
             parcel.readLong()
     )
 
     constructor(
+            id: String,
             name: String,
             image: String,
             admin: String,
             created_at: Long
     ) {
+        this.id = id
         this.name = name
         this.image = image
         this.admin = admin
@@ -34,6 +38,7 @@ class GroupDetails : Parcelable {
     }
 
     override fun writeToParcel(p0: Parcel, p1: Int) {
+        p0.writeString(id)
         p0.writeString(name)
         p0.writeString(image)
         p0.writeString(admin)

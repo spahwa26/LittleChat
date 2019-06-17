@@ -82,14 +82,14 @@ class Signup : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(etEmail.text.toString(), etPassword.text.toString())
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in otherUser's information
+                            // Sign in success, update UI with the signed-in groupDetails's information
                             Log.d("aaaaaa", "createUserWithEmail:success")
                             val user = auth.currentUser
 
                             sendVerificationEmail(user)
                         } else {
                             CommonUtilities.hideProgressWheel()
-                            // If sign in fails, display a message to the otherUser.
+                            // If sign in fails, display a message to the groupDetails.
                             Log.w("aaaaaa", "createUserWithEmail:failure", task.exception)
                             Toast.makeText(
                                     baseContext, "Authentication failed.",
@@ -110,7 +110,7 @@ class Signup : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 CommonUtilities.hideProgressWheel()
                 if (task.isSuccessful) {
-                    //CommonUtilities.showToast(activity,"A verification email has been sent to "+otherUser.getEmail()+", please verify the email then login.");
+                    //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
                     //startActivity(new Intent(activity,Login.class));
                     FirebaseAuth.getInstance().signOut()
                     CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", true)

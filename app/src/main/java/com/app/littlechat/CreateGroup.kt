@@ -1,4 +1,4 @@
-package com.app
+package com.app.littlechat
 
 import android.app.Activity
 import android.content.Intent
@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.littlechat.R
+import com.app.littlechat.adapter.CreateGroupAdapter
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.GroupDetails
@@ -38,9 +38,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
 
     internal var friendList = ArrayList<User>()
 
-    internal var participantsList = ArrayList<String>()
-
-    lateinit var adapter: UsersAdapter
+    lateinit var adapter: CreateGroupAdapter
 
     private var userID: String = ""
 
@@ -61,43 +59,38 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                     .start(this)
         }
 
-        ivDone.setOnClickListener{
-            if(etGrpName.text.isEmpty())
-            {
+        ivDone.setOnClickListener {
+
+            val participantsList = getParicipents()
+
+            if (etGrpName.text.isEmpty()) {
                 CommonUtilities.showToast(activity, "Please enter group name.")
                 return@setOnClickListener
             }
-            if(participantsList.isEmpty())
-            {
+            if (participantsList.size<=1) {
                 CommonUtilities.showToast(activity, "Please select participants.")
                 return@setOnClickListener
             }
 
             val createdAt = System.currentTimeMillis()
 
-            CommonUtilities.showProgressWheel(activity)
-            FirebaseDatabase.getInstance().reference.child("groups").child(userID+"__"+createdAt)
-                    .child("group_details").setValue(GroupDetails(etGrpName.text.toString(),imagePath, userID, createdAt))
-                    .addOnCompleteListener { task ->
-                        task.result
-                        if (task.isSuccessful) {
-                            FirebaseDatabase.getInstance().reference.child("groups").child(userID+"__"+createdAt)
-                                    .child("participants").setValue(participantsList).addOnCompleteListener{task ->
-                                        CommonUtilities.hideProgressWheel()
-                                        if(task.isSuccessful)
-                                            CommonUtilities.showAlert(activity, "Group created successfully.", true);
-                                        else
-                                            CommonUtilities.showAlert(activity, task.exception!!.message, false)
-                                    }
-                        } else {
-                            CommonUtilities.hideProgressWheel()
-                            CommonUtilities.showAlert(activity, task.exception!!.message, false)
-                        }
-                    }?.addOnFailureListener { e ->
-                        CommonUtilities.hideProgressWheel()
-                        CommonUtilities.showAlert(activity, e.message, false)
-                    }
+           uploadImages(participantsList, createdAt)
         }
+    }
+
+    private fun getParicipents(): ArrayList<String> {
+
+        var list = ArrayList<String>()
+
+        list.add(userID)
+
+        for (user in friendList) {
+            if (user.isAdded)
+                list.add(user.id)
+        }
+
+        return list
+
     }
 
 
@@ -105,9 +98,8 @@ class CreateGroup : AppCompatActivity(), AppInterface {
 
         activity = this
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
-        adapter = UsersAdapter()
+        adapter = CreateGroupAdapter()
         adapter.setData(this@CreateGroup, friendList, this)
-        adapter.setGroupVariable(true)
         rvFriends.adapter = adapter
 
         CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(this))
@@ -133,7 +125,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
     private fun getFriends() {
         CommonUtilities.showProgressWheel(activity)
         val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
-        ref.addValueEventListener(
+        ref.addListenerForSingleValueEvent(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         CommonUtilities.hideProgressWheel()
@@ -141,19 +133,19 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                         if (dataSnapshot.getValue() != null) {
                             try {
                                 for (user in dataSnapshot.children) {
-                                    val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                                    val savedUser = user.getValue(User::class.java)
+                                            ?: User("", "", "", "", "", "")
                                     if (user.key.equals(dataSnapshot.children.last().key))
-                                        getUsersData(user.key ?: "",true, savedUser.status)
+                                        getUsersData(user.key ?: "", true, savedUser.status)
                                     else
-                                        getUsersData(user.key ?: "",false, savedUser.status)
+                                        getUsersData(user.key ?: "", false, savedUser.status)
                                 }
 
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
 
-                        }
-                        else{
+                        } else {
                             adapter.notifyDataSetChanged()
                         }
 
@@ -166,20 +158,21 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                 })
     }
 
-    private fun getUsersData(id: String, notify: Boolean, status : String) {
+    private fun getUsersData(id: String, notify: Boolean, status: String) {
         FirebaseDatabase.getInstance().getReference().child("users/$id")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         if (dataSnapshot.getValue() != null) {
                             try {
-                                val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                                val user = dataSnapshot.getValue(User::class.java)
+                                        ?: User("", "", "", "", "", "")
                                 user.status = status
                                 friendList.add(user)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                         }
-                        if(notify)
+                        if (notify)
                             adapter.notifyDataSetChanged()
                     }
 
@@ -189,74 +182,93 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                 })
     }
 
-//
-//    private fun uploadImages() {
-//        val file = Uri.fromFile(File(imagePath))
-//        val storageRef = FirebaseStorage.getInstance().reference
-//        val riversRef = storageRef.child("images/" + file.lastPathSegment)
-//        val uploadTask = riversRef.putFile(file)
-//        CommonUtilities.showProgressWheel(activity)
-//        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-//            if (!task.isSuccessful) {
-//                task.exception?.let {
-//                    throw it
-//                }
-//            }
-//            return@Continuation riversRef.downloadUrl
-//        }).addOnCompleteListener { task ->
-//            CommonUtilities.hideProgressWheel()
-//            if (task.isSuccessful) {
-//                imagePath = task.result.toString()
-//                submitProfile()
-//            } else {
-//
-//                Log.e("Failiure", "")
-//            }
-//        }
-//    }
+
+    private fun uploadImages(participantsList : ArrayList<String>, createdAt : Long) {
+        val file = Uri.fromFile(File(imagePath))
+        val storageRef = FirebaseStorage.getInstance().reference
+        val riversRef = storageRef.child("images/" + file.lastPathSegment)
+        val uploadTask = riversRef.putFile(file)
+        CommonUtilities.showProgressWheel(activity)
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            return@Continuation riversRef.downloadUrl
+        }).addOnCompleteListener { task ->
+            CommonUtilities.hideProgressWheel()
+            if (task.isSuccessful) {
+                imagePath = task.result.toString()
+                createGroup(participantsList, createdAt)
+            } else {
+
+                Log.e("Failiure", "")
+            }
+        }
+    }
+
+    private fun createGroup(participantsList : ArrayList<String>, createdAt : Long) {
+        CommonUtilities.showProgressWheel(activity)
+        FirebaseDatabase.getInstance().reference.child("groups").child(userID + "__" + createdAt)
+                .child("group_details").setValue(GroupDetails(userID + "__" + createdAt, etGrpName.text.toString(), imagePath, userID, createdAt))
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        FirebaseDatabase.getInstance().reference.child("groups").child(userID + "__" + createdAt)
+                                .child("participants").setValue(participantsList).addOnCompleteListener { task ->
+                                    CommonUtilities.hideProgressWheel()
+                                    if (task.isSuccessful) {
+                                        CommonUtilities.showAlert(activity, "Group created successfully.", true)
+                                        for (id in participantsList)
+                                            FirebaseDatabase.getInstance().reference.child("users").child(id).child("my_groups")
+                                                    .push().setValue(userID + "__" + createdAt)
+                                    } else
+                                        CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                                }
+                    } else {
+                        CommonUtilities.hideProgressWheel()
+                        CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                    }
+                }?.addOnFailureListener { e ->
+                    CommonUtilities.hideProgressWheel()
+                    CommonUtilities.showAlert(activity, e.message, false)
+                }
+    }
 
 
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
 
-        if(act==-1)
+        if (act == -1)
             addRemoveView(pos, true)
-        else if(act==-2)
+        else if (act == -2)
             addRemoveView(pos, false)
 
     }
 
     private fun addRemoveView(pos: Int, isAdd: Boolean) {
 
-        if(isAdd){
+        if (isAdd) {
             val view = layoutInflater.inflate(R.layout.layout_participants, null)
-            if(!friendList.get(pos).image.isEmpty())
+            if (!friendList.get(pos).image.isEmpty())
                 Picasso.get().load(friendList.get(pos).image).placeholder(R.mipmap.ic_launcher).into(view.ivParticipant)
 
             view.tvName.setText(friendList[pos].name)
-
-            participantsList.add(friendList[pos].id)
             view.setTag(friendList[pos].id)
-
             view.btnCross.setOnClickListener {
-                for(i in friendList.indices )
-                {
-                    if(friendList[i].id.equals(view.tag))
-                        friendList[i].isAdded=false
+                for (i in friendList.indices) {
+                    if (friendList[i].id.equals(view.tag))
+                        friendList[i].isAdded = false
                 }
-                //participantsList.remove(view.tag)
                 llParticipants.removeView(view)
                 adapter.notifyDataSetChanged()
             }
 
             llParticipants.addView(view)
-        }
-        else {
+        } else {
 
 
             for (i in 0 until llParticipants.childCount) {
-                if(friendList[pos].id.equals(llParticipants.getChildAt(i).tag))
-                {
-                    //participantsList.remove(llParticipants.getChildAt(i).tag)
+                if (friendList[pos].id.equals(llParticipants.getChildAt(i).tag)) {
                     llParticipants.removeViewAt(i)
                     break
                 }

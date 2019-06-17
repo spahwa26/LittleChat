@@ -21,4 +21,7 @@
     <string name="home">Home</string>
     <string name="signup">SignUp</string>
     <string name="create_group">Create Group</string>
+    <string name="my_groups">My Groups</string>
+    <string name="group_chat">Group Chat</string>
+    <string name="groups">Groups</string>
 </resources>

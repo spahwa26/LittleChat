@@ -41,13 +41,13 @@ class CommonUtilities {
         private var dialog: Dialog? = null
 
 
-        fun putString(activity: Activity, name: String, value: String?) {
+        fun putString(activity: Context, name: String, value: String?) {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
 
             preferences.edit().putString(name, value).apply()
         }
 
-        fun getString(activity: Activity, name: String): String {
+        fun getString(activity: Context, name: String): String {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
 
             return preferences.getString(name, "")
