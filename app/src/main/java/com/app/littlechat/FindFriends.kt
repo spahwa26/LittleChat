@@ -59,6 +59,9 @@ class FindFriends : AppCompatActivity(), AppInterface {
             }
 
         })
+
+
+        ivBack.setOnClickListener { finish() }
     }
 
     private fun init() {

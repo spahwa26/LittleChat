@@ -113,12 +113,12 @@ class Signup : AppCompatActivity() {
                     //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
                     //startActivity(new Intent(activity,Login.class));
                     FirebaseAuth.getInstance().signOut()
-                    CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", true)
+                    CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", true, true)
                 } else {
                     CommonUtilities.showToast(this, task.exception!!.message?:"")
                 }
             }.addOnFailureListener { e ->
-                    CommonUtilities.showAlert(this, e.message?:"", false)
+                    CommonUtilities.showAlert(this, e.message?:"", false, true)
                     CommonUtilities.hideProgressWheel()
                 }
     }

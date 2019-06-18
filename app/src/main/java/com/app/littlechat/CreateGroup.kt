@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.CreateGroupAdapter
-import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.GroupDetails
 import com.app.littlechat.pojo.User
@@ -38,11 +37,19 @@ class CreateGroup : AppCompatActivity(), AppInterface {
 
     internal var friendList = ArrayList<User>()
 
+    internal var participantsListData = ArrayList<User>()
+
     lateinit var adapter: CreateGroupAdapter
 
     private var userID: String = ""
 
     private var imagePath: String = ""
+
+    lateinit var groupDetails: GroupDetails
+
+    val createdAt = System.currentTimeMillis()
+
+    var isEdit = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +66,8 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                     .start(this)
         }
 
+        ivBack.setOnClickListener { finish() }
+
         ivDone.setOnClickListener {
 
             val participantsList = getParicipents()
@@ -67,14 +76,20 @@ class CreateGroup : AppCompatActivity(), AppInterface {
                 CommonUtilities.showToast(activity, "Please enter group name.")
                 return@setOnClickListener
             }
-            if (participantsList.size<=1) {
-                CommonUtilities.showToast(activity, "Please select participants.")
-                return@setOnClickListener
+            if (participantsList.size <= 1) {
+                if (participantsListData.isEmpty()) {
+                    CommonUtilities.showToast(activity, "Please select participants.")
+                    return@setOnClickListener
+                }
             }
 
-            val createdAt = System.currentTimeMillis()
+            if (!imagePath.isEmpty() && imagePath.contains(BuildConfig.APPLICATION_ID))
 
-           uploadImages(participantsList, createdAt)
+                uploadImages(participantsList)
+
+            else
+
+                createGroup(participantsList)
         }
     }
 
@@ -98,13 +113,36 @@ class CreateGroup : AppCompatActivity(), AppInterface {
 
         activity = this
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
+
         adapter = CreateGroupAdapter()
         adapter.setData(this@CreateGroup, friendList, this)
+
+        if (intent.hasExtra("data"))
+            setData()
+
         rvFriends.adapter = adapter
 
         CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(this))
 
         getFriends()
+
+    }
+
+    private fun setData() {
+        isEdit = true
+        tvTitle.text="Edit Group"
+        groupDetails = intent.getParcelableExtra("data")
+
+        etGrpName.setText(groupDetails.name)
+        imagePath = groupDetails.image
+        if (!imagePath.isEmpty())
+            Picasso.get().load(imagePath).placeholder(R.mipmap.ic_launcher).into(ivIcon)
+
+
+        participantsListData = intent.getParcelableArrayListExtra("participant_list")
+
+        adapter.setParticipantList(participantsListData)
+
 
     }
 
@@ -114,13 +152,26 @@ class CreateGroup : AppCompatActivity(), AppInterface {
             val result = CropImage.getActivityResult(data)
             if (resultCode === Activity.RESULT_OK) {
                 imagePath = result.uri.path
-                imagePath = CommonUtilities.getResizedBitmap(imagePath, 800, userID + "__group_icon.jpg", this, false)
+                val name = if(isEdit) groupDetails.id else userID+createdAt
+                imagePath = CommonUtilities.getResizedBitmap(imagePath, 800,  name+ "__group_icon.jpg", this, false)
                 ivIcon.setImageURI(result.uri)
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
             }
         }
     }
+
+
+    override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
+
+        if (act == -1)
+            addRemoveView(pos, true)
+        else if (act == -2)
+            addRemoveView(pos, false)
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////Firebase////////////////////////////////////////////
 
     private fun getFriends() {
         CommonUtilities.showProgressWheel(activity)
@@ -183,7 +234,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
     }
 
 
-    private fun uploadImages(participantsList : ArrayList<String>, createdAt : Long) {
+    private fun uploadImages(participantsList: ArrayList<String>) {
         val file = Uri.fromFile(File(imagePath))
         val storageRef = FirebaseStorage.getInstance().reference
         val riversRef = storageRef.child("images/" + file.lastPathSegment)
@@ -200,7 +251,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
             CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
                 imagePath = task.result.toString()
-                createGroup(participantsList, createdAt)
+                createGroup(participantsList)
             } else {
 
                 Log.e("Failiure", "")
@@ -208,41 +259,70 @@ class CreateGroup : AppCompatActivity(), AppInterface {
         }
     }
 
-    private fun createGroup(participantsList : ArrayList<String>, createdAt : Long) {
+    private fun createGroup(participantsList: ArrayList<String>) {
         CommonUtilities.showProgressWheel(activity)
-        FirebaseDatabase.getInstance().reference.child("groups").child(userID + "__" + createdAt)
-                .child("group_details").setValue(GroupDetails(userID + "__" + createdAt, etGrpName.text.toString(), imagePath, userID, createdAt))
+        var details: GroupDetails
+        var groupID: String
+        if (isEdit) {
+            groupDetails.name = etGrpName.text.toString()
+            groupDetails.image = if (imagePath.isEmpty()) groupDetails.image else imagePath
+            details = groupDetails
+            groupID = groupDetails.id
+        } else {
+            details = GroupDetails(userID + "__" + createdAt, etGrpName.text.toString(), imagePath, userID, System.currentTimeMillis())
+            groupID = userID + "__" + createdAt
+        }
+        FirebaseDatabase.getInstance().reference.child("groups").child(groupID)
+                .child("group_details").setValue(details)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        FirebaseDatabase.getInstance().reference.child("groups").child(userID + "__" + createdAt)
-                                .child("participants").setValue(participantsList).addOnCompleteListener { task ->
-                                    CommonUtilities.hideProgressWheel()
-                                    if (task.isSuccessful) {
-                                        CommonUtilities.showAlert(activity, "Group created successfully.", true)
-                                        for (id in participantsList)
-                                            FirebaseDatabase.getInstance().reference.child("users").child(id).child("my_groups")
-                                                    .push().setValue(userID + "__" + createdAt)
-                                    } else
-                                        CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                        for (part_id in participantsList) {
+                            if (!isAlreadyParticipant(part_id)) {
+                                FirebaseDatabase.getInstance().reference.child("groups").child(groupID)
+                                        .child("participants").push().setValue(part_id).addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                FirebaseDatabase.getInstance().reference.child("users").child(part_id).child("my_groups")
+                                                        .push().setValue(groupID)
+                                                if (part_id.equals(participantsList.last())) {
+                                                    showSucceass()
+                                                }
+                                            }
+
+                                        }
+                            }
+                            else{
+                                if (part_id.equals(participantsList.last())) {
+                                    showSucceass()
                                 }
+                            }
+                        }
                     } else {
                         CommonUtilities.hideProgressWheel()
-                        CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                        CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
                     }
                 }?.addOnFailureListener { e ->
                     CommonUtilities.hideProgressWheel()
-                    CommonUtilities.showAlert(activity, e.message, false)
+                    CommonUtilities.showAlert(activity, e.message, false, true)
                 }
     }
 
+    private fun showSucceass() {
+        val msg = if (isEdit) "Group updated successfully." else "Group created successfully."
+        CommonUtilities.hideProgressWheel()
+        setResult(Activity.RESULT_OK)
+        CommonUtilities.showAlert(activity, msg, true, false)
+    }
 
-    override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
 
-        if (act == -1)
-            addRemoveView(pos, true)
-        else if (act == -2)
-            addRemoveView(pos, false)
-
+    private fun isAlreadyParticipant(id: String): Boolean {
+        var value = false
+        for (user in participantsListData) {
+            if (user.id.equals(id)) {
+                value = true
+                break
+            }
+        }
+        return value
     }
 
     private fun addRemoveView(pos: Int, isAdd: Boolean) {

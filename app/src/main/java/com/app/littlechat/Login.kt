@@ -108,12 +108,12 @@ class Login : AppCompatActivity() {
                     else
                         CommonUtilities.showToast(activity, "Some error occu, Please try again.")
                 } else
-                    CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                    CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
             }
             .addOnFailureListener(object : OnFailureListener {
                 override fun onFailure(e: Exception) {
                     CommonUtilities.hideProgressWheel()
-                    CommonUtilities.showAlert(activity, e.message, false)
+                    CommonUtilities.showAlert(activity, e.message, false, true)
                 }
             })
     }
@@ -171,12 +171,12 @@ class Login : AppCompatActivity() {
                         //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
                         //startActivity(new Intent(activity,Login.class));
                         FirebaseAuth.getInstance().signOut()
-                        CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", false)
+                        CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", false, true)
                     } else {
                         CommonUtilities.showToast(this, task.exception!!.message?:"")
                     }
                 }.addOnFailureListener { e ->
-                    CommonUtilities.showAlert(this, e.message?:"", false)
+                    CommonUtilities.showAlert(this, e.message?:"", false, true)
                     CommonUtilities.hideProgressWheel()
                 }
     }

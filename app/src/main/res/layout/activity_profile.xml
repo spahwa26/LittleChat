@@ -9,19 +9,32 @@
     tools:context=".Profile">
 
 
+
+
     <RelativeLayout
-        android:id="@+id/rl_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        android:layout_height="45dp"
+        android:background="@color/colorPrimary">
 
         <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:id="@+id/ivBack"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:layout_margin="10dp"
-            android:src="@drawable/back" />
+            android:padding="7dp"
+            android:src="@drawable/back_white"/>
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/ivBack"
+            android:layout_centerVertical="true"
+            android:text="@string/profile"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            />
+
 
         <ImageView
             android:id="@+id/btn_logout"
@@ -32,17 +45,11 @@
             android:layout_alignParentRight="true"
             android:src="@drawable/logout" />
 
-        <TextView
-            android:id="@+id/tv_name_top_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/profile"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/textSizeLarge" />
-
-
     </RelativeLayout>
+
+
+
+
 
 
     <LinearLayout
@@ -53,7 +60,7 @@
         android:padding="@dimen/large_margin">
 
 
-        <ImageView
+        <com.app.littlechat.utility.CircleImageView
             android:id="@+id/ivImage"
             android:layout_width="100dp"
             android:layout_height="100dp"

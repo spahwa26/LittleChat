@@ -18,10 +18,16 @@ class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>
     lateinit var context: Context
     lateinit var appInterface: AppInterface
 
+    internal var participantsList = java.util.ArrayList<User>()
+
     fun setData(context: Context, list: ArrayList<User>, appInterface: AppInterface) {
         this.list = list
         this.context = context
         this.appInterface = appInterface
+    }
+
+    fun setParticipantList(participantsList : ArrayList<User>){
+        this.participantsList=participantsList
     }
 
 
@@ -42,22 +48,44 @@ class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>
 
         holder.cvAdd.visibility = VISIBLE
 
-        holder.cvAdd.isChecked = list[position].isAdded
 
-
-        holder.itemView.setOnClickListener {
-            if (list[position].isAdded) {
+        if(!participantsList.isEmpty()  && isAlreadyParticipant(list[position].id))
+        {
+            holder.tvName.isEnabled=false
+            holder.tvEmail.isEnabled=false
+            holder.tvEmail.text = "Already added to group."
+            holder.cvAdd.isChecked=true
+        }
+        else {
+            holder.tvName.isEnabled=true
+            holder.tvEmail.isEnabled=true
+            holder.cvAdd.isChecked = list[position].isAdded
+            holder.itemView.setOnClickListener {
+                if (list[position].isAdded) {
 //                holder.cvAdd.isChecked = false
 //                list[position].isAdded = false
 //                appInterface.handleEvent(position, -2, null)
-            } else {
-                holder.cvAdd.isChecked = true
-                list[position].isAdded = true
-                appInterface.handleEvent(position, -1, null)
+                } else {
+                    holder.cvAdd.isChecked = true
+                    list[position].isAdded = true
+                    appInterface.handleEvent(position, -1, null)
+                }
             }
         }
 
 
+    }
+
+    private fun isAlreadyParticipant(id : String): Boolean {
+        var value = false
+        for(user in participantsList)
+        {
+            if(user.id.equals(id)) {
+                value = true
+                break
+            }
+        }
+        return value
     }
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {

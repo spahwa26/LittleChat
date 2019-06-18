@@ -33,6 +33,9 @@ class FriendRequests : AppCompatActivity(), AppInterface {
         setContentView(R.layout.activity_friend_requests)
 
         init()
+
+
+        ivBack.setOnClickListener { finish() }
     }
 
     private fun init() {
@@ -42,9 +45,7 @@ class FriendRequests : AppCompatActivity(), AppInterface {
         adapter = RequestsAdapter()
         adapter.setData(this@FriendRequests, requestList, this)
         rvRequests.adapter = adapter
-
         CommonUtilities.setLayoutManager(rvRequests, LinearLayoutManager(this))
-
         database = FirebaseDatabase.getInstance().getReference("users")
         getRequests()
 
@@ -127,10 +128,10 @@ class FriendRequests : AppCompatActivity(), AppInterface {
                 CommonUtilities.showToast(activity, "Request Accepted")
                 cancelRequest(pos)
             } else
-                CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
         }?.addOnFailureListener { e ->
             CommonUtilities.hideProgressWheel()
-            CommonUtilities.showAlert(activity, e.message, false)
+            CommonUtilities.showAlert(activity, e.message, false, true)
         }
     }
 
@@ -143,10 +144,10 @@ class FriendRequests : AppCompatActivity(), AppInterface {
             if (task.isSuccessful) {
                 FirebaseDatabase.getInstance().reference.child(Constants.REQUESTS)?.child(id)?.child(userID)?.removeValue()
             } else
-                CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
         }?.addOnFailureListener { e ->
             CommonUtilities.hideProgressWheel()
-            CommonUtilities.showAlert(activity, e.message, false)
+            CommonUtilities.showAlert(activity, e.message, false, true)
         }
     }
 

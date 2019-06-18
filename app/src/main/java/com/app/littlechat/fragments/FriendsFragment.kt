@@ -2,6 +2,7 @@ package com.app.littlechat.fragments
 
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,11 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.littlechat.ChatScreen
-import com.app.littlechat.CreateGroup
-import com.app.littlechat.FindFriends
 
-import com.app.littlechat.R
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
@@ -26,6 +23,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_friends.*
+import com.app.littlechat.*
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,71 +81,107 @@ class FriendsFragment : Fragment(), AppInterface {
 
     }
 
-    private fun getFriends() {
-        CommonUtilities.showProgressWheel(activity)
-        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
-        ref.addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        CommonUtilities.hideProgressWheel()
-                        friendList.clear()
-                        if (dataSnapshot.getValue() != null) {
-                            try {
-                                for (user in dataSnapshot.children) {
-                                    val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
-                                    if (user.key.equals(dataSnapshot.children.last().key))
-                                        getUsersData(user.key ?: "",true, savedUser.status)
-                                    else
-                                        getUsersData(user.key ?: "",false, savedUser.status)
-                                }
-
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-
-                        }
-                        else{
-                            adapter.notifyDataSetChanged()
-                        }
-
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        CommonUtilities.hideProgressWheel()
-                        //handle databaseError
-                    }
-                })
-    }
-
-    private fun getUsersData(id: String, notify: Boolean, status : String) {
-        FirebaseDatabase.getInstance().getReference().child("users/$id")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        if (dataSnapshot.getValue() != null) {
-                            try {
-                                val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
-                                user.status = status
-                                friendList.add(user)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                        if(notify)
-                            adapter.notifyDataSetChanged()
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        Log.d("onCancelled", "onCancelled: ")
-                    }
-                })
-    }
-
 
 
 
 
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
-        startActivity(Intent(activity, ChatScreen::class.java).putExtra("data", friendList.get(pos)))
+
+
+        val builder = AlertDialog.Builder(activity)
+
+        val animals = arrayOf("Chat", "Show profile", "Remove from list")
+
+        builder.setItems(animals) { dialog, which ->
+            when(which){
+                0 -> startActivity(Intent(activity, ChatScreen::class.java).putExtra("data", friendList.get(pos)))
+                1 -> startActivity(Intent(activity, Profile::class.java).putExtra("data", friendList.get(pos)))
+                2 -> removeFriend(pos)
+            }
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////Firebase////////////////////////////////////////////
+
+    private fun getFriends() {
+        CommonUtilities.showProgressWheel(activity)
+        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
+        ref.addValueEventListener(
+            object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    CommonUtilities.hideProgressWheel()
+                    friendList.clear()
+                    if (dataSnapshot.getValue() != null) {
+                        try {
+                            for (user in dataSnapshot.children) {
+                                val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                                if (user.key.equals(dataSnapshot.children.last().key))
+                                    getUsersData(user.key ?: "",true, savedUser.status)
+                                else
+                                    getUsersData(user.key ?: "",false, savedUser.status)
+                            }
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                    }
+                    else{
+                        adapter.notifyDataSetChanged()
+                    }
+
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    CommonUtilities.hideProgressWheel()
+                    //handle databaseError
+                }
+            })
+    }
+
+    private fun getUsersData(id: String, notify: Boolean, status : String) {
+        FirebaseDatabase.getInstance().getReference().child("users/$id")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.getValue() != null) {
+                        try {
+                            val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                            user.status = status
+                            friendList.add(user)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    if(notify)
+                        adapter.notifyDataSetChanged()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.d("onCancelled", "onCancelled: ")
+                }
+            })
+    }
+
+    private fun removeFriend(pos: Int) {
+        CommonUtilities.showProgressWheel(activity)
+        val id = friendList.get(pos).id
+        FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(userID)?.child(id)
+            ?.removeValue()?.addOnCompleteListener { task ->
+                CommonUtilities.hideProgressWheel()
+                if (task.isSuccessful) {
+                    FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(id)?.child(userID)?.removeValue()
+                } else
+                    CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
+            }?.addOnFailureListener { e ->
+                CommonUtilities.hideProgressWheel()
+                CommonUtilities.showAlert(activity, e.message, false, true)
+            }
+    }
+
 
 }

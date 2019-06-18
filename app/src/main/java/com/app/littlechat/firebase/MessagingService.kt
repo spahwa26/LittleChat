@@ -16,6 +16,7 @@ import com.app.littlechat.R
 import com.app.littlechat.utility.CommonUtilities
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import android.media.RingtoneManager
 
 
 class MessagingService : FirebaseMessagingService() {
@@ -36,15 +37,14 @@ class MessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(remoteMessage: RemoteMessage, isMessage: Boolean) {
+        val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         var id = 1001
         var intent: Intent
 
         if (isMessage) {
             intent = Intent(applicationContext, HomeScreen::class.java)
-        }
-        else
-        {
-            id= (0..1000).random()
+        } else {
+            id = (0..1000).random()
             intent = Intent(applicationContext, FriendRequests::class.java)
         }
 
@@ -55,11 +55,12 @@ class MessagingService : FirebaseMessagingService() {
         val bitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round)
 
         mBuilder.setContentIntent(pendingIntent)
-        mBuilder.setSmallIcon(R.mipmap.ic_launcher_round)
-            .setLargeIcon(bitmap)
-            .setContentTitle("Friend Request")
-            .setContentText(remoteMessage.data.get("name") + " has sent you s friend request.")
-            .setAutoCancel(true)
+        mBuilder.setSmallIcon(R.drawable.chat_small)
+                .setLargeIcon(bitmap)
+                .setContentTitle("Friend Request")
+                .setContentText(remoteMessage.data.get("name") + " has sent you s friend request.")
+                .setSound(sound)
+                .setAutoCancel(true)
 
         if (isMessage) {
             mBuilder.setGroup("My Group")
@@ -75,15 +76,15 @@ class MessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= O) {
             val channelId = "notify_001"
             val channel = NotificationChannel(
-                channelId,
-                "Channel human readable title",
-                android.app.NotificationManager.IMPORTANCE_DEFAULT
+                    channelId,
+                    "Channel human readable title",
+                    android.app.NotificationManager.IMPORTANCE_DEFAULT
             )
             mNotificationManager!!.createNotificationChannel(channel)
             mBuilder.setChannelId(channelId)
         }
 
-        mNotificationManager!!.notify("Little Chat",id, mBuilder.build())
+        mNotificationManager!!.notify("Little Chat", id, mBuilder.build())
     }
 
     override fun onNewToken(token: String?) {

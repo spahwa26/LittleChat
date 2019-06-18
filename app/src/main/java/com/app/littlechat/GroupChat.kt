@@ -1,6 +1,7 @@
 package com.app.littlechat
 
 import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -51,14 +52,11 @@ class GroupChat : AppCompatActivity(), AppInterface {
         activity = this
         groupDetails = intent.getParcelableExtra("data")
 
-        tvName.text = groupDetails.name
-
-        if (!groupDetails.image.isEmpty())
-            Picasso.get().load(groupDetails.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+        setUiData()
 
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
         adapter = GroupChatAdapter()
-        adapter.setData(this@GroupChat, chatList, participantsList, userID,this)
+        adapter.setData(this@GroupChat, chatList, participantsList, userID, this)
         rvChat.adapter = adapter
         CommonUtilities.setLayoutManager(rvChat, LinearLayoutManager(this, RecyclerView.VERTICAL, false))
 
@@ -68,20 +66,31 @@ class GroupChat : AppCompatActivity(), AppInterface {
             chatID = userID + "__" + groupDetails.id
 
 
-        getParticipantsData()
+        getParticipantsData(true)
     }
 
-    private fun getParticipantsData() {
+    private fun setUiData() {
+
+
+        tvName.text = groupDetails.name
+
+        if (!groupDetails.image.isEmpty())
+            Picasso.get().load(groupDetails.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+    }
+
+    private fun getParticipantsData(getChats: Boolean) {
+
 
         val ref = FirebaseDatabase.getInstance().reference.child("groups").child(groupDetails.id).child("participants")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener{
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-
+                CommonUtilities.hideProgressWheel()
             }
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
                     try {
+                        participantsList.clear()
                         for (ids in dataSnapshot.children) {
                             val id = ids.getValue(String::class.java) ?: ""
                             FirebaseDatabase.getInstance().reference.child("users").child(id)
@@ -94,14 +103,17 @@ class GroupChat : AppCompatActivity(), AppInterface {
 
                                             if (ids.key.equals(dataSnapshot.children.last().key)) {
                                                 adapter.updateParticipantList(participantsList)
-                                                getChats()
+                                                if (getChats)
+                                                    getChats()
+                                                else
+                                                    CommonUtilities.hideProgressWheel()
                                             }
 
 
                                         }
 
                                         override fun onCancelled(p0: DatabaseError) {
-
+                                            CommonUtilities.hideProgressWheel()
                                         }
                                     })
                         }
@@ -115,6 +127,39 @@ class GroupChat : AppCompatActivity(), AppInterface {
             }
         })
 
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 101 && resultCode == Activity.RESULT_OK) {
+            updateGroupDetails()
+        }
+    }
+
+    private fun updateGroupDetails() {
+        CommonUtilities.showProgressWheel(activity)
+        FirebaseDatabase.getInstance().getReference().child("groups").child(groupDetails.id).child("group_details")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if (dataSnapshot.getValue() != null) {
+                            try {
+                                groupDetails = dataSnapshot.getValue(GroupDetails::class.java)
+                                        ?: GroupDetails("", "", "", "", 0)
+                                setUiData()
+                                getParticipantsData(false)
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.d("onCancelled", "onCancelled: ")
+                        CommonUtilities.hideProgressWheel()
+                    }
+                })
     }
 
     private fun getChats() {
@@ -180,6 +225,11 @@ class GroupChat : AppCompatActivity(), AppInterface {
             sendMessage(chat)
             etMessage.setText("")
         }
+
+        tvEdit.setOnClickListener {
+            startActivityForResult(Intent(activity, CreateGroup::class.java).putExtra("data", groupDetails).putExtra("participant_list", participantsList), 101)
+        }
+
 
         ivBack.setOnClickListener { finish() }
     }

@@ -100,7 +100,7 @@ class Profile : AppCompatActivity() {
     }
 
     private fun listeners() {
-        iv_back.setOnClickListener { finish() }
+        ivBack.setOnClickListener { finish() }
         btn_submit.setOnClickListener {
 
             if (isInformationFilled()) {
@@ -179,10 +179,10 @@ class Profile : AppCompatActivity() {
                 btn_send.visibility = GONE
                 btn_cancel.visibility = VISIBLE
             } else
-                CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
         }?.addOnFailureListener { e ->
             CommonUtilities.hideProgressWheel()
-            CommonUtilities.showAlert(activity, e.message, false)
+            CommonUtilities.showAlert(activity, e.message, false, true)
         }
     }
 
@@ -196,10 +196,10 @@ class Profile : AppCompatActivity() {
                 btn_send.visibility = VISIBLE
                 btn_cancel.visibility = GONE
             } else
-                CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
         }?.addOnFailureListener { e ->
             CommonUtilities.hideProgressWheel()
-            CommonUtilities.showAlert(activity, e.message, false)
+            CommonUtilities.showAlert(activity, e.message, false, true)
         }
     }
 
@@ -277,10 +277,10 @@ class Profile : AppCompatActivity() {
                 } else
                     CommonUtilities.showToast(activity, "Profile Updated Successfully")
             } else
-                CommonUtilities.showAlert(activity, task.exception!!.message, false)
+                CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
         }?.addOnFailureListener { e ->
             CommonUtilities.hideProgressWheel()
-            CommonUtilities.showAlert(activity, e.message, false)
+            CommonUtilities.showAlert(activity, e.message, false, true)
         }
     }
 

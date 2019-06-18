@@ -114,10 +114,10 @@ class CommonUtilities {
         }
 
 
-        fun showAlert(activity: Activity, msg: String?, isFinish: Boolean) {
+        fun showAlert(activity: Activity, msg: String?, isFinish: Boolean, isCancelable : Boolean) {
             val alert = AlertDialog.Builder(activity)
 
-            alert.setCancelable(true)
+            alert.setCancelable(isCancelable)
 
             alert.setMessage(msg)
 

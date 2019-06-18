@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             CommonUtilities.showAlert(
                 activity,
                 "Please indicate that you have read and agree to the Terms & Conditions",
-                false
+                false, true
             )
         } else
             startActivity(Intent(activity, Login::class.java)) }
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             CommonUtilities.showAlert(
                 activity,
                 "Please indicate that you have read and agree to the Terms & Conditions",
-                false
+                false, true
             )
         } else
             startActivity(Intent(activity, Signup::class.java)) }

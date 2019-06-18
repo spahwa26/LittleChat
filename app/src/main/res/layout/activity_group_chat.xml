@@ -42,6 +42,17 @@
                 android:textColor="@color/white"
         />
 
+        <TextView
+            android:id="@+id/tvEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Edit"
+            android:gravity="center"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/white"
+            android:layout_alignParentRight="true"
+            />
+
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

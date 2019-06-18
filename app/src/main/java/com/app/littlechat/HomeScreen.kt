@@ -39,11 +39,11 @@ class HomeScreen : AppCompatActivity(), AppInterface {
 
         val adapter = PageAdapter(supportFragmentManager)
 
-        adapter.addFragment(ChatFragment(), "Chats")
-
-        adapter.addFragment(GroupsFragment(), "Groups")
+        //adapter.addFragment(ChatFragment(), "Chats")
 
         adapter.addFragment(FriendsFragment(), "Friends")
+
+        adapter.addFragment(GroupsFragment(), "Groups")
 
         chatPager.adapter=adapter
 
@@ -62,7 +62,7 @@ class HomeScreen : AppCompatActivity(), AppInterface {
             }
         })
 
-        chatPager.offscreenPageLimit=4
+        chatPager.offscreenPageLimit=2
 
     }
 
