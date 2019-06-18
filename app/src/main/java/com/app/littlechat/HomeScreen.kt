@@ -3,21 +3,17 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.littlechat.adapter.UsersAdapter
+import androidx.viewpager.widget.PagerAdapter
+import com.app.littlechat.adapter.PageAdapter
+import com.app.littlechat.fragments.ChatFragment
+import com.app.littlechat.fragments.FriendsFragment
+import com.app.littlechat.fragments.GroupsFragment
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
-import com.app.littlechat.utility.CommonUtilities
-import com.app.littlechat.utility.Constants
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import java.util.*
 
@@ -26,8 +22,6 @@ class HomeScreen : AppCompatActivity(), AppInterface {
     lateinit var activity: Activity
 
     internal var friendList = ArrayList<User>()
-
-    lateinit var adapter: UsersAdapter
 
     private var userID: String = ""
 
@@ -42,75 +36,34 @@ class HomeScreen : AppCompatActivity(), AppInterface {
 
     private fun init() {
 
-        activity = this
-        userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
-        adapter = UsersAdapter()
-        adapter.setData(this@HomeScreen, friendList, this)
-        rvFriends.adapter = adapter
 
-        CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(this))
+        val adapter = PageAdapter(supportFragmentManager)
 
-        getFriends()
+        adapter.addFragment(ChatFragment(), "Chats")
 
-    }
+        adapter.addFragment(GroupsFragment(), "Groups")
 
-    private fun getFriends() {
-        CommonUtilities.showProgressWheel(activity)
-        val ref = FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS).child(userID)
-        ref.addValueEventListener(
-            object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    CommonUtilities.hideProgressWheel()
-                    friendList.clear()
-                    if (dataSnapshot.getValue() != null) {
-                        try {
-                            for (user in dataSnapshot.children) {
-                                val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
-                                if (user.key.equals(dataSnapshot.children.last().key))
-                                    getUsersData(user.key ?: "",true, savedUser.status)
-                                else
-                                    getUsersData(user.key ?: "",false, savedUser.status)
-                            }
+        adapter.addFragment(FriendsFragment(), "Friends")
 
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+        chatPager.adapter=adapter
 
-                    }
-                    else{
-                        adapter.notifyDataSetChanged()
-                    }
+        chatTabs.setupWithViewPager(chatPager)
 
-                }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    CommonUtilities.hideProgressWheel()
-                    //handle databaseError
-                }
-            })
-    }
+        chatTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(p0: TabLayout.Tab?) {
+            }
 
-    private fun getUsersData(id: String, notify: Boolean, status : String) {
-        FirebaseDatabase.getInstance().getReference().child("users/$id")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.getValue() != null) {
-                        try {
-                            val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
-                            user.status = status
-                            friendList.add(user)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                    if(notify)
-                        adapter.notifyDataSetChanged()
-                }
+            override fun onTabUnselected(p0: TabLayout.Tab?) {
+            }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.d("onCancelled", "onCancelled: ")
-                }
-            })
+            override fun onTabSelected(p0: TabLayout.Tab?) {
+
+            }
+        })
+
+        chatPager.offscreenPageLimit=4
+
     }
 
 
@@ -122,15 +75,11 @@ class HomeScreen : AppCompatActivity(), AppInterface {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
         when (item?.itemId) {
-            R.id.find_friends -> startActivity(Intent(this, FindFriends::class.java))
 
             R.id.profile -> startActivity(Intent(this, Profile::class.java))
 
             R.id.friend_requests -> startActivity(Intent(this, FriendRequests::class.java))
 
-            R.id.create_group -> startActivity(Intent(this, CreateGroup::class.java))
-
-            R.id.my_groups -> startActivity(Intent(this, Groups::class.java))
         }
 
         return super.onOptionsItemSelected(item)
