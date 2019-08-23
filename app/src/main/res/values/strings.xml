@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Little Chat</string>
+    <string name="welcome_to">Welcome to LittleChat</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="login">Login</string>
+    <string name="or">OR</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="profile">Profile</string>
+    <string name="submit">Submit</string>
+    <string name="logout">Logout</string>
+    <string name="name">Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="find_friends">Find Friends</string>
+    <string name="send_request">Send Request</string>
+    <string name="cancel_request">Cencel Request</string>
+    <string name="accept_request">Accept Request</string>
+    <string name="send_message">Send Message</string>
+    <string name="friend_requests">Friend Requests</string>
+    <string name="home">Home</string>
+    <string name="signup">SignUp</string>
+    <string name="create_group">Create Group</string>
+    <string name="my_groups">My Groups</string>
+    <string name="group_chat">Group Chat</string>
+    <string name="groups">Groups</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
