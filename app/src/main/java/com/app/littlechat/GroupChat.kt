@@ -50,7 +50,7 @@ class GroupChat : AppCompatActivity(), AppInterface {
 
     private fun init() {
         activity = this
-        groupDetails = intent.getParcelableExtra("data")
+        groupDetails = intent.getParcelableExtra("data")!!
 
         setUiData()
 

@@ -87,7 +87,7 @@ class MessagingService : FirebaseMessagingService() {
         mNotificationManager!!.notify("Little Chat", id, mBuilder.build())
     }
 
-    override fun onNewToken(token: String?) {
+    override fun onNewToken(token: String) {
         super.onNewToken(token)
         CommonUtilities.putToken(applicationContext, token)
         Log.e("token", token)

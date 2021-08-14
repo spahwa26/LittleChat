@@ -131,7 +131,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
     private fun setData() {
         isEdit = true
         tvTitle.text="Edit Group"
-        groupDetails = intent.getParcelableExtra("data")
+        groupDetails = intent.getParcelableExtra("data")!!
 
         etGrpName.setText(groupDetails.name)
         imagePath = groupDetails.image
@@ -139,7 +139,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
             Picasso.get().load(imagePath).placeholder(R.mipmap.ic_launcher).into(ivIcon)
 
 
-        participantsListData = intent.getParcelableArrayListExtra("participant_list")
+        participantsListData = intent.getParcelableArrayListExtra("participant_list")!!
 
         adapter.setParticipantList(participantsListData)
 
@@ -151,7 +151,7 @@ class CreateGroup : AppCompatActivity(), AppInterface {
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === Activity.RESULT_OK) {
-                imagePath = result.uri.path
+                imagePath = result.uri.path?:""
                 val name = if(isEdit) groupDetails.id else userID+createdAt
                 imagePath = CommonUtilities.getResizedBitmap(imagePath, 800,  name+ "__group_icon.jpg", this, false)
                 ivIcon.setImageURI(result.uri)

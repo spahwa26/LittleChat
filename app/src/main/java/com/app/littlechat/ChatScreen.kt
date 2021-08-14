@@ -45,7 +45,7 @@ class ChatScreen : AppCompatActivity(), AppInterface {
 
     private fun init() {
         activity = this
-        otherUser = intent.getParcelableExtra("data")
+        otherUser = intent.getParcelableExtra("data")!!
 
         tvName.text = otherUser.name
 

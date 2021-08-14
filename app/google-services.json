@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "402324866191-arijlit133dg2g1fou603nbhqbo2on1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.littlechat",
+            "certificate_hash": "51dae577e07cc1e1572833bb5b3e02e6e708bd6a"
+          }
+        },
+        {
+          "client_id": "402324866191-l5dsi7316fge1lupfv4khmn0l6q1ppen.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.littlechat",
+            "certificate_hash": "6360c004531024669d184071dcd82782eecddb07"
+          }
+        },
+        {
           "client_id": "402324866191-nqqo7bbeo5j9b4v9j8flojcd3ffsk8kg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -23,11 +39,11 @@
           }
         },
         {
-          "client_id": "402324866191-arijlit133dg2g1fou603nbhqbo2on1h.apps.googleusercontent.com",
+          "client_id": "402324866191-p2mide7rne1e4i1419iqqpb574ok2q0l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.app.littlechat",
-            "certificate_hash": "51dae577e07cc1e1572833bb5b3e02e6e708bd6a"
+            "certificate_hash": "efa665d42022a04cd5943f0bf600fb2386a19bbf"
           }
         },
         {

@@ -65,7 +65,7 @@ class Profile : AppCompatActivity() {
         if (intent.hasExtra("data")) {
             userID = mAuth?.getCurrentUser()!!.uid
             getUserDetail(false)
-            otherUser = intent.getParcelableExtra("data")
+            otherUser = intent.getParcelableExtra("data")!!
             et_name.setText(otherUser.name)
             et_email.setText(otherUser.email)
             et_phone.setText(otherUser.phone_number)
@@ -77,10 +77,10 @@ class Profile : AppCompatActivity() {
             ivImage.isEnabled = false
             findUserInRequestList()
         } else if (intent.hasExtra("name")) {
-            btn_logout.setVisibility(View.GONE)
-            name = intent.getStringExtra("name")
-            email = intent.getStringExtra("email")
-            userID = intent.getStringExtra("uid")
+            btn_logout.visibility = View.GONE
+            name = intent.getStringExtra("name")?:""
+            email = intent.getStringExtra("email")?:""
+            userID = intent.getStringExtra("uid")?:""
 
             if (!name.isEmpty()) {
                 et_name.setText(name)
@@ -144,7 +144,7 @@ class Profile : AppCompatActivity() {
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === Activity.RESULT_OK) {
-                imagePath = result.uri.path
+                imagePath = result.uri.path?:""
                 imagePath = CommonUtilities.getResizedBitmap(imagePath, 800, mAuth?.uid + "__ProfilePic.jpg", this, false)
                 ivImage.setImageURI(result.uri)
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

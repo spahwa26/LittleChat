@@ -18,13 +18,13 @@ class Chat : Parcelable {
 
 
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readLong(),
-        parcel.readString()
+        parcel.readString()!!
     )
 
     constructor(

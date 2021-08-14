@@ -50,7 +50,7 @@ class CommonUtilities {
         fun getString(activity: Context, name: String): String {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
 
-            return preferences.getString(name, "")
+            return preferences.getString(name, "")?:""
         }
 
 
@@ -63,7 +63,7 @@ class CommonUtilities {
         fun getToken(activity: Context): String {
             val preferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID+"+token", Context.MODE_PRIVATE)
 
-            return preferences.getString("token", "")
+            return preferences.getString("token", "")?:""
         }
 
         fun clearPrefrences(activity: Activity) {
@@ -234,7 +234,7 @@ class CommonUtilities {
             try {
                 val exif = ExifInterface(imagePath)
 
-                Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION))
+                Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION)?:"")
                 if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equals("6", ignoreCase = true)) {
 
                     realImage = rotate(realImage, 90)
