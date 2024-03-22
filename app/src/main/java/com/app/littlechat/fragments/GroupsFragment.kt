@@ -10,10 +10,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.CreateGroup
-import com.app.littlechat.FindFriends
 import com.app.littlechat.GroupChat
-import com.app.littlechat.R
 import com.app.littlechat.adapter.GroupsAdapter
+import com.app.littlechat.databinding.FragmentGroups2Binding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.GroupDetails
 import com.app.littlechat.utility.CommonUtilities
@@ -22,20 +21,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.android.synthetic.main.fragment_groups2.*
-import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class GroupsFragment : Fragment(), AppInterface {
 
+    private lateinit var binding: FragmentGroups2Binding
 
     lateinit var activity: Activity
 
@@ -46,11 +36,11 @@ class GroupsFragment : Fragment(), AppInterface {
     private var userID: String = ""
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_groups2, container, false)
+        binding = FragmentGroups2Binding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,7 +52,14 @@ class GroupsFragment : Fragment(), AppInterface {
     }
 
     private fun listeners() {
-        fabCreateGroup.setOnClickListener { startActivity(Intent(activity, CreateGroup::class.java)) }
+        binding.fabCreateGroup.setOnClickListener {
+            startActivity(
+                Intent(
+                    activity,
+                    CreateGroup::class.java
+                )
+            )
+        }
 
     }
 
@@ -72,9 +69,11 @@ class GroupsFragment : Fragment(), AppInterface {
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
         adapter = GroupsAdapter()
         adapter.setData(activity, groupList, this)
-        rvGroups.adapter = adapter
+        binding.run {
+            rvGroups.adapter = adapter
 
-        CommonUtilities.setLayoutManager(rvGroups, LinearLayoutManager(activity))
+            CommonUtilities.setLayoutManager(rvGroups, LinearLayoutManager(activity))
+        }
 
         getGroups()
 
@@ -82,44 +81,47 @@ class GroupsFragment : Fragment(), AppInterface {
 
     private fun getGroups() {
         CommonUtilities.showProgressWheel(activity)
-        val ref = FirebaseDatabase.getInstance().reference.child("users").child(userID).child("my_groups")
+        val ref =
+            FirebaseDatabase.getInstance().reference.child("users").child(userID).child("my_groups")
         ref.addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        CommonUtilities.hideProgressWheel()
-                        groupList.clear()
-                        for (ids in dataSnapshot.children) {
-                            val id = ids.getValue(String::class.java) ?: ""
-                            FirebaseDatabase.getInstance().reference.child("groups").child(id).child("group_details")
-                                    .addListenerForSingleValueEvent(object : ValueEventListener {
+            object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    CommonUtilities.hideProgressWheel()
+                    groupList.clear()
+                    for (ids in dataSnapshot.children) {
+                        val id = ids.getValue(String::class.java) ?: ""
+                        FirebaseDatabase.getInstance().reference.child("groups").child(id)
+                            .child("group_details")
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
 
-                                        override fun onDataChange(dataSnapshotIn: DataSnapshot) {
-                                            if (dataSnapshotIn.getValue() != null) {
-                                                val group = dataSnapshotIn.getValue(GroupDetails::class.java)
-                                                        ?: GroupDetails("", "", "", "", 0)
+                                override fun onDataChange(dataSnapshotIn: DataSnapshot) {
+                                    if (dataSnapshotIn.getValue() != null) {
+                                        val group =
+                                            dataSnapshotIn.getValue(GroupDetails::class.java)
+                                                ?: GroupDetails("", "", "", "", 0)
 
-                                                groupList.add(group)
+                                        groupList.add(group)
 
 
-                                                if (ids.key.equals(dataSnapshot.children.last().key))
-                                                    adapter.notifyDataSetChanged()
+                                        if (ids.key.equals(dataSnapshot.children.last().key))
+                                            adapter.notifyDataSetChanged()
 
-                                            }
-                                        }
+                                    }
+                                }
 
-                                        override fun onCancelled(p0: DatabaseError) {
+                                override fun onCancelled(p0: DatabaseError) {
 
-                                        }
-                                    })
-                        }
-
+                                }
+                            })
                     }
 
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        CommonUtilities.hideProgressWheel()
-                        //handle databaseError
-                    }
-                })
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    CommonUtilities.hideProgressWheel()
+                    //handle databaseError
+                }
+            })
     }
 
 

@@ -3,19 +3,24 @@ package com.app.littlechat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.app.littlechat.databinding.ActivityLoginBinding
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
-import kotlinx.android.synthetic.main.activity_login.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class Login : AppCompatActivity() {
 
+    private lateinit var binding: ActivityLoginBinding
 
     private var mAuth: FirebaseAuth? = null
 
@@ -30,13 +35,13 @@ class Login : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
 
         init()
 
         listeners()
+        setContentView(binding.root)
     }
-
 
 
     fun init() {
@@ -49,61 +54,73 @@ class Login : AppCompatActivity() {
     }
 
     private fun listeners() {
-        iv_back.setOnClickListener {
-            finish()
-        }
+        binding.run {
 
-        btn_login.setOnClickListener {
+            ivBack.setOnClickListener {
+                finish()
+            }
 
-            launchHomeScreen()
-        }
+            btnLogin.setOnClickListener {
 
-        iv_google.setOnClickListener {
-            //            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient)
+                launchHomeScreen()
+            }
+
+            ivGoogle.setOnClickListener {
+                //            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient)
 //            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
 //            startActivityForResult(signInIntent, 101)
 
-        }
+            }
 
-        iv_fb.setOnClickListener {
-            //login_button.performClick()
+            ivFb.setOnClickListener {
+                //login_button.performClick()
+            }
         }
     }
 
     private fun launchHomeScreen() {
+        binding.run {
 
-        if (et_email.text.toString().isEmpty()) {
-            et_email.error = "Enter Your Email"
-            et_email.requestFocus()
-            return
-        }
-        if (et_password.text.toString().isEmpty()) {
-            et_password.error = "Enter Your Password"
-            et_password.requestFocus()
-            return
-        }
+            if (etEmail.text.toString().isEmpty()) {
+                etEmail.error = "Enter Your Email"
+                etEmail.requestFocus()
+                return
+            }
+            if (etPassword.text.toString().isEmpty()) {
+                etPassword.error = "Enter Your Password"
+                etPassword.requestFocus()
+                return
+            }
 
-        if (!CommonUtilities.isValidEmail(et_email.text.toString())) {
-            et_email.error = "Enter Valid Email"
-            et_email.requestFocus()
-            return
+            if (!CommonUtilities.isValidEmail(etEmail.text.toString())) {
+                etEmail.error = "Enter Valid Email"
+                etEmail.requestFocus()
+                return
+            }
+            firebaseSignInwithEmailPassword()
         }
-        firebaseSignInwithEmailPassword()
     }
 
     private fun firebaseSignInwithEmailPassword() {
 
         CommonUtilities.showProgressWheel(this)
 
-        mAuth!!.signInWithEmailAndPassword(et_email.text.toString(), et_password.text.toString())
+        mAuth!!.signInWithEmailAndPassword(
+            binding.etEmail.text.toString(),
+            binding.etPassword.text.toString()
+        )
             .addOnCompleteListener(
                 activity
             ) { task ->
                 CommonUtilities.hideProgressWheel()
                 if (task.isSuccessful) {
                     if (mAuth!!.getCurrentUser()!!.isEmailVerified)
-                        checkNameNumber(mAuth!!.getCurrentUser()!!.uid, mAuth!!.getCurrentUser()!!.email, "")
-                    else if(mAuth?.currentUser?.isEmailVerified ==false)
+                        checkNameNumber(
+                            mAuth!!.getCurrentUser()!!.uid,
+                            mAuth!!.getCurrentUser()!!.email,
+                            ""
+                        )
+                    else if (mAuth?.currentUser?.isEmailVerified == false)
                         sendVerificationEmail(mAuth!!.getCurrentUser())
                     else
                         CommonUtilities.showToast(activity, "Some error occu, Please try again.")
@@ -127,11 +144,17 @@ class Login : AppCompatActivity() {
                     if (dataSnapshot.getValue() != null) {
                         try {
                             FirebaseDatabase.getInstance().getReference().child("users")
-                                ?.child(userId)?.child("device_token")?.setValue(CommonUtilities.getToken(activity))
+                                ?.child(userId)?.child("device_token")
+                                ?.setValue(CommonUtilities.getToken(activity))
                             val pojo = dataSnapshot.getValue<User>(User::class.java)
                             CommonUtilities.putString(activity, "isLoggedIn", "yes")
                             setUserData(pojo)
-                            startActivity(Intent(activity, HomeScreen::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK))
+                            startActivity(
+                                Intent(
+                                    activity,
+                                    HomeScreen::class.java
+                                ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -161,24 +184,29 @@ class Login : AppCompatActivity() {
     }
 
 
-    private fun sendVerificationEmail(user : FirebaseUser?) {
+    private fun sendVerificationEmail(user: FirebaseUser?) {
 
 
         user!!.sendEmailVerification()
-                .addOnCompleteListener { task ->
-                    CommonUtilities.hideProgressWheel()
-                    if (task.isSuccessful) {
-                        //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
-                        //startActivity(new Intent(activity,Login.class));
-                        FirebaseAuth.getInstance().signOut()
-                        CommonUtilities.showAlert(this, "A verification email has been sent to " + user.email + ", please verify the email then login.", false, true)
-                    } else {
-                        CommonUtilities.showToast(this, task.exception!!.message?:"")
-                    }
-                }.addOnFailureListener { e ->
-                    CommonUtilities.showAlert(this, e.message?:"", false, true)
-                    CommonUtilities.hideProgressWheel()
+            .addOnCompleteListener { task ->
+                CommonUtilities.hideProgressWheel()
+                if (task.isSuccessful) {
+                    //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
+                    //startActivity(new Intent(activity,Login.class));
+                    FirebaseAuth.getInstance().signOut()
+                    CommonUtilities.showAlert(
+                        this,
+                        "A verification email has been sent to " + user.email + ", please verify the email then login.",
+                        false,
+                        true
+                    )
+                } else {
+                    CommonUtilities.showToast(this, task.exception!!.message ?: "")
                 }
+            }.addOnFailureListener { e ->
+                CommonUtilities.showAlert(this, e.message ?: "", false, true)
+                CommonUtilities.hideProgressWheel()
+            }
     }
 
 

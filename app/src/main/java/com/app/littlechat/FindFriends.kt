@@ -8,15 +8,18 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.UsersAdapter
+import com.app.littlechat.databinding.ActivityFindFriendsBinding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.CommonUtilities
+import com.app.littlechat.utility.getActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import kotlinx.android.synthetic.main.activity_find_friends.*
 import java.util.*
 
 class FindFriends : AppCompatActivity(), AppInterface {
+
+    private var binding: ActivityFindFriendsBinding? = null
 
     private lateinit var database: DatabaseReference
 
@@ -29,15 +32,16 @@ class FindFriends : AppCompatActivity(), AppInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_find_friends)
+        binding = ActivityFindFriendsBinding.inflate(layoutInflater)
 
         init()
 
         listeners()
+        setContentView(binding?.root)
     }
 
     private fun listeners() {
-        etSearch.addTextChangedListener(object : TextWatcher {
+        binding?.etSearch?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 Log.e("afterTextChanged", "")
             }
@@ -61,19 +65,20 @@ class FindFriends : AppCompatActivity(), AppInterface {
         })
 
 
-        ivBack.setOnClickListener { finish() }
+        binding?.ivBack?.setOnClickListener { finish() }
     }
 
     private fun init() {
+        binding?.run {
 
+            adapter = UsersAdapter()
+            adapter.setData(this@FindFriends, usersList, this@FindFriends)
+            rvUsers.adapter = adapter
 
-        adapter = UsersAdapter()
-        adapter.setData(this@FindFriends, usersList, this)
-        rvUsers.adapter = adapter
+            CommonUtilities.setLayoutManager(rvUsers, LinearLayoutManager(getActivity()))
 
-        CommonUtilities.setLayoutManager(rvUsers, LinearLayoutManager(this))
-
-        database = FirebaseDatabase.getInstance().getReference("users")
+            database = FirebaseDatabase.getInstance().getReference("users")
+        }
 
 
     }
@@ -95,8 +100,10 @@ class FindFriends : AppCompatActivity(), AppInterface {
                     try {
                         for (user in dataSnapshot.children) {
                             if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid))
-                                usersList.add(user.getValue(User::class.java)
-                                        ?: User("", "", "", "", "",""))
+                                usersList.add(
+                                    user.getValue(User::class.java)
+                                        ?: User("", "", "", "", "", "")
+                                )
                         }
 
                     } catch (e: Exception) {
@@ -121,6 +128,11 @@ class FindFriends : AppCompatActivity(), AppInterface {
 
 
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
-        startActivity(Intent(this@FindFriends, Profile::class.java).putExtra("data", usersList.get(pos)))
+        startActivity(
+            Intent(this@FindFriends, Profile::class.java).putExtra(
+                "data",
+                usersList.get(pos)
+            )
+        )
     }
 }

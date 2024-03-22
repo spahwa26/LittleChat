@@ -7,10 +7,10 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.R
+import com.app.littlechat.databinding.LayoutCreateGroupUsersBinding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.layout_create_group_users.view.*
 
 
 class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>() {
@@ -26,14 +26,17 @@ class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>
         this.appInterface = appInterface
     }
 
-    fun setParticipantList(participantsList : ArrayList<User>){
-        this.participantsList=participantsList
+    fun setParticipantList(participantsList: ArrayList<User>) {
+        this.participantsList = participantsList
     }
 
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): MyViewHolder {
-        val v = LayoutInflater.from(p0.context).inflate(R.layout.layout_create_group_users, p0, false)
-        return MyViewHolder(v)
+        val binding =
+            LayoutCreateGroupUsersBinding.inflate(LayoutInflater.from(p0.context), p0, false)
+        val holder = MyViewHolder(binding.root)
+        holder.setBinding(binding)
+        return holder
     }
 
     override fun getItemCount(): Int {
@@ -41,46 +44,13 @@ class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.tvName.text = list.get(position).name
-        holder.tvEmail.text = list.get(position).email
-        if (!list.get(position).image.isEmpty())
-            Picasso.get().load(list.get(position).image).placeholder(R.mipmap.ic_launcher).into(holder.ivImage)
-
-        holder.cvAdd.visibility = VISIBLE
-
-
-        if(!participantsList.isEmpty()  && isAlreadyParticipant(list[position].id))
-        {
-            holder.tvName.isEnabled=false
-            holder.tvEmail.isEnabled=false
-            holder.tvEmail.text = "Already added to group."
-            holder.cvAdd.isChecked=true
-        }
-        else {
-            holder.tvName.isEnabled=true
-            holder.tvEmail.isEnabled=true
-            holder.cvAdd.isChecked = list[position].isAdded
-            holder.itemView.setOnClickListener {
-                if (list[position].isAdded) {
-//                holder.cvAdd.isChecked = false
-//                list[position].isAdded = false
-//                appInterface.handleEvent(position, -2, null)
-                } else {
-                    holder.cvAdd.isChecked = true
-                    list[position].isAdded = true
-                    appInterface.handleEvent(position, -1, null)
-                }
-            }
-        }
-
-
+        holder.onBind(position)
     }
 
-    private fun isAlreadyParticipant(id : String): Boolean {
+    private fun isAlreadyParticipant(id: String): Boolean {
         var value = false
-        for(user in participantsList)
-        {
-            if(user.id.equals(id)) {
+        for (user in participantsList) {
+            if (user.id.equals(id)) {
                 value = true
                 break
             }
@@ -89,10 +59,48 @@ class CreateGroupAdapter : RecyclerView.Adapter<CreateGroupAdapter.MyViewHolder>
     }
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName = view.tvName
-        val tvEmail = view.tvEmail
-        val ivImage = view.ivImage
-        val cvAdd = view.cvAdd
+
+
+        private var binding: LayoutCreateGroupUsersBinding? = null
+
+        fun setBinding(_binding: LayoutCreateGroupUsersBinding) {
+            binding = _binding
+        }
+
+        fun onBind(position: Int) {
+            binding?.apply {
+                tvName.text = list.get(position).name
+                tvEmail.text = list.get(position).email
+                if (!list.get(position).image.isEmpty())
+                    Picasso.get().load(list.get(position).image).placeholder(R.mipmap.ic_launcher)
+                        .into(ivImage)
+
+                cvAdd.visibility = VISIBLE
+
+
+                if (!participantsList.isEmpty() && isAlreadyParticipant(list[position].id)) {
+                    tvName.isEnabled = false
+                    tvEmail.isEnabled = false
+                    tvEmail.text = "Already added to group."
+                    cvAdd.isChecked = true
+                } else {
+                    tvName.isEnabled = true
+                    tvEmail.isEnabled = true
+                    cvAdd.isChecked = list[position].isAdded
+                    itemView.setOnClickListener {
+                        if (list[position].isAdded) {
+//                cvAdd.isChecked = false
+//                list[position].isAdded = false
+//                appInterface.handleEvent(position, -2, null)
+                        } else {
+                            cvAdd.isChecked = true
+                            list[position].isAdded = true
+                            appInterface.handleEvent(position, -1, null)
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

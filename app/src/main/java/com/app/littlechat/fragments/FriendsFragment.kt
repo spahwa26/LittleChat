@@ -6,13 +6,16 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-
+import com.app.littlechat.ChatScreen
+import com.app.littlechat.FindFriends
+import com.app.littlechat.Profile
 import com.app.littlechat.adapter.UsersAdapter
+import com.app.littlechat.databinding.FragmentFriendsBinding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.CommonUtilities
@@ -22,20 +25,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.android.synthetic.main.fragment_friends.*
-import com.app.littlechat.*
 
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- *
- */
 class FriendsFragment : Fragment(), AppInterface {
+
+    private lateinit var binding: FragmentFriendsBinding
 
     lateinit var activity: Activity
 
@@ -49,9 +42,8 @@ class FriendsFragment : Fragment(), AppInterface {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return  inflater.inflate(R.layout.fragment_friends, container, false)
-
-
+        binding = FragmentFriendsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +56,14 @@ class FriendsFragment : Fragment(), AppInterface {
     }
 
     private fun listeners() {
-        fabFindFriends.setOnClickListener { startActivity(Intent(activity, FindFriends::class.java)) }
+        binding.fabFindFriends.setOnClickListener {
+            startActivity(
+                Intent(
+                    activity,
+                    FindFriends::class.java
+                )
+            )
+        }
     }
 
     private fun init() {
@@ -73,16 +72,13 @@ class FriendsFragment : Fragment(), AppInterface {
         userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
         adapter = UsersAdapter()
         adapter.setData(activity, friendList, this)
-        rvFriends.adapter = adapter
-
-        CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(activity))
-
+        binding.run {
+            rvFriends.adapter = adapter
+            CommonUtilities.setLayoutManager(rvFriends, LinearLayoutManager(activity))
+        }
         getFriends()
 
     }
-
-
-
 
 
     override fun handleEvent(pos: Int, act: Int, map: Map<String, Any>?) {
@@ -93,9 +89,21 @@ class FriendsFragment : Fragment(), AppInterface {
         val animals = arrayOf("Chat", "Show profile", "Remove from list")
 
         builder.setItems(animals) { dialog, which ->
-            when(which){
-                0 -> startActivity(Intent(activity, ChatScreen::class.java).putExtra("data", friendList.get(pos)))
-                1 -> startActivity(Intent(activity, Profile::class.java).putExtra("data", friendList.get(pos)))
+            when (which) {
+                0 -> startActivity(
+                    Intent(activity, ChatScreen::class.java).putExtra(
+                        "data",
+                        friendList.get(pos)
+                    )
+                )
+
+                1 -> startActivity(
+                    Intent(activity, Profile::class.java).putExtra(
+                        "data",
+                        friendList.get(pos)
+                    )
+                )
+
                 2 -> removeFriend(pos)
             }
         }
@@ -103,7 +111,6 @@ class FriendsFragment : Fragment(), AppInterface {
         val dialog = builder.create()
         dialog.show()
     }
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////Firebase////////////////////////////////////////////
@@ -119,19 +126,19 @@ class FriendsFragment : Fragment(), AppInterface {
                     if (dataSnapshot.getValue() != null) {
                         try {
                             for (user in dataSnapshot.children) {
-                                val savedUser = user.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                                val savedUser =
+                                    user.getValue(User::class.java) ?: User("", "", "", "", "", "")
                                 if (user.key.equals(dataSnapshot.children.last().key))
-                                    getUsersData(user.key ?: "",true, savedUser.status)
+                                    getUsersData(user.key ?: "", true, savedUser.status)
                                 else
-                                    getUsersData(user.key ?: "",false, savedUser.status)
+                                    getUsersData(user.key ?: "", false, savedUser.status)
                             }
 
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
 
-                    }
-                    else{
+                    } else {
                         adapter.notifyDataSetChanged()
                     }
 
@@ -144,20 +151,27 @@ class FriendsFragment : Fragment(), AppInterface {
             })
     }
 
-    private fun getUsersData(id: String, notify: Boolean, status : String) {
+    private fun getUsersData(id: String, notify: Boolean, status: String) {
         FirebaseDatabase.getInstance().getReference().child("users/$id")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.getValue() != null) {
                         try {
-                            val user = dataSnapshot.getValue(User::class.java) ?: User("", "", "", "", "", "")
+                            val user = dataSnapshot.getValue(User::class.java) ?: User(
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                ""
+                            )
                             user.status = status
                             friendList.add(user)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     }
-                    if(notify)
+                    if (notify)
                         adapter.notifyDataSetChanged()
                 }
 
@@ -174,7 +188,8 @@ class FriendsFragment : Fragment(), AppInterface {
             ?.removeValue()?.addOnCompleteListener { task ->
                 CommonUtilities.hideProgressWheel()
                 if (task.isSuccessful) {
-                    FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(id)?.child(userID)?.removeValue()
+                    FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(id)
+                        ?.child(userID)?.removeValue()
                 } else
                     CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
             }?.addOnFailureListener { e ->

@@ -4,66 +4,77 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.app.littlechat.databinding.ActivityMainBinding
 import com.app.littlechat.utility.CommonUtilities
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_main.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
 
     lateinit var activity: Activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity = this@MainActivity
-
         if (CommonUtilities.getString(activity, "isLoggedIn").equals("yes"))
             startActivity(
-                Intent(activity, HomeScreen::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                Intent(
+                    activity,
+                    HomeScreen::class.java
+                ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         else {
-
-            setContentView(R.layout.activity_main)
+            binding = ActivityMainBinding.inflate(layoutInflater)
 
             generateKeyHash()
 
-            CommonUtilities.underlineTextView(tv_terms, getString(R.string.terms_and_conditions))
+            CommonUtilities.underlineTextView(
+                binding.tvTerms,
+                getString(R.string.terms_and_conditions)
+            )
 
             listeners()
+            setContentView(binding.root)
         }
 
     }
 
     private fun listeners() {
+        binding.run {
 
-        btn_login.setOnClickListener { if (!cb_terms!!.isChecked) {
-            CommonUtilities.showAlert(
-                activity,
-                "Please indicate that you have read and agree to the Terms & Conditions",
-                false, true
-            )
-        } else
-            startActivity(Intent(activity, Login::class.java)) }
+            btnLogin.setOnClickListener {
+                if (!cbTerms.isChecked) {
+                    CommonUtilities.showAlert(
+                        activity,
+                        "Please indicate that you have read and agree to the Terms & Conditions",
+                        false, true
+                    )
+                } else
+                    startActivity(Intent(activity, Login::class.java))
+            }
 
-        btn_signup.setOnClickListener { if (!cb_terms!!.isChecked) {
-            CommonUtilities.showAlert(
-                activity,
-                "Please indicate that you have read and agree to the Terms & Conditions",
-                false, true
-            )
-        } else
-            startActivity(Intent(activity, Signup::class.java)) }
+            btnSignup.setOnClickListener {
+                if (!cbTerms!!.isChecked) {
+                    CommonUtilities.showAlert(
+                        activity,
+                        "Please indicate that you have read and agree to the Terms & Conditions",
+                        false, true
+                    )
+                } else
+                    startActivity(Intent(activity, Signup::class.java))
+            }
 
 
-        tv_terms.setOnClickListener {
-            val url = "http://www.google.com"
-            val i = Intent(Intent.ACTION_VIEW)
-            i.data = Uri.parse(url)
-            startActivity(i)
+            tvTerms.setOnClickListener {
+                val url = "http://www.google.com"
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data = Uri.parse(url)
+                startActivity(i)
+            }
         }
     }
 

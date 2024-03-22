@@ -1,26 +1,27 @@
 package com.app.littlechat
 
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.adapter.ChatAdapter
-import com.app.littlechat.adapter.UsersAdapter
+import com.app.littlechat.databinding.ActivityChatScreenBinding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.Chat
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
+import com.app.littlechat.utility.getActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_chat_screen.*
-import java.util.ArrayList
 
 class ChatScreen : AppCompatActivity(), AppInterface {
 
-    lateinit var activity: Activity
+    lateinit var binding :  ActivityChatScreenBinding
 
     internal var chatList = ArrayList<Chat>()
 
@@ -35,36 +36,40 @@ class ChatScreen : AppCompatActivity(), AppInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat_screen)
+        binding=ActivityChatScreenBinding.inflate(layoutInflater)
 
         init()
 
         listeners()
 
+        setContentView(binding.root)
+
     }
 
     private fun init() {
-        activity = this
         otherUser = intent.getParcelableExtra("data")!!
 
-        tvName.text = otherUser.name
+        binding.apply {
 
-        if (!otherUser.image.isEmpty())
-            Picasso.get().load(otherUser.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
+            tvName.text = otherUser.name
 
-        userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
-        adapter = ChatAdapter()
-        adapter.setData(this@ChatScreen, chatList, userID, CommonUtilities.getString(activity, Constants.IMAGE), otherUser.image, this)
-        rvChat.adapter = adapter
-        CommonUtilities.setLayoutManager(rvChat, LinearLayoutManager(this, RecyclerView.VERTICAL, false))
+            if (!otherUser.image.isEmpty())
+                Picasso.get().load(otherUser.image).placeholder(R.mipmap.ic_launcher).into(ivImage)
 
-        if (otherUser.id > userID)
-            chatID = otherUser.id + "__" + userID
-        else
-            chatID = userID + "__" + otherUser.id
+            userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
+            adapter = ChatAdapter()
+            adapter.setData(getActivity(), chatList, userID, CommonUtilities.getString(getActivity(), Constants.IMAGE), otherUser.image, this@ChatScreen)
+            rvChat.adapter = adapter
+            CommonUtilities.setLayoutManager(rvChat, LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false))
+
+            if (otherUser.id > userID)
+                chatID = otherUser.id + "__" + userID
+            else
+                chatID = userID + "__" + otherUser.id
 
 
-        getChats()
+            getChats()
+        }
     }
 
     private fun getChats() {
@@ -90,7 +95,7 @@ class ChatScreen : AppCompatActivity(), AppInterface {
 
                 adapter.notifyDataSetChanged()
 
-                rvChat.scrollToPosition(adapter.itemCount-1)
+                binding.rvChat.scrollToPosition(adapter.itemCount-1)
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
@@ -100,7 +105,7 @@ class ChatScreen : AppCompatActivity(), AppInterface {
     }
 
     private fun sendMessage(chat: Chat) {
-        FirebaseDatabase.getInstance().reference.child(Constants.CHATS)?.child("$chatID/messages")?.push().setValue(chat)
+        FirebaseDatabase.getInstance().reference.child(Constants.CHATS)?.child("$chatID/messages")?.push()?.setValue(chat)
     }
 
     private fun removeLastMessage() {
@@ -111,26 +116,29 @@ class ChatScreen : AppCompatActivity(), AppInterface {
 
     private fun listeners() {
 
-        btnSend.setOnClickListener {
-            if (etMessage.text.toString().trim().isEmpty()) {
-                CommonUtilities.showToast(activity, "Please type any message.")
-                return@setOnClickListener
-            }
-            if (!CommonUtilities.isNetworkConnected(activity)) {
-                CommonUtilities.showToast(activity, "Please connect to internet first.")
-                return@setOnClickListener
-            }
-            val chat = Chat(userID,
-                otherUser.id,
-                CommonUtilities.getString(activity, Constants.IMAGE),
-                CommonUtilities.getString(activity, Constants.NAME),
-                etMessage.text.toString(),
-                System.currentTimeMillis(), "sent")
-            sendMessage(chat)
-            etMessage.setText("")
-        }
+        binding.apply {
 
-        ivBack.setOnClickListener { finish() }
+            btnSend.setOnClickListener {
+                if (etMessage.text.toString().trim().isEmpty()) {
+                    CommonUtilities.showToast(getActivity(), "Please type any message.")
+                    return@setOnClickListener
+                }
+                if (!CommonUtilities.isNetworkConnected(getActivity())) {
+                    CommonUtilities.showToast(getActivity(), "Please connect to internet first.")
+                    return@setOnClickListener
+                }
+                val chat = Chat(userID,
+                    otherUser.id,
+                    CommonUtilities.getString(getActivity(), Constants.IMAGE),
+                    CommonUtilities.getString(getActivity(), Constants.NAME),
+                    etMessage.text.toString(),
+                    System.currentTimeMillis(), "sent")
+                sendMessage(chat)
+                etMessage.setText("")
+            }
+
+            ivBack.setOnClickListener { finish() }
+        }
     }
 
 

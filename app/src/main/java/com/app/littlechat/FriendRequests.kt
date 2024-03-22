@@ -7,16 +7,18 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.RequestsAdapter
+import com.app.littlechat.databinding.ActivityFriendRequestsBinding
 import com.app.littlechat.interfaces.AppInterface
 import com.app.littlechat.pojo.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import kotlinx.android.synthetic.main.activity_friend_requests.*
 import java.util.*
 
 class FriendRequests : AppCompatActivity(), AppInterface {
+
+    private var binding : ActivityFriendRequestsBinding?=null
 
     lateinit var activity: Activity
     private lateinit var database: DatabaseReference
@@ -30,24 +32,27 @@ class FriendRequests : AppCompatActivity(), AppInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_friend_requests)
+        binding=ActivityFriendRequestsBinding.inflate(layoutInflater)
 
         init()
 
 
-        ivBack.setOnClickListener { finish() }
+        binding?.ivBack?.setOnClickListener { finish() }
+        setContentView(binding?.root)
     }
 
     private fun init() {
 
         activity = this
-        userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
-        adapter = RequestsAdapter()
-        adapter.setData(this@FriendRequests, requestList, this)
-        rvRequests.adapter = adapter
-        CommonUtilities.setLayoutManager(rvRequests, LinearLayoutManager(this))
-        database = FirebaseDatabase.getInstance().getReference("users")
-        getRequests()
+        binding?.run {
+            userID = FirebaseAuth.getInstance().getCurrentUser()?.uid ?: ""
+            adapter = RequestsAdapter()
+            adapter.setData(this@FriendRequests, requestList, this@FriendRequests)
+            rvRequests.adapter = adapter
+            CommonUtilities.setLayoutManager(rvRequests, LinearLayoutManager(this@FriendRequests))
+            database = FirebaseDatabase.getInstance().getReference("users")
+            getRequests()
+        }
 
     }
 
