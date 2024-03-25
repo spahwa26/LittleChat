@@ -3,9 +3,11 @@ package com.app.littlechat.firebase
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.Build.VERSION_CODES.O
 import android.util.Log
@@ -16,27 +18,27 @@ import com.app.littlechat.R
 import com.app.littlechat.utility.CommonUtilities
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import android.media.RingtoneManager
 
 
 class MessagingService : FirebaseMessagingService() {
     private var mNotificationManager: NotificationManager? = null
-    override fun onMessageReceived(remoteMessage: RemoteMessage?) {
-        super.onMessageReceived(remoteMessage)
 
-        Log.d("", "From: ${remoteMessage?.from}")
+    override fun onMessageReceived(message: RemoteMessage) {
+        super.onMessageReceived(message)
+
+        Log.d("", "From: ${message?.from}")
 
         // Check if message contains a data payload.
-        remoteMessage?.data?.isNotEmpty()?.let {
-            Log.d("", "Message data payload: " + remoteMessage.data)
-            if (remoteMessage.data.containsKey("email"))
-                showNotification(remoteMessage, false)
+        message.data?.isNotEmpty()?.let {
+            Log.d("", "Message data payload: " + message.data)
+            if (message.data.containsKey("email"))
+                showNotification(message, false)
             else
-                showNotification(remoteMessage, true)
+                showNotification(message, true)
         }
     }
 
-    private fun showNotification(remoteMessage: RemoteMessage, isMessage: Boolean) {
+    private fun showNotification(message: RemoteMessage, isMessage: Boolean) {
         val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         var id = 1001
         var intent: Intent
@@ -50,35 +52,36 @@ class MessagingService : FirebaseMessagingService() {
 
 
         val mBuilder = NotificationCompat.Builder(applicationContext, "notify_001")
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, 0)
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, FLAG_IMMUTABLE)
 
         val bitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round)
 
         mBuilder.setContentIntent(pendingIntent)
         mBuilder.setSmallIcon(R.drawable.chat_small)
-                .setLargeIcon(bitmap)
-                .setContentTitle("Friend Request")
-                .setContentText(remoteMessage.data.get("name") + " has sent you s friend request.")
-                .setSound(sound)
-                .setAutoCancel(true)
+            .setLargeIcon(bitmap)
+            .setContentTitle("Friend Request")
+            .setContentText(message.data.get("name") + " has sent you s friend request.")
+            .setSound(sound)
+            .setAutoCancel(true)
 
         if (isMessage) {
             mBuilder.setGroup("My Group")
             val bigText = NotificationCompat.InboxStyle()
-            bigText.setBigContentTitle(remoteMessage.data["name"])
-            bigText.addLine(remoteMessage.data["message"])
+            bigText.setBigContentTitle(message.data["name"])
+            bigText.addLine(message.data["message"])
             mBuilder.setStyle(bigText)
         }
 
-        mNotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
 // === Removed some obsoletes
         if (Build.VERSION.SDK_INT >= O) {
             val channelId = "notify_001"
             val channel = NotificationChannel(
-                    channelId,
-                    "Channel human readable title",
-                    android.app.NotificationManager.IMPORTANCE_DEFAULT
+                channelId,
+                "Channel human readable title",
+                android.app.NotificationManager.IMPORTANCE_DEFAULT
             )
             mNotificationManager!!.createNotificationChannel(channel)
             mBuilder.setChannelId(channelId)

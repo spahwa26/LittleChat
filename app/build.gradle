@@ -5,11 +5,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 34
     defaultConfig {
         applicationId "com.app.littlechat"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 2
         vectorDrawables.useSupportLibrary = true
         versionName "1.2"
@@ -43,20 +43,26 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.firebase:firebase-messaging:18.0.0'
+    implementation 'com.google.android.material:material:1.11.0'
+    //Firebase
+    implementation(platform('com.google.firebase:firebase-bom:32.8.0'))
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+
+    //compose
+    
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-auth:17.0.0'
-    implementation 'com.google.firebase:firebase-database:17.0.0'
-    implementation 'com.google.firebase:firebase-storage:17.0.0'
-    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 }
 
