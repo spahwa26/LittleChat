@@ -26,10 +26,10 @@ class MessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        Log.d("", "From: ${message?.from}")
+        Log.d("", "From: ${message.from}")
 
         // Check if message contains a data payload.
-        message.data?.isNotEmpty()?.let {
+        message.data.isNotEmpty().let {
             Log.d("", "Message data payload: " + message.data)
             if (message.data.containsKey("email"))
                 showNotification(message, false)
@@ -41,7 +41,7 @@ class MessagingService : FirebaseMessagingService() {
     private fun showNotification(message: RemoteMessage, isMessage: Boolean) {
         val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         var id = 1001
-        var intent: Intent
+        val intent: Intent
 
         if (isMessage) {
             intent = Intent(applicationContext, HomeScreen::class.java)
@@ -60,7 +60,7 @@ class MessagingService : FirebaseMessagingService() {
         mBuilder.setSmallIcon(R.drawable.chat_small)
             .setLargeIcon(bitmap)
             .setContentTitle("Friend Request")
-            .setContentText(message.data.get("name") + " has sent you s friend request.")
+            .setContentText(message.data["name"] + " has sent you s friend request.")
             .setSound(sound)
             .setAutoCancel(true)
 
@@ -81,7 +81,7 @@ class MessagingService : FirebaseMessagingService() {
             val channel = NotificationChannel(
                 channelId,
                 "Channel human readable title",
-                android.app.NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             mNotificationManager!!.createNotificationChannel(channel)
             mBuilder.setChannelId(channelId)
@@ -93,6 +93,7 @@ class MessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         CommonUtilities.putToken(applicationContext, token)
+        CommonUtilities.putString(applicationContext,"DEVICE_TOKEN", token)
         Log.e("token", token)
     }
 

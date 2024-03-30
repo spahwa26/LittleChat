@@ -1,11 +1,14 @@
-apply plugin: 'com.android.application'
-
-apply plugin: 'kotlin-android'
-
-apply plugin: 'kotlin-parcelize'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
+    id 'com.google.gms.google-services'
+}
 
 android {
-    compileSdkVersion 34
+    compileSdk 34
     defaultConfig {
         applicationId "com.app.littlechat"
         minSdkVersion 21
@@ -37,12 +40,17 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
+        compose true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    namespace 'com.app.littlechat'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -55,15 +63,47 @@ dependencies {
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-storage'
 
-    //compose
-    
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    //implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //Navigation component
+    def nav_version = "2.7.7"
+    implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    //compose
+    def composeBom = platform('androidx.compose:compose-bom:2024.03.00')
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+    implementation "androidx.compose.runtime:runtime"
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.foundation:foundation"
+    implementation "androidx.compose.foundation:foundation-layout"
+    implementation "androidx.compose.material3:material3"
+    implementation "androidx.compose.runtime:runtime-livedata"
+    implementation "androidx.compose.ui:ui-tooling"
+
+
+    def hilt_core = "2.48"
+    implementation "com.google.dagger:hilt-android:$hilt_core"
+    kapt "com.google.dagger:hilt-compiler:$hilt_core"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
+
+    //prefs
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+
+
 }
 
-apply plugin: 'com.google.gms.google-services'
+kapt{
+    correctErrorTypes true
+}
+

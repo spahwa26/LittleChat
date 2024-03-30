@@ -1,4 +1,4 @@
-package com.app.littlechat
+package com.app.littlechat.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -6,6 +6,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.app.littlechat.BuildConfig
+import com.app.littlechat.HomeScreen
+import com.app.littlechat.Login
+import com.app.littlechat.R
+import com.app.littlechat.Signup
 import com.app.littlechat.databinding.ActivityMainBinding
 import com.app.littlechat.utility.CommonUtilities
 import java.security.MessageDigest

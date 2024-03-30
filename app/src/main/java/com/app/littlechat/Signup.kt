@@ -111,8 +111,6 @@ class Signup : AppCompatActivity() {
 
 
     private fun sendVerificationEmail(user: FirebaseUser?) {
-
-
         user!!.sendEmailVerification()
             .addOnCompleteListener { task ->
                 CommonUtilities.hideProgressWheel()

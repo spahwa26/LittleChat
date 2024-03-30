@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import com.app.littlechat.databinding.ActivityLoginBinding
-import com.app.littlechat.pojo.User
+import com.app.littlechat.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.OnFailureListener
@@ -18,14 +18,14 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class Login : AppCompatActivity() {
+class Login : ComponentActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
     private var mAuth: FirebaseAuth? = null
 
 
-    lateinit var activity: Activity
+    private lateinit var activity: Activity
 
     private val TAG = "Login"
 

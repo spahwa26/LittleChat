@@ -5,15 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.CreateGroupAdapter
 import com.app.littlechat.databinding.ActivityCreateGroupBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.pojo.GroupDetails
-import com.app.littlechat.pojo.User
+import com.app.littlechat.model.GroupDetails
+import com.app.littlechat.model.User
 import com.app.littlechat.utility.CircleImageView
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
@@ -28,8 +27,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+//import com.theartofdev.edmodo.cropper.CropImage
+//import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
 
 class CreateGroup : AppCompatActivity(), AppInterface {
@@ -65,9 +64,9 @@ class CreateGroup : AppCompatActivity(), AppInterface {
     private fun listeners() {
         binding.apply {
             ivIcon.setOnClickListener {
-                CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(getActivity())
+//                setOnClickListenerCropImage.activity()
+//                    .setGuidelines(CropImageView.Guidelines.ON)
+//                    .start(getActivity())
             }
 
             ivBack.setOnClickListener { finish() }
@@ -150,23 +149,23 @@ class CreateGroup : AppCompatActivity(), AppInterface {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode === Activity.RESULT_OK) {
-                imagePath = result.uri.path ?: ""
-                val name = if (isEdit) groupDetails.id else userID + createdAt
-                imagePath = CommonUtilities.getResizedBitmap(
-                    imagePath,
-                    800,
-                    name + "__group_icon.jpg",
-                    this,
-                    false
-                )
-                binding.ivIcon.setImageURI(result.uri)
-            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-            }
-        }
+//        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//            val result = CropImage.getActivityResult(data)
+//            if (resultCode === Activity.RESULT_OK) {
+//                imagePath = result.uri.path ?: ""
+//                val name = if (isEdit) groupDetails.id else userID + createdAt
+//                imagePath = CommonUtilities.getResizedBitmap(
+//                    imagePath,
+//                    800,
+//                    name + "__group_icon.jpg",
+//                    this,
+//                    false
+//                )
+//                binding.ivIcon.setImageURI(result.uri)
+//            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+//                val error = result.error
+//            }
+//        }
     }
 
 

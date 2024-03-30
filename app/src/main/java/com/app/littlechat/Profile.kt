@@ -10,7 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import com.app.littlechat.databinding.ActivityProfileBinding
-import com.app.littlechat.pojo.User
+import com.app.littlechat.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.Continuation
@@ -24,8 +24,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+//import com.theartofdev.edmodo.cropper.CropImage
+//import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
 
 
@@ -120,9 +120,9 @@ class Profile : AppCompatActivity() {
             }
             btnLogout.setOnClickListener { CommonUtilities.showLogoutPopup(activity) }
             ivImage.setOnClickListener {
-                CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(activity)
+//                CropImage.activity()
+//                    .setGuidelines(CropImageView.Guidelines.ON)
+//                    .start(activity)
             }
             btnSend.setOnClickListener { sendRequest() }
             btnCancel.setOnClickListener { cancelRequest() }
@@ -152,22 +152,23 @@ class Profile : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode === Activity.RESULT_OK) {
-                imagePath = result.uri.path ?: ""
-                imagePath = CommonUtilities.getResizedBitmap(
-                    imagePath,
-                    800,
-                    mAuth?.uid + "__ProfilePic.jpg",
-                    this,
-                    false
-                )
-                binding.ivImage.setImageURI(result.uri)
-            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-            }
-        }
+//        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//            val result = CropImage.getActivityResult(data)
+//            if (resultCode === Activity.RESULT_OK) {
+//                imagePath = result.uri.path ?: ""
+//                imagePath = CommonUtilities.getResizedBitmap(
+//                    imagePath,
+//                    800,
+//                    mAuth?.uid + "__ProfilePic.jpg",
+//                    this,
+//                    false
+//                )
+//                binding.ivImage.setImageURI(result.uri)
+//            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+//                val error = result.error
+//            }
+//        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setUserData(pojo: User?) {

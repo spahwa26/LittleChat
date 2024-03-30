@@ -1,4 +1,4 @@
-package com.app.littlechat.pojo
+package com.app.littlechat.model
 
 import android.os.Parcel
 import android.os.Parcelable

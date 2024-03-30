@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.R
 import com.app.littlechat.databinding.LayoutChatBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.pojo.Chat
+import com.app.littlechat.model.Chat
 import com.squareup.picasso.Picasso
 
 

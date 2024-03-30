@@ -20,9 +20,9 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.BuildConfig
-import com.app.littlechat.MainActivity
+import com.app.littlechat.ui.MainActivity
 import com.app.littlechat.R
-import com.app.littlechat.pojo.User
+import com.app.littlechat.model.User
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream

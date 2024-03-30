@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.UsersAdapter
 import com.app.littlechat.databinding.ActivityFindFriendsBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.pojo.User
+import com.app.littlechat.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.getActivity
 import com.google.firebase.auth.FirebaseAuth
