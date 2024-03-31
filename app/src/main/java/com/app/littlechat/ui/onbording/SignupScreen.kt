@@ -1,4 +1,4 @@
-package com.app.littlechat.ui.onbording.login
+package com.app.littlechat.ui.onbording
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
+import com.app.littlechat.data.network.OnboardingRepository
 import com.app.littlechat.ui.commoncomposables.AppImage
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
-import com.app.littlechat.utility.UserPreferences
+import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.utility.showToast
 
 @Composable

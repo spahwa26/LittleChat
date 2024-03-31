@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.littlechat.adapter.CreateGroupAdapter
 import com.app.littlechat.databinding.ActivityCreateGroupBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.GroupDetails
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.GroupDetails
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CircleImageView
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants

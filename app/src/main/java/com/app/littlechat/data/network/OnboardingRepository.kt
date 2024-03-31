@@ -1,17 +1,16 @@
-package com.app.littlechat.ui.onbording.login
+package com.app.littlechat.data.network
 
 import android.util.Log
-import android.widget.Toast
-import com.app.littlechat.model.CustomResult
-import com.app.littlechat.model.User
-import com.app.littlechat.ui.onbording.login.OnboardingViewModel.Companion.AUTH_FAIL
-import com.app.littlechat.ui.onbording.login.OnboardingViewModel.Companion.FAILURE_ERROR
-import com.app.littlechat.ui.onbording.login.OnboardingViewModel.Companion.GOTO_PROFILE
-import com.app.littlechat.ui.onbording.login.OnboardingViewModel.Companion.VERIFICATION_EMAIL
+import com.app.littlechat.data.model.CustomResult
+import com.app.littlechat.data.model.User
+import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.AUTH_FAIL
+import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.FAILURE_ERROR
+import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.GOTO_PROFILE
+import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.VERIFICATION_EMAIL
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.LocalisedException
 import com.app.littlechat.utility.SomethingWentWrongException
-import com.app.littlechat.utility.UserPreferences
+import com.app.littlechat.data.UserPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase

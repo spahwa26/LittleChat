@@ -10,7 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import com.app.littlechat.databinding.ActivityProfileBinding
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.Continuation

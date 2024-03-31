@@ -1,6 +1,7 @@
-package com.app.littlechat.ui.onbording.login
+package com.app.littlechat.ui.onbording
 
 import android.content.Context
+import android.content.Intent
 import android.support.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -38,10 +39,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
+import com.app.littlechat.data.network.OnboardingRepository
 import com.app.littlechat.ui.commoncomposables.AppImage
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
-import com.app.littlechat.utility.UserPreferences
+import com.app.littlechat.data.UserPreferences
+import com.app.littlechat.ui.home.HomeActivity
+import com.app.littlechat.utility.finishActivity
 import com.app.littlechat.utility.showToast
 
 @Composable
@@ -60,6 +64,10 @@ fun LoginScreen(
     }
     if (state is OnboardingViewModel.OnboardingState.LocalError) {
         context.showToast(state.e)
+    }
+    if (state is OnboardingViewModel.OnboardingState.Success) {
+        context.startActivity(Intent(context, HomeActivity::class.java))
+        context.finishActivity()
     }
     EmailAlert(viewModel)
     Column {

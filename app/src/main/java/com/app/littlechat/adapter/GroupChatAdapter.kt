@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.R
 import com.app.littlechat.databinding.LayoutChatBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.Chat
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.Chat
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.squareup.picasso.Picasso

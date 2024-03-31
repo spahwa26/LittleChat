@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.adapter.GroupChatAdapter
 import com.app.littlechat.databinding.ActivityGroupChatBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.Chat
-import com.app.littlechat.model.GroupDetails
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.Chat
+import com.app.littlechat.data.model.GroupDetails
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.firebase.auth.FirebaseAuth

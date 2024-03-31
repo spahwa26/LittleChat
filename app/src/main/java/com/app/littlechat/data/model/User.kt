@@ -1,4 +1,4 @@
-package com.app.littlechat.model
+package com.app.littlechat.data.model
 
 import android.os.Parcel
 import android.os.Parcelable

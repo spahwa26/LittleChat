@@ -11,7 +11,7 @@ import com.app.littlechat.databinding.ActivityHomeScreenBinding
 import com.app.littlechat.fragments.FriendsFragment
 import com.app.littlechat.fragments.GroupsFragment
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.User
 import com.google.android.material.tabs.TabLayout
 
 class HomeScreen : AppCompatActivity(), AppInterface {

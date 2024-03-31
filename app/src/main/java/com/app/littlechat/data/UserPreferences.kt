@@ -1,4 +1,4 @@
-package com.app.littlechat.utility
+package com.app.littlechat.data
 
 import android.content.Context
 import androidx.preference.PreferenceManager

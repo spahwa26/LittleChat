@@ -126,8 +126,8 @@ fun CommonAlertDialog(
     onConfirmation: () -> Unit,
     dialogTitle: String,
     dialogText: String,
-    icon: ImageVector?=null,
-    dismissText: String?=stringResource(id = R.string.cancel),
+    icon: ImageVector? = null,
+    dismissText: String? = stringResource(id = R.string.cancel),
 ) {
     AlertDialog(
         icon = {

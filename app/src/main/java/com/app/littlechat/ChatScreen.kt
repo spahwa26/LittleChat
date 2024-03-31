@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.adapter.ChatAdapter
 import com.app.littlechat.databinding.ActivityChatScreenBinding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.Chat
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.Chat
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.getActivity
@@ -85,7 +85,8 @@ class ChatScreen : AppCompatActivity(), AppInterface {
                 if (dataSnapshot.getValue() != null) {
                     try {
                         chatList.add(dataSnapshot.getValue(Chat::class.java)
-                                ?: Chat("", "", "", "", "", 0, ""))
+                                ?: Chat("", "", "", "", "", 0, "")
+                        )
 
                     } catch (e: Exception) {
                         e.printStackTrace()

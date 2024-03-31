@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import com.app.littlechat.databinding.ActivityLoginBinding
-import com.app.littlechat.model.User
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.google.android.gms.tasks.OnFailureListener

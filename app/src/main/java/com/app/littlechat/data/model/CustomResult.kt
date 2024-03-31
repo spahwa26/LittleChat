@@ -1,4 +1,4 @@
-package com.app.littlechat.model
+package com.app.littlechat.data.model
 
 import com.app.littlechat.utility.LocalisedException
 

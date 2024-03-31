@@ -1,4 +1,4 @@
-package com.app.littlechat
+package com.app.littlechat.ui.onbording.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,9 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.app.littlechat.ui.onbording.login.LoginScreen
+import com.app.littlechat.ui.onbording.LoginScreen
 import com.app.littlechat.ui.onbording.OnboardingScreen
-import com.app.littlechat.ui.onbording.login.SignupScreen
+import com.app.littlechat.ui.onbording.SignupScreen
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

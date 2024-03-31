@@ -14,7 +14,7 @@ import com.app.littlechat.GroupChat
 import com.app.littlechat.adapter.GroupsAdapter
 import com.app.littlechat.databinding.FragmentGroups2Binding
 import com.app.littlechat.interfaces.AppInterface
-import com.app.littlechat.model.GroupDetails
+import com.app.littlechat.data.model.GroupDetails
 import com.app.littlechat.utility.CommonUtilities
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
