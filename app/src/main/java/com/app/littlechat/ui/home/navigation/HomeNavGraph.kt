@@ -5,12 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.ui.home.ui.firends.FriendsScreen
+import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.settings.SettingsScreen
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +29,7 @@ fun HomeNavGraph(
 ) {
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
-
+    val viewmodel: HomeViewmodel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -35,11 +37,11 @@ fun HomeNavGraph(
     ) {
 
         composable(HomeDestinations.FRIENDS_ROUTE) {
-            FriendsScreen()
+            FriendsScreen(viewmodel)
         }
 
         composable(HomeDestinations.GROUPS_ROUTE) {
-            GroupsScreen()
+            GroupsScreen(viewmodel)
         }
 
         composable(HomeDestinations.SETTINGS_ROUTE) {

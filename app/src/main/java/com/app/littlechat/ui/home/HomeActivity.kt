@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.app.littlechat.R
 import com.app.littlechat.data.model.BottomNavItem
 import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
@@ -38,7 +39,10 @@ import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeNavGraph
 import com.app.littlechat.ui.home.ui.theme.LittleChatTheme
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 
+@AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +90,10 @@ fun MainContent() {
                     navController = navController,
                     modifier = Modifier,
                     onItemClick = {
-                        navController.navigate(it.route)
+                        navController.navigate(it.route, navOptions = navOptions {
+                            launchSingleTop = true
+                            popUpTo(FRIENDS_ROUTE)
+                        })
                     }
                 )
             }) {

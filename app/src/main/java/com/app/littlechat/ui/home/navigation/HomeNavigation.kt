@@ -1,6 +1,7 @@
 package com.app.littlechat.ui.home.navigation
 
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
 import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
@@ -26,12 +27,18 @@ object HomeDestinations{
 
 class HomeNavigationActions(private val navController: NavHostController) {
     fun navigateToFriends(){
-        navController.navigate(FRIENDS_ROUTE)
+        navController.navigate(FRIENDS_ROUTE, navOptions = navOptions {
+            launchSingleTop
+        })
     }
     fun navigateToGroups(){
-        navController.navigate(GROUPS_ROUTE)
+        navController.navigate(GROUPS_ROUTE, navOptions = navOptions {
+            launchSingleTop
+        })
     }
     fun navigateToSettings(){
-        navController.navigate(SETTINGS_ROUTE)
+        navController.navigate(SETTINGS_ROUTE, navOptions = navOptions {
+            launchSingleTop
+        })
     }
 }
