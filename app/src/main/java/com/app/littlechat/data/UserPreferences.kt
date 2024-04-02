@@ -39,6 +39,10 @@ class UserPreferences @Inject constructor(val context: Context) {
         get() = prefManager.getString(STATUS, null)
         set(value) = prefManager.edit().putString(STATUS, value).apply()
 
+    var bottomPadding: Float?
+        get() = prefManager.getFloat(BOTTOM_PADDING, 0f)
+        set(value) = prefManager.edit().putFloat(BOTTOM_PADDING, value ?: 0f).apply()
+
     fun clearPrefs() {
         prefManager.edit().clear().apply()
     }
@@ -53,5 +57,6 @@ class UserPreferences @Inject constructor(val context: Context) {
         const val PHONE = "phone"
         const val IMAGE = "image"
         const val STATUS = "status"
+        const val BOTTOM_PADDING = "bottom_padding"
     }
 }

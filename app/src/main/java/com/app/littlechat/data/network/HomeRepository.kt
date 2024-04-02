@@ -7,6 +7,7 @@ import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.LocalisedException
+import com.app.littlechat.utility.SomethingWentWrongException
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -58,13 +59,23 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
                             }
 
                         } else {
-                            //todo: handle no data
+                            resultCallback.invoke(
+                                CustomResult.Error(
+                                    exception = SomethingWentWrongException()
+                                )
+                            )
                         }
 
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        //handle databaseError
+                        resultCallback.invoke(
+                            CustomResult.Error(
+                                exception = LocalisedException(
+                                    databaseError.message
+                                )
+                            )
+                        )
                     }
                 })
         }
