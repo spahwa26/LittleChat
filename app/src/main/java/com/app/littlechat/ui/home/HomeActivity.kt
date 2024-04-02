@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOut
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -125,7 +123,7 @@ fun MainContent(userPreferences: UserPreferences) {
                     userPreferences = userPreferences,
                     navController = navController,
                     bottomNavVisibilityState = bottomBarVisibilityState,
-                    bottomPadding = (userPreferences.bottomPadding?:0f).dp
+                    bottomPadding = (userPreferences.bottomPadding ?: 0f).dp
                 )
             }
         }

@@ -4,6 +4,11 @@ import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.Chat
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.utility.Constants
+import com.app.littlechat.utility.LocalisedException
+import com.app.littlechat.utility.SomethingWentWrongException
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 
@@ -12,28 +17,39 @@ class ChatRepository @Inject constructor(private val userPreferences: UserPrefer
         FirebaseDatabase.getInstance().getReference()
     }
 
-
-    fun getChats(chatID: String, resultCallback: (CustomResult<List<Chat>>) -> Unit) {
-        val chatList = mutableListOf<Chat>()
-        db.child(Constants.CHATS).child(chatID).child("messages").get()
-            .addOnCompleteListener {
-                val dataSnapshot = it.result
-                if (dataSnapshot.value != null) {
+    fun setChatListener(chatID: String, resultCallback: (CustomResult<Chat?>) -> Unit){
+        db.child(Constants.CHATS).child(chatID).child("messages").addChildEventListener(object:
+            ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (snapshot.value != null) {
                     try {
-                        for (chat in dataSnapshot.children) {
-                            chat?.getValue(Chat::class.java)?.let { msg ->
-                                chatList.add(
-                                    msg
-                                )
-                            }
-                        }
-                        resultCallback.invoke(CustomResult.Success(chatList))
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                        resultCallback.invoke(CustomResult.Success(snapshot.getValue(Chat::class.java)))
                     }
-
+                    catch (_: Exception){ }
                 }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    fun sendMessage(
+        chat: Chat,
+        chatID: String,
+        resultCallback: (CustomResult<List<Chat>>) -> Unit
+    ) {
+        db.child(Constants.CHATS).child("$chatID/messages").push().setValue(chat)
+            .addOnCompleteListener {
+                if (it.exception != null)
+                    resultCallback.invoke(CustomResult.Error(exception = LocalisedException(it.exception?.message)))
+                else if (it.isCanceled)
+                    resultCallback.invoke(CustomResult.Error(exception = SomethingWentWrongException()))
             }
     }
 

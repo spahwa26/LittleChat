@@ -5,10 +5,15 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.UnderlineSpan
@@ -20,22 +25,25 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.app.littlechat.BuildConfig
-import com.app.littlechat.ui.MainActivity
 import com.app.littlechat.R
 import com.app.littlechat.data.model.User
+import com.app.littlechat.ui.MainActivity
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+
 
 class CommonUtilities {
 
     companion object {
 
 
-        fun isNetworkConnected(activity: Activity) : Boolean{
-            var cm = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            return cm.activeNetworkInfo != null
+        fun isNetworkConnected(context: Context) : Boolean{
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = cm.activeNetworkInfo
+            val isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting
+            return isConnected
         }
 
         private var dialog: Dialog? = null

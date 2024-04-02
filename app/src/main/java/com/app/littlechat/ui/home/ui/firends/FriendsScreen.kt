@@ -45,11 +45,7 @@ fun FriendsScreen(myUID: String?, viewmodel: HomeViewmodel, navActions: HomeNavi
                                 .clickable {
                                     val encodedUrl = URLEncoder.encode(user.image, StandardCharsets.UTF_8.toString())
                                     myUID?.let {
-                                        val chatID = if (user.id > myUID)
-                                            user.id + "__" + myUID
-                                        else
-                                            myUID + "__" + user.id
-                                        navActions.navigateToChat(chatID, user.name, encodedUrl)
+                                        navActions.navigateToChat(user.id, user.name, encodedUrl)
                                     }
                                 },
                             elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)

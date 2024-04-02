@@ -4,6 +4,8 @@ import android.app.Activity
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.support.annotation.StringRes
 import android.text.TextUtils
 import android.widget.Toast
@@ -34,3 +36,18 @@ fun Context.finishActivity(): Activity {
 
 fun String.isValidEmail() =
     !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+fun Context.isNetworkConnected() : Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities =  connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    capabilities.also {
+        if (it != null){
+            if (it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+                return true
+            else if (it.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
+                return true
+            }
+        }
+    }
+    return false
+}
