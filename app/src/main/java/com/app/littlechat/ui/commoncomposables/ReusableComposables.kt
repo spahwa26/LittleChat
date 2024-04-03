@@ -62,7 +62,7 @@ fun CustomToolbar(
         Card(
             shape = RoundedCornerShape(0.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.primary,
             ),
             modifier = Modifier
                 .fillMaxWidth(),
@@ -95,7 +95,7 @@ fun CustomToolbar(
                     modifier = Modifier.align(Alignment.Center),
                     text = title,
                     fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.inversePrimary
                 )
                 onHomePress?.let {
                     Image(
