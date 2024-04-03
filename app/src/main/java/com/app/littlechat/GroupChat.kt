@@ -35,8 +35,6 @@ class GroupChat : AppCompatActivity(), AppInterface {
 
     private var userID: String = ""
 
-    private var chatID: String = ""
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,11 +61,6 @@ class GroupChat : AppCompatActivity(), AppInterface {
             binding.rvChat,
             LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         )
-
-        if (groupDetails.id > userID)
-            chatID = groupDetails.id + "__" + userID
-        else
-            chatID = userID + "__" + groupDetails.id
 
 
         getParticipantsData(true)
@@ -172,6 +165,7 @@ class GroupChat : AppCompatActivity(), AppInterface {
     private fun getChats() {
         val ref = FirebaseDatabase.getInstance().reference.child("groups").child(groupDetails.id)
             .child("messages")
+
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
 

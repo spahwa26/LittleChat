@@ -47,7 +47,7 @@ import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeNavGraph
-import com.app.littlechat.ui.home.ui.theme.LittleChatTheme
+import com.app.littlechat.ui.theme.LittleChatTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

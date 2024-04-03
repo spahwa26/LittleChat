@@ -11,7 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.home.HomeActivity
-import com.app.littlechat.ui.home.ui.theme.LittleChatTheme
+import com.app.littlechat.ui.theme.LittleChatTheme
 import com.app.littlechat.ui.onbording.navigation.LittleChatNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

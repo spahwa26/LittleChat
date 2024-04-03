@@ -1,4 +1,4 @@
-package com.app.littlechat.ui.home.ui.theme
+package com.app.littlechat.ui.theme
 
 import android.app.Activity
 import android.os.Build

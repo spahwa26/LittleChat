@@ -67,7 +67,7 @@ class HomeViewmodel @Inject constructor(private val repository: HomeRepository) 
 
     sealed class GroupsUiState {
         data object Loading : GroupsUiState()
-        data class Success(val friendList: List<GroupDetails>) : GroupsUiState()
+        data class Success(val groupList: List<GroupDetails>) : GroupsUiState()
         data class Error(val e: String?) : GroupsUiState()
     }
 

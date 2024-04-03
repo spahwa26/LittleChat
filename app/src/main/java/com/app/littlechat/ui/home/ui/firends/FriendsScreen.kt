@@ -23,16 +23,25 @@ import androidx.compose.ui.unit.dp
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
+import com.app.littlechat.utility.Constants
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun FriendsScreen(myUID: String?, viewmodel: HomeViewmodel, navActions: HomeNavigationActions, bottomPadding: Dp) {
+fun FriendsScreen(
+    viewmodel: HomeViewmodel,
+    navActions: HomeNavigationActions,
+    bottomPadding: Dp
+) {
     val state = viewmodel.friendsUiState.value
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding)) {
+    Box(
+        contentAlignment = Alignment.Center, modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = bottomPadding)
+    ) {
         if (state is HomeViewmodel.FriendsUiState.Success) {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.friendList) { user ->
                     Box(Modifier.padding(10.dp)) {
                         Card(
@@ -43,12 +52,14 @@ fun FriendsScreen(myUID: String?, viewmodel: HomeViewmodel, navActions: HomeNavi
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val encodedUrl = URLEncoder.encode(user.image, StandardCharsets.UTF_8.toString())
-                                    myUID?.let {
-                                        navActions.navigateToChat(user.id, user.name, encodedUrl)
-                                    }
+                                    val encodedUrl = URLEncoder.encode(
+                                        user.image.ifBlank { Constants.DUMMY_URL },
+                                        StandardCharsets.UTF_8.toString()
+                                    )
+                                    navActions.navigateToChat(user.id, user.name, encodedUrl)
+
                                 },
-                            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                         ) {
                             Row(
                                 modifier = Modifier

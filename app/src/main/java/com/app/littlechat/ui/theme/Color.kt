@@ -1,4 +1,4 @@
-package com.app.littlechat.ui.home.ui.theme
+package com.app.littlechat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

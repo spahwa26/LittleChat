@@ -1,6 +1,5 @@
 package com.app.littlechat.ui.home.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -17,7 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.home.ui.firends.FriendsScreen
 import com.app.littlechat.ui.home.ui.HomeViewmodel
-import com.app.littlechat.ui.home.ui.chat.ChatScreen
+import com.app.littlechat.ui.home.ui.chat.FriendChatScreen
+import com.app.littlechat.ui.home.ui.chat.GroupChatScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.settings.SettingsScreen
 
@@ -44,29 +44,36 @@ fun HomeNavGraph(
 
         composable(HomeDestinations.FRIENDS_ROUTE) {
             LaunchedEffect(Unit) {
-                bottomNavVisibilityState.value=true
+                bottomNavVisibilityState.value = true
             }
-            FriendsScreen(myUID = userPreferences.id,viewmodel, navActions, bottomPadding)
+            FriendsScreen(viewmodel, navActions, bottomPadding)
         }
 
         composable(HomeDestinations.GROUPS_ROUTE) {
             LaunchedEffect(Unit) {
-                bottomNavVisibilityState.value=true
+                bottomNavVisibilityState.value = true
             }
-            GroupsScreen(viewmodel, bottomPadding)
+            GroupsScreen(viewmodel, bottomPadding, navActions)
         }
 
         composable(HomeDestinations.SETTINGS_ROUTE) {
             LaunchedEffect(Unit) {
-                bottomNavVisibilityState.value=true
+                bottomNavVisibilityState.value = true
             }
             SettingsScreen(bottomPadding)
         }
 
         composable(HomeDestinations.CHATS_ROUTE) {
-            ChatScreen(uid = userPreferences.id, myImage = userPreferences.image)
+            FriendChatScreen()
             LaunchedEffect(Unit) {
-                bottomNavVisibilityState.value=false
+                bottomNavVisibilityState.value = false
+            }
+        }
+
+        composable(HomeDestinations.GROUP_CHAT_ROUTE) {
+            GroupChatScreen()
+            LaunchedEffect(Unit) {
+                bottomNavVisibilityState.value = false
             }
         }
 

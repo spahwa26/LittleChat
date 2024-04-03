@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.groups
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,16 +21,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.littlechat.ui.commoncomposables.ProfileImage
+import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
+import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun GroupsScreen(viewmodel: HomeViewmodel, bottomPadding:Dp) {
+fun GroupsScreen(
+    viewmodel: HomeViewmodel,
+    bottomPadding: Dp,
+    navActions: HomeNavigationActions,
+) {
     val state = viewmodel.groupsUiState.value
-    Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding)) {
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = bottomPadding)
+    ) {
         if (state is HomeViewmodel.GroupsUiState.Success) {
             LazyColumn {
-                items(state.friendList) { user ->
+                items(state.groupList) { group ->
                     Box(Modifier.padding(10.dp)) {
                         Card(
                             shape = RoundedCornerShape(10.dp),
@@ -37,7 +51,14 @@ fun GroupsScreen(viewmodel: HomeViewmodel, bottomPadding:Dp) {
                                 containerColor = MaterialTheme.colorScheme.onPrimary,
                             ),
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable {
+                                    val encodedUrl = URLEncoder.encode(
+                                        group.image.ifBlank { DUMMY_URL },
+                                        StandardCharsets.UTF_8.toString()
+                                    )
+                                    navActions.navigateToGroupChat(group.id, group.name, encodedUrl)
+                                },
                             elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
                         ) {
                             Row(
@@ -45,9 +66,9 @@ fun GroupsScreen(viewmodel: HomeViewmodel, bottomPadding:Dp) {
                                     .fillMaxWidth()
                                     .padding(10.dp)
                             ) {
-                                ProfileImage(modifier = Modifier.size(50.dp), user.image, user.name)
+                                ProfileImage(modifier = Modifier.size(50.dp), group.image, group.name)
                                 Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                    Text(text = user.name)
+                                    Text(text = group.name)
                                 }
                             }
                         }

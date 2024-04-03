@@ -23,24 +23,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.ChatText
 import com.app.littlechat.ui.commoncomposables.ProfileImage
-import com.app.littlechat.utility.showToast
 
 @Composable
-fun ChatScreen(uid: String?, myImage: String?, viewmodel: ChatViewmodel = hiltViewModel()) {
-    val context = LocalContext.current
-    val state = viewmodel.chatUiState.value
-    if (state is ChatViewmodel.ChatUiState.Error) {
-        context.showToast(txt = state.msg)
-    }
+fun ChatLayout(viewmodel: ChatViewmodel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
@@ -50,7 +42,7 @@ fun ChatScreen(uid: String?, myImage: String?, viewmodel: ChatViewmodel = hiltVi
         LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f)) {
             items(viewmodel.chatList.reversed()) { chat ->
 
-                val isMyMsg = chat.sender_id == uid
+                val isMyMsg = chat.sender_id == viewmodel.getId()
                 Box(Modifier.padding(10.dp)) {
 
                     Row(
@@ -72,13 +64,13 @@ fun ChatScreen(uid: String?, myImage: String?, viewmodel: ChatViewmodel = hiltVi
                             ProfileImage(
                                 modifier = Modifier
                                     .size(30.dp),
-                                imageUrl = myImage ?: "",
+                                imageUrl = viewmodel.getMyImage(),
                                 name = chat.sender_name
                             )
                         } else {
                             ProfileImage(
                                 modifier = Modifier.size(30.dp),
-                                viewmodel.image ?: "",
+                                viewmodel.getUserImage(chat.sender_id),
                                 chat.sender_name
                             )
                             Spacer(modifier = Modifier.width(5.dp))
@@ -95,39 +87,39 @@ fun ChatScreen(uid: String?, myImage: String?, viewmodel: ChatViewmodel = hiltVi
             }
         }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        BasicTextField(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .padding(10.dp),
-            value = viewmodel.message.value,
-            onValueChange = {
-                viewmodel.message.value = it
-            },
-            textStyle = TextStyle.Default.copy(
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-        )
-
-        Image(
-            modifier = Modifier
-                .padding(end = 10.dp, bottom = 10.dp)
-                .size(40.dp)
-                .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                .padding(5.dp)
-                .clickable {
-                    viewmodel.sendMessage()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BasicTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onTertiary,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .padding(10.dp),
+                value = viewmodel.message.value,
+                onValueChange = {
+                    viewmodel.message.value = it
                 },
-            painter = painterResource(id = R.drawable.ic_send),
-            contentDescription = "send",
-            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSecondary)
-        )
-    } }
+                textStyle = TextStyle.Default.copy(
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
 
+            Image(
+                modifier = Modifier
+                    .padding(end = 10.dp, bottom = 10.dp)
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+                    .padding(5.dp)
+                    .clickable {
+                        viewmodel.sendMessage()
+                    },
+                painter = painterResource(id = R.drawable.ic_send),
+                contentDescription = "send",
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSecondary)
+            )
+        }
+    }
 }
