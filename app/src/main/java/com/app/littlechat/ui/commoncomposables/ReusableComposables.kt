@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,60 +52,63 @@ import com.app.littlechat.data.model.Chat
 
 @Composable
 fun CustomToolbar(
-    navController: NavController = rememberNavController(),
     title: String,
-    onBackPress: () -> Boolean? = {
-        navController.navigateUp()
-    },
-    onHomePress: () -> Boolean
+    onBackPress: (() -> Boolean?)? = null,
+    onHomePress: (() -> Boolean?)? = null
 ) {
     val backInteractionSource = remember { MutableInteractionSource() }
     val homeInteractionSource = remember { MutableInteractionSource() }
-    MaterialTheme {
-        Box(Modifier.padding(bottom = 10.dp)) {
-            Card(
-                shape = RoundedCornerShape(0.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White,
-                ),
+    Box(Modifier.padding(bottom = 6.dp)) {
+        Card(
+            shape = RoundedCornerShape(0.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            modifier = Modifier
+                .fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+        ) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                    .fillMaxWidth().defaultMinSize(minHeight = 50.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
+                onBackPress?.let {
                     Image(
                         modifier = Modifier
                             .clickable(
                                 indication = rememberRipple(),
                                 interactionSource = backInteractionSource
                             ) {
-                                onBackPress.invoke()
+                                it.invoke()
                             }
                             .size(50.dp)
-                            .padding(10.dp),
+                            .padding(10.dp)
+                            .align(Alignment.CenterStart),
                         painter = painterResource(id = R.drawable.back),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                         contentDescription = stringResource(
                             id = R.string.back_icon
                         )
                     )
-                    Text(text = title, fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
-
+                }
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = title,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                onHomePress?.let {
                     Image(
                         modifier = Modifier
                             .clickable(
                                 indication = rememberRipple(),
                                 interactionSource = homeInteractionSource
                             ) {
-                                onHomePress.invoke()
+                                it.invoke()
                             }
                             .size(50.dp)
-                            .padding(10.dp),
+                            .padding(10.dp)
+                            .align(Alignment.CenterEnd),
                         painter = painterResource(id = R.drawable.ic_home),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                         contentDescription = stringResource(

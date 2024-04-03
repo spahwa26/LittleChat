@@ -73,7 +73,6 @@ fun LoginScreen(
     Column {
         CustomToolbar(
             title = stringResource(id = R.string.login),
-            onHomePress = onHomeClick,
             onBackPress = onBackPress
         )
         Column(

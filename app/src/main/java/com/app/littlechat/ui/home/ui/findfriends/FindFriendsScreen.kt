@@ -1,10 +1,9 @@
-package com.app.littlechat.ui.home.ui.firends
+package com.app.littlechat.ui.home.ui.findfriends
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.ProfileImage
@@ -33,19 +34,30 @@ import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun FriendsScreen(
-    viewmodel: HomeViewmodel,
-    navActions: HomeNavigationActions,
-    bottomPadding: Dp
+fun FindFriendsScreen(
+    viewmodel: FindFriendsViewmodel = hiltViewModel(),
+    navActions: HomeNavigationActions
 ) {
     val state = viewmodel.friendsUiState.value
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = bottomPadding)
     ) {
-        CustomToolbar(title = stringResource(id = R.string.app_name))
-        if (state is HomeViewmodel.FriendsUiState.Success) {
+        CustomToolbar(
+            title = stringResource(id = R.string.find_friends),
+            onBackPress = {
+                navActions.popBack()
+                false
+            })
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = viewmodel.searchText.value,
+            onValueChange = {
+                viewmodel.updateText(it)
+            })
+
+        if (state is FindFriendsViewmodel.FriendsUiState.Success) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.friendList) { user ->
                     Box(Modifier.padding(10.dp)) {

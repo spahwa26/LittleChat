@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,11 +46,13 @@ import androidx.navigation.navOptions
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.BottomNavItem
+import com.app.littlechat.ui.home.navigation.HomeDestinations.FIND_FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeNavGraph
 import com.app.littlechat.ui.theme.LittleChatTheme
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -71,6 +76,9 @@ fun MainContent(userPreferences: UserPreferences) {
     val bottomBarVisibilityState = rememberSaveable {
         mutableStateOf(true)
     }
+    val floatingVisibilityState = rememberSaveable {
+        mutableStateOf(true)
+    }
     LittleChatTheme {
         val navController = rememberNavController()
         // A surface container using the 'background' color from the theme
@@ -78,7 +86,9 @@ fun MainContent(userPreferences: UserPreferences) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Scaffold(bottomBar = {
+            Scaffold(floatingActionButton = {
+                FloatingButton(navController, floatingVisibilityState)
+            },bottomBar = {
                 BottomNavigationBar(
                     items = listOf(
                         BottomNavItem(
@@ -123,9 +133,28 @@ fun MainContent(userPreferences: UserPreferences) {
                     userPreferences = userPreferences,
                     navController = navController,
                     bottomNavVisibilityState = bottomBarVisibilityState,
+                    floatingNavVisibilityState = floatingVisibilityState,
                     bottomPadding = (userPreferences.bottomPadding ?: 0f).dp
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun FloatingButton(navController: NavController,floatingVisibilityState: MutableState<Boolean>) {
+    val backStack=navController.currentBackStackEntryAsState()
+    AnimatedVisibility(
+        visible = floatingVisibilityState.value,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        androidx.compose.material3.FloatingActionButton(onClick = {
+            if (backStack.value?.destination?.route == FRIENDS_ROUTE) {
+                navController.navigate(FIND_FRIENDS_ROUTE)
+            }
+        }) {
+            Text(text = "+", fontWeight = FontWeight.Bold, fontSize = 30.sp)
         }
     }
 }
