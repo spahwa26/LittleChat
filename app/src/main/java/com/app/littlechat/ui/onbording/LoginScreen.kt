@@ -44,6 +44,7 @@ import com.app.littlechat.ui.commoncomposables.AppImage
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.data.UserPreferences
+import com.app.littlechat.ui.commoncomposables.EmailField
 import com.app.littlechat.ui.home.HomeActivity
 import com.app.littlechat.utility.finishActivity
 import com.app.littlechat.utility.showToast
@@ -84,7 +85,7 @@ fun LoginScreen(
             PasswordField(
                 modifier = Modifier.padding(bottom = 50.dp),
                 passwordString,
-                label = R.string.confirm
+                label = R.string.password
             )
             Box(
                 contentAlignment = Alignment.Center, modifier = Modifier
@@ -121,23 +122,6 @@ fun LoginScreen(
         }
     }
 
-}
-
-@Composable
-fun EmailField(modifier: Modifier = Modifier, emailString: MutableState<String>) {
-    TextField(
-        modifier = modifier,
-        value = emailString.value,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
-        ),
-        label = { Text(text = stringResource(id = R.string.email)) },
-        onValueChange = {
-            emailString.value = it
-        }
-    )
 }
 
 @Composable

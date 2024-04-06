@@ -20,6 +20,7 @@ import com.app.littlechat.ui.home.ui.chat.FriendChatScreen
 import com.app.littlechat.ui.home.ui.chat.GroupChatScreen
 import com.app.littlechat.ui.home.ui.findfriends.FindFriendsScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
+import com.app.littlechat.ui.home.ui.profile.ProfileScreen
 import com.app.littlechat.ui.home.ui.settings.SettingsScreen
 
 @Composable
@@ -47,7 +48,7 @@ fun HomeNavGraph(
         composable(HomeDestinations.FRIENDS_ROUTE) {
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = true
-                floatingNavVisibilityState.value=true
+                floatingNavVisibilityState.value = true
             }
             FriendsScreen(viewmodel, navActions, bottomPadding)
         }
@@ -55,7 +56,7 @@ fun HomeNavGraph(
         composable(HomeDestinations.GROUPS_ROUTE) {
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = true
-                floatingNavVisibilityState.value=true
+                floatingNavVisibilityState.value = true
             }
             GroupsScreen(viewmodel, bottomPadding, navActions)
         }
@@ -63,7 +64,7 @@ fun HomeNavGraph(
         composable(HomeDestinations.SETTINGS_ROUTE) {
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = true
-                floatingNavVisibilityState.value=false
+                floatingNavVisibilityState.value = false
             }
             SettingsScreen(bottomPadding)
         }
@@ -72,7 +73,7 @@ fun HomeNavGraph(
             FriendChatScreen()
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
-                floatingNavVisibilityState.value=false
+                floatingNavVisibilityState.value = false
             }
         }
 
@@ -80,7 +81,7 @@ fun HomeNavGraph(
             GroupChatScreen()
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
-                floatingNavVisibilityState.value=false
+                floatingNavVisibilityState.value = false
             }
         }
 
@@ -88,7 +89,7 @@ fun HomeNavGraph(
             GroupChatScreen()
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
-                floatingNavVisibilityState.value=false
+                floatingNavVisibilityState.value = false
             }
         }
 
@@ -96,7 +97,15 @@ fun HomeNavGraph(
             FindFriendsScreen(navActions = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
-                floatingNavVisibilityState.value=false
+                floatingNavVisibilityState.value = false
+            }
+        }
+
+        composable(HomeDestinations.PROFILE_ROUTE) {
+            ProfileScreen(navActions = navActions)
+            LaunchedEffect(Unit) {
+                bottomNavVisibilityState.value = false
+                floatingNavVisibilityState.value = false
             }
         }
 

@@ -1,19 +1,16 @@
 package com.app.littlechat.ui.home.navigation
 
 import androidx.navigation.NavHostController
-import androidx.navigation.navOptions
 import com.app.littlechat.ui.home.navigation.HomeArgs.CHAT_ID_ARG
 import com.app.littlechat.ui.home.navigation.HomeArgs.IMAGE_ARG
 import com.app.littlechat.ui.home.navigation.HomeArgs.NAME_ARG
-import com.app.littlechat.ui.home.navigation.HomeDestinations.FIND_FRIENDS_ROUTE
-import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
-import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
-import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
+import com.app.littlechat.ui.home.navigation.HomeArgs.USER_ID_ARG
 import com.app.littlechat.ui.home.navigation.HomeScreens.CHATS_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.FIND_FRIENDS_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.FRIENDS_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.GROUPS_CHAT_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.GROUPS_SCREEN
+import com.app.littlechat.ui.home.navigation.HomeScreens.PROFILE_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.SETTINGS_SCREEN
 
 private object HomeScreens {
@@ -23,32 +20,41 @@ private object HomeScreens {
     const val CHATS_SCREEN = "chats"
     const val GROUPS_CHAT_SCREEN = "group_chats"
     const val FIND_FRIENDS_SCREEN = "find_friends"
+    const val PROFILE_SCREEN = "profile"
 }
 
-object HomeArgs{
+object HomeArgs {
     const val CHAT_ID_ARG = "chatId"
     const val IMAGE_ARG = "image"
     const val NAME_ARG = "name"
+    const val USER_ID_ARG = "userId"
 }
 
-object HomeDestinations{
-    const val FRIENDS_ROUTE=FRIENDS_SCREEN
-    const val GROUPS_ROUTE=GROUPS_SCREEN
-    const val SETTINGS_ROUTE=SETTINGS_SCREEN
-    const val CHATS_ROUTE="$CHATS_SCREEN/{$CHAT_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
-    const val GROUP_CHAT_ROUTE="$GROUPS_CHAT_SCREEN/{$CHAT_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
-    const val FIND_FRIENDS_ROUTE=FIND_FRIENDS_SCREEN
+object HomeDestinations {
+    const val FRIENDS_ROUTE = FRIENDS_SCREEN
+    const val GROUPS_ROUTE = GROUPS_SCREEN
+    const val SETTINGS_ROUTE = SETTINGS_SCREEN
+    const val CHATS_ROUTE = "$CHATS_SCREEN/{$CHAT_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
+    const val GROUP_CHAT_ROUTE = "$GROUPS_CHAT_SCREEN/{$CHAT_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
+    const val FIND_FRIENDS_ROUTE = FIND_FRIENDS_SCREEN
+    const val PROFILE_ROUTE = "$PROFILE_SCREEN/{$USER_ID_ARG}"
 }
 
 class HomeNavigationActions(private val navController: NavHostController) {
-    fun navigateToChat(id: String, name: String, image: String){
+    fun navigateToChat(id: String, name: String, image: String) {
         navController.navigate("$CHATS_SCREEN/$id/$name/$image")
     }
-    fun navigateToGroupChat(id: String, name: String, image: String){
+
+    fun navigateToGroupChat(id: String, name: String, image: String) {
         navController.navigate("$GROUPS_CHAT_SCREEN/$id/$name/$image")
     }
 
-    fun popBack(){
+    fun navigateToProfile(id: String) {
+        navController.navigate("$PROFILE_SCREEN/$id")
+    }
+
+    fun popBack(): Boolean {
         navController.popBackStack()
+        return false
     }
 }

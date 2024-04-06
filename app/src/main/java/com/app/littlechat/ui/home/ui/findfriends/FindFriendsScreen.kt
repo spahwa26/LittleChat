@@ -10,30 +10,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
-import com.app.littlechat.ui.home.ui.HomeViewmodel
-import com.app.littlechat.utility.Constants
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -42,6 +50,8 @@ fun FindFriendsScreen(
     navActions: HomeNavigationActions
 ) {
     val state = viewmodel.friendsUiState.value
+    val focusRequester = remember { FocusRequester() }
+    val scope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
@@ -50,16 +60,33 @@ fun FindFriendsScreen(
             title = stringResource(id = R.string.find_friends),
             onBackPress = {
                 navActions.popBack()
-                false
             })
 
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+
+        TextField(
             value = viewmodel.searchText.value,
+            onValueChange = { viewmodel.updateText(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 5.dp)
+                .focusRequester(focusRequester),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            shape = CircleShape,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-            onValueChange = {
-                viewmodel.updateText(it)
-            })
+            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "") },
+            placeholder = { Text(text = "Search") }
+        )
+
+
+//        OutlinedTextField(
+//            value = viewmodel.searchText.value,
+//            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+//            onValueChange = {
+//                viewmodel.updateText(it)
+//            })
 
         if (state is FindFriendsViewmodel.FriendsUiState.Success) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -73,12 +100,12 @@ fun FindFriendsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val encodedUrl = URLEncoder.encode(
-                                        user.image.ifBlank { Constants.DUMMY_URL },
-                                        StandardCharsets.UTF_8.toString()
-                                    )
-                                    navActions.navigateToChat(user.id, user.name, encodedUrl)
-
+                                    focusRequester.freeFocus()
+                                    scope.launch {
+                                        delay(1000)
+                                        navActions.navigateToProfile(user.id)
+                                        this.cancel()
+                                    }
                                 },
                             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                         ) {
@@ -98,5 +125,9 @@ fun FindFriendsScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }

@@ -12,7 +12,7 @@ class SomethingWentWrongException() : LocalisedException(null)
 class ApiException(message: String?) : LocalisedException(message)
 
 
-fun <T> setError(resultCallback: (CustomResult<List<T>>) -> Unit, e: String? = null) {
+fun <T> setError(resultCallback: (CustomResult<T>) -> Unit, e: String? = null) {
     resultCallback.invoke(
         CustomResult.Error(
             exception = LocalisedException(e)

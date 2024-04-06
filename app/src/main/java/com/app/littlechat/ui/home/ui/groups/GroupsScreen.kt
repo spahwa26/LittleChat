@@ -38,9 +38,8 @@ fun GroupsScreen(
     navActions: HomeNavigationActions,
 ) {
     val state = viewmodel.groupsUiState.value
-    Box(
-        contentAlignment = Alignment.TopCenter,
-        modifier = Modifier
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
             .padding(bottom = bottomPadding)
     ) {

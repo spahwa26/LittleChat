@@ -2,8 +2,10 @@ package com.app.littlechat.data
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.app.littlechat.data.model.User
 import javax.inject.Inject
 
+//todo: handle null check wherever the profile params are being used
 class UserPreferences @Inject constructor(val context: Context) {
     private val prefManager by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
 
@@ -42,6 +44,8 @@ class UserPreferences @Inject constructor(val context: Context) {
     var bottomPadding: Float?
         get() = prefManager.getFloat(BOTTOM_PADDING, 0f)
         set(value) = prefManager.edit().putFloat(BOTTOM_PADDING, value ?: 0f).apply()
+
+    val myUser = User(id?:"", name?:"", email?:"",phone?:"", image?:"")
 
     fun clearPrefs() {
         prefManager.edit().clear().apply()

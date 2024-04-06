@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -28,7 +29,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +43,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,65 +63,55 @@ fun CustomToolbar(
 ) {
     val backInteractionSource = remember { MutableInteractionSource() }
     val homeInteractionSource = remember { MutableInteractionSource() }
-    Box(Modifier.padding(bottom = 6.dp)) {
-        Card(
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-            ),
-            modifier = Modifier
-                .fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-        ) {
-            Box(
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 50.dp).background(color = MaterialTheme.colorScheme.primary)
+    ) {
+        onBackPress?.let {
+            Image(
                 modifier = Modifier
-                    .fillMaxWidth().defaultMinSize(minHeight = 50.dp)
-            ) {
-                onBackPress?.let {
-                    Image(
-                        modifier = Modifier
-                            .clickable(
-                                indication = rememberRipple(),
-                                interactionSource = backInteractionSource
-                            ) {
-                                it.invoke()
-                            }
-                            .size(50.dp)
-                            .padding(10.dp)
-                            .align(Alignment.CenterStart),
-                        painter = painterResource(id = R.drawable.back),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        contentDescription = stringResource(
-                            id = R.string.back_icon
-                        )
-                    )
-                }
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = title,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.inversePrimary
+                    .clickable(
+                        indication = rememberRipple(),
+                        interactionSource = backInteractionSource
+                    ) {
+                        it.invoke()
+                    }
+                    .size(50.dp)
+                    .padding(10.dp)
+                    .align(Alignment.CenterStart),
+                painter = painterResource(id = R.drawable.back),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
+                contentDescription = stringResource(
+                    id = R.string.back_icon
                 )
-                onHomePress?.let {
-                    Image(
-                        modifier = Modifier
-                            .clickable(
-                                indication = rememberRipple(),
-                                interactionSource = homeInteractionSource
-                            ) {
-                                it.invoke()
-                            }
-                            .size(50.dp)
-                            .padding(10.dp)
-                            .align(Alignment.CenterEnd),
-                        painter = painterResource(id = R.drawable.ic_home),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        contentDescription = stringResource(
-                            id = R.string.back_icon
-                        )
-                    )
-                }
-            }
+            )
+        }
+        Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = title,
+            fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.inversePrimary
+        )
+        onHomePress?.let {
+            Image(
+                modifier = Modifier
+                    .clickable(
+                        indication = rememberRipple(),
+                        interactionSource = homeInteractionSource
+                    ) {
+                        it.invoke()
+                    }
+                    .size(50.dp)
+                    .padding(10.dp)
+                    .align(Alignment.CenterEnd),
+                painter = painterResource(id = R.drawable.ic_home),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
+                contentDescription = stringResource(
+                    id = R.string.back_icon
+                )
+            )
         }
     }
 }
@@ -177,6 +172,25 @@ fun CommonAlertDialog(
                     Text(it)
                 }
             }
+        }
+    )
+}
+
+
+
+@Composable
+fun EmailField(modifier: Modifier = Modifier, emailString: MutableState<String>) {
+    TextField(
+        modifier = modifier,
+        value = emailString.value,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
+        label = { Text(text = stringResource(id = R.string.email)) },
+        onValueChange = {
+            emailString.value = it
         }
     )
 }

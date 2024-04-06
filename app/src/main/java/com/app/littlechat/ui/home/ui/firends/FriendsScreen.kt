@@ -71,7 +71,9 @@ fun FriendsScreen(
                                     .fillMaxWidth()
                                     .padding(10.dp)
                             ) {
-                                ProfileImage(modifier = Modifier.size(50.dp), user.image, user.name)
+                                ProfileImage(modifier = Modifier.size(50.dp).clickable {
+                                    navActions.navigateToProfile(user.id)
+                                }, user.image, user.name)
                                 Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                                     Text(text = user.name)
                                     Text(text = user.email)
