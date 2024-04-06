@@ -25,10 +25,10 @@ fun Context.showToast(
     }
 }
 
-fun Context.finishActivity(): Activity {
+fun Context.finishActivity() {
     var context = this
     while (context is ContextWrapper) {
-        if (context is Activity) return context
+        if (context is Activity) return context.finish()
         context = context.baseContext
     }
     throw IllegalStateException("no activity")

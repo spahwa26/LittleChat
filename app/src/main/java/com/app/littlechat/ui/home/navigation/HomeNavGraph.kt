@@ -21,7 +21,7 @@ import com.app.littlechat.ui.home.ui.chat.GroupChatScreen
 import com.app.littlechat.ui.home.ui.findfriends.FindFriendsScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.profile.ProfileScreen
-import com.app.littlechat.ui.home.ui.settings.SettingsScreen
+import com.app.littlechat.ui.settings.SettingsScreen
 
 @Composable
 fun HomeNavGraph(
@@ -66,7 +66,7 @@ fun HomeNavGraph(
                 bottomNavVisibilityState.value = true
                 floatingNavVisibilityState.value = false
             }
-            SettingsScreen(bottomPadding)
+            SettingsScreen(bottomPadding, userPreferences)
         }
 
         composable(HomeDestinations.CHATS_ROUTE) {

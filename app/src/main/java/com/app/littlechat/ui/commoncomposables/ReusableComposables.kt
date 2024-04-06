@@ -9,9 +9,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -27,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -49,11 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.app.littlechat.R
-import com.app.littlechat.data.model.Chat
 
 @Composable
 fun CustomToolbar(
@@ -67,7 +68,8 @@ fun CustomToolbar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 50.dp).background(color = MaterialTheme.colorScheme.primary)
+            .defaultMinSize(minHeight = 50.dp)
+            .background(color = MaterialTheme.colorScheme.primary)
     ) {
         onBackPress?.let {
             Image(
@@ -136,6 +138,7 @@ fun CommonAlertDialog(
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector? = null,
+    confirmText: String = stringResource(id = R.string.ok),
     dismissText: String? = stringResource(id = R.string.cancel),
 ) {
     AlertDialog(
@@ -159,7 +162,7 @@ fun CommonAlertDialog(
                     onConfirmation()
                 }
             ) {
-                Text(stringResource(id = R.string.ok))
+                Text(confirmText)
             }
         },
         dismissButton = {
@@ -175,7 +178,6 @@ fun CommonAlertDialog(
         }
     )
 }
-
 
 
 @Composable
@@ -236,5 +238,85 @@ private fun ToolbarPreview() {
     CustomToolbar(title = "Title") {
         Toast.makeText(context, "Home Clicked!", Toast.LENGTH_SHORT).show()
         false
+    }
+}
+
+@Composable
+fun ToggleCard(
+    modifier: Modifier = Modifier,
+    text: String,
+    toggle: Boolean,
+    onChange: (Boolean) -> Unit
+) {
+    Box(modifier = modifier.padding(10.dp)) {
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            modifier = Modifier
+                .fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 75.dp)
+                    .padding(10.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = text)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = text, fontSize = 20.sp)
+                }
+                Switch(checked = toggle, onCheckedChange = {
+                    onChange.invoke(it)
+                })
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SettingsTextOption(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Box(modifier = modifier.padding(10.dp)) {
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onClick.invoke()
+                },
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 75.dp)
+                    .padding(10.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = text)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = text, fontSize = 20.sp)
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = text
+                )
+            }
+        }
     }
 }

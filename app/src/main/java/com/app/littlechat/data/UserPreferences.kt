@@ -1,6 +1,7 @@
 package com.app.littlechat.data
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import androidx.preference.PreferenceManager
 import com.app.littlechat.data.model.User
 import javax.inject.Inject
@@ -8,14 +9,20 @@ import javax.inject.Inject
 //todo: handle null check wherever the profile params are being used
 class UserPreferences @Inject constructor(val context: Context) {
     private val prefManager by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
+    private val prefManagerPersist by lazy {
+        context.getSharedPreferences(
+            "${context.packageName}_persist",
+            MODE_PRIVATE
+        )
+    }
 
     var isLoggedIn: Boolean
         set(value) = prefManager.edit().putBoolean(LOGGED_IN, value).apply()
         get() = prefManager.getBoolean(LOGGED_IN, false)
 
     var deviceToken: String?
-        get() = prefManager.getString(DEVICE_TOKEN, null)
-        set(value) = prefManager.edit().putString(DEVICE_TOKEN, value).apply()
+        get() = prefManagerPersist.getString(DEVICE_TOKEN, null)
+        set(value) = prefManagerPersist.edit().putString(DEVICE_TOKEN, value).apply()
 
     var id: String?
         get() = prefManager.getString(ID, null)
@@ -42,10 +49,18 @@ class UserPreferences @Inject constructor(val context: Context) {
         set(value) = prefManager.edit().putString(STATUS, value).apply()
 
     var bottomPadding: Float?
-        get() = prefManager.getFloat(BOTTOM_PADDING, 0f)
-        set(value) = prefManager.edit().putFloat(BOTTOM_PADDING, value ?: 0f).apply()
+        get() = prefManagerPersist.getFloat(BOTTOM_PADDING, 0f)
+        set(value) = prefManagerPersist.edit().putFloat(BOTTOM_PADDING, value ?: 0f).apply()
 
-    val myUser = User(id?:"", name?:"", email?:"",phone?:"", image?:"")
+    var isDarkTheme: Boolean
+        get() = prefManagerPersist.getBoolean(DARK_THEME_TOGGLE, false)
+        set(value) = prefManagerPersist.edit().putBoolean(DARK_THEME_TOGGLE, value).apply()
+
+    var isDynamicTheme: Boolean
+        get() = prefManagerPersist.getBoolean(DYNAMIC_THEME_TOGGLE, true)
+        set(value) = prefManagerPersist.edit().putBoolean(DYNAMIC_THEME_TOGGLE, value).apply()
+
+    val myUser = User(id ?: "", name ?: "", email ?: "", phone ?: "", image ?: "")
 
     fun clearPrefs() {
         prefManager.edit().clear().apply()
@@ -62,5 +77,7 @@ class UserPreferences @Inject constructor(val context: Context) {
         const val IMAGE = "image"
         const val STATUS = "status"
         const val BOTTOM_PADDING = "bottom_padding"
+        const val DARK_THEME_TOGGLE = "DARK_THEME_TOGGLE"
+        const val DYNAMIC_THEME_TOGGLE = "DYNAMIC_THEME_TOGGLE"
     }
 }

@@ -25,6 +25,7 @@
     <string name="my_groups">My Groups</string>
     <string name="group_chat">Group Chat</string>
     <string name="groups">Groups</string>
+    <string name="logout_alert">Are you sure you want to logout?</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -50,4 +51,21 @@
     <string name="connect_to_internet">Please connect to internet first.</string>
     <string name="empt">.</string>
     <string name="reject_request">Reject Request</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="invert_theme">Invert Theme</string>
+    <string name="disable_dynamic_theme">Disable Dynamic Theme</string>
+    <string name="yes">Yes</string>
 </resources>
