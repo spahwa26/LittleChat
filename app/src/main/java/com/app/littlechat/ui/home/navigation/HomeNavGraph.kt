@@ -3,7 +3,6 @@ package com.app.littlechat.ui.home.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -11,7 +10,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.home.ui.HomeViewmodel
@@ -31,6 +29,8 @@ fun HomeNavGraph(
     userPreferences: UserPreferences,
     bottomNavVisibilityState: MutableState<Boolean>,
     floatingNavVisibilityState: MutableState<Boolean>,
+    enableDisableDynamicColor: MutableState<Boolean>,
+    invertTheme: MutableState<Boolean>,
     bottomPadding: Dp,
     startDestination: String = HomeDestinations.FRIENDS_ROUTE,
     navActions: HomeNavigationActions = remember(navController) {
@@ -67,7 +67,13 @@ fun HomeNavGraph(
                 bottomNavVisibilityState.value = true
                 floatingNavVisibilityState.value = false
             }
-            SettingsScreen(bottomPadding, userPreferences, navActions)
+            SettingsScreen(
+                bottomPadding,
+                userPreferences,
+                navActions,
+                enableDisableDynamicColor,
+                invertTheme
+            )
         }
 
         composable(HomeDestinations.CHATS_ROUTE) {

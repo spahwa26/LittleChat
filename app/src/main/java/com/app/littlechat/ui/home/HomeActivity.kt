@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +51,6 @@ import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeNavGraph
 import com.app.littlechat.ui.theme.LittleChatTheme
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -79,7 +77,13 @@ fun MainContent(userPreferences: UserPreferences) {
     val floatingVisibilityState = rememberSaveable {
         mutableStateOf(true)
     }
-    LittleChatTheme {
+    val dynamicThemeEnabled = rememberSaveable {
+        mutableStateOf(userPreferences.isDynamicTheme)
+    }
+    val invertTheme = rememberSaveable {
+        mutableStateOf(userPreferences.invertTheme)
+    }
+    LittleChatTheme(dynamicColor = dynamicThemeEnabled, invertTheme = invertTheme) {
         val navController = rememberNavController()
         // A surface container using the 'background' color from the theme
         Surface(
@@ -88,7 +92,7 @@ fun MainContent(userPreferences: UserPreferences) {
         ) {
             Scaffold(floatingActionButton = {
                 FloatingButton(navController, floatingVisibilityState)
-            },bottomBar = {
+            }, bottomBar = {
                 BottomNavigationBar(
                     items = listOf(
                         BottomNavItem(
@@ -134,6 +138,8 @@ fun MainContent(userPreferences: UserPreferences) {
                     navController = navController,
                     bottomNavVisibilityState = bottomBarVisibilityState,
                     floatingNavVisibilityState = floatingVisibilityState,
+                    enableDisableDynamicColor = dynamicThemeEnabled,
+                    invertTheme = invertTheme,
                     bottomPadding = (userPreferences.bottomPadding ?: 0f).dp
                 )
             }
@@ -142,8 +148,8 @@ fun MainContent(userPreferences: UserPreferences) {
 }
 
 @Composable
-fun FloatingButton(navController: NavController,floatingVisibilityState: MutableState<Boolean>) {
-    val backStack=navController.currentBackStackEntryAsState()
+fun FloatingButton(navController: NavController, floatingVisibilityState: MutableState<Boolean>) {
+    val backStack = navController.currentBackStackEntryAsState()
     AnimatedVisibility(
         visible = floatingVisibilityState.value,
         enter = fadeIn(),

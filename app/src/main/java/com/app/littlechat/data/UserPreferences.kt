@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import androidx.preference.PreferenceManager
 import com.app.littlechat.data.model.User
+import com.app.littlechat.utility.Constants
 import javax.inject.Inject
 
 //todo: handle null check wherever the profile params are being used
+//todo: check usage of each variable and delete unnecessary
 class UserPreferences @Inject constructor(val context: Context) {
     private val prefManager by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     private val prefManagerPersist by lazy {
@@ -52,7 +54,7 @@ class UserPreferences @Inject constructor(val context: Context) {
         get() = prefManagerPersist.getFloat(BOTTOM_PADDING, 0f)
         set(value) = prefManagerPersist.edit().putFloat(BOTTOM_PADDING, value ?: 0f).apply()
 
-    var isDarkTheme: Boolean
+    var invertTheme: Boolean
         get() = prefManagerPersist.getBoolean(DARK_THEME_TOGGLE, false)
         set(value) = prefManagerPersist.edit().putBoolean(DARK_THEME_TOGGLE, value).apply()
 
@@ -60,7 +62,21 @@ class UserPreferences @Inject constructor(val context: Context) {
         get() = prefManagerPersist.getBoolean(DYNAMIC_THEME_TOGGLE, true)
         set(value) = prefManagerPersist.edit().putBoolean(DYNAMIC_THEME_TOGGLE, value).apply()
 
-    val myUser = User(id ?: "", name ?: "", email ?: "", phone ?: "", image ?: "")
+    val profilePic = "${id}_${Constants.PROFILE_PIC}"
+
+    val groupPic = "${id}_${Constants.GROUP_ICON}"
+
+    fun setUserData(pojo: User?) {
+        isLoggedIn = true
+        id = pojo?.id
+        name = pojo?.name
+        email = pojo?.email
+        phone = pojo?.phone_number
+        image = pojo?.image
+        status = pojo?.status
+    }
+
+    var myUser = User(id ?: "", name ?: "", email ?: "", phone ?: "", image ?: "")
 
     fun clearPrefs() {
         prefManager.edit().clear().apply()
@@ -68,7 +84,7 @@ class UserPreferences @Inject constructor(val context: Context) {
 
     companion object {
         const val LOGGED_IN = "LOGGED_IN"
-        const val DEVICE_TOKEN = "DEVICE_TOKEN"
+        const val DEVICE_TOKEN = "device_token"
 
         const val ID = "sender_id"
         const val NAME = "name"

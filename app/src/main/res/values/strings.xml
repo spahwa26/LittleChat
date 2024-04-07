@@ -66,8 +66,13 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="invert_theme">Invert Theme</string>
-    <string name="disable_dynamic_theme">Disable Dynamic Theme</string>
+    <string name="dynamic_theme">Dynamic Theme</string>
     <string name="yes">Yes</string>
     <string name="no_requests">No requests found!</string>
     <string name="update_profile">Update Profile</string>
+    <string name="permission_denied">Permission Denied!</string>
+    <string name="save">Save</string>
+    <string name="enter_valid_name">Please enter a valid name.</string>
+    <string name="enter_valid_number">Please enter a valid number.</string>
+    <string name="profile_updated">Profile Updated Successfully!</string>
 </resources>

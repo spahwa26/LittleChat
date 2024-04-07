@@ -196,11 +196,10 @@ class CommonUtilities {
             val options = BitmapFactory.Options()
 
             options.inPreferredConfig = Bitmap.Config.ARGB_8888
-            val image: Bitmap
-            if (isCamera)
-                image = CommonUtilities.rotateBitmap(BitmapFactory.decodeFile(path, options), path)
+            val image: Bitmap = if (isCamera)
+                rotateBitmap(BitmapFactory.decodeFile(path, options), path)
             else
-                image = BitmapFactory.decodeFile(path, options)
+                BitmapFactory.decodeFile(path, options)
 
             var width = image.width
             var height = image.height

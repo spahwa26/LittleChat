@@ -1,6 +1,12 @@
 package com.app.littlechat.ui.home.ui.profile
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+import android.content.Context
 import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -22,13 +28,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +43,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
+import com.app.littlechat.utility.Constants.Companion.IMAGE_MIME
+import com.app.littlechat.utility.getColors
+import com.app.littlechat.utility.getResizedBitmap
 import com.app.littlechat.utility.showToast
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -65,17 +73,33 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
     val state = profileViewmodel.profileUiState.value
     val userData = profileViewmodel.userData.value
     val context = LocalContext.current
-    val color = MaterialTheme.colorScheme
-    val imageUri = remember { mutableStateOf<Uri?>(null) }
+
+
     val launcher = rememberLauncherForActivityResult(
-        contract =
-        ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        imageUri.value = uri
+        uri?.let {
+            profileViewmodel.imageUri.value = context.getResizedBitmap(
+                uri = uri,
+                maxSize = 600,
+                fileName = profileViewmodel.getImageName()
+            )
+        }
     }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        .fillMaxSize()
-        .imePadding()) {
+
+    val galleryPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { pRes ->
+        val res = pRes.values.find { !it }
+        if (res == true) {
+            launcher.launch(IMAGE_MIME)
+        } else context.showToast(intRes = R.string.permission_denied)
+    }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+    ) {
         CustomToolbar(title = stringResource(id = R.string.profile), onBackPress = {
             navActions.popBack()
         })
@@ -98,9 +122,13 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                         .clip(CircleShape)
                         .background(Color.Transparent)
                         .clickable {
-                                   launcher.launch("image/*")
+                            checkAndRequestPermission(context, launcher, galleryPermissionLauncher)
+                            //launcher.launch("image/*")
                         },
-                    model = if (userData?.image.isNullOrBlank()) DUMMY_URL else userData?.image,
+                    model = if (profileViewmodel.imageUri.value != null) {
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(profileViewmodel.imageUri.value).build()
+                    } else if (userData?.image.isNullOrBlank()) DUMMY_URL else userData?.image,
                     contentScale = ContentScale.Crop,
                     contentDescription = "",
 
@@ -112,20 +140,20 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                         .padding(bottom = 15.dp, top = 30.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
-                    value = userData?.name ?: "",
+                    value = profileViewmodel.name.value,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next
                     ),
                     label = { Text(text = stringResource(id = R.string.name)) },
-                    onValueChange = {},
+                    onValueChange = { profileViewmodel.name.value = it },
                     enabled = profileViewmodel.isMyProfile(),
                     colors = TextFieldDefaults.colors(
-                        disabledTextColor = color.primary,
-                        disabledPlaceholderColor = color.primary,
-                        disabledLabelColor = color.primary,
+                        disabledTextColor = getColors().primary,
+                        disabledPlaceholderColor = getColors().primary,
+                        disabledLabelColor = getColors().primary,
                         disabledContainerColor = Color.Transparent
-                    )
+                    ),
                 )
 
 
@@ -143,33 +171,35 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                     label = { Text(text = stringResource(id = R.string.email)) },
                     onValueChange = {},
                     colors = TextFieldDefaults.colors(
-                        disabledTextColor = color.primary,
-                        disabledPlaceholderColor = color.primary,
-                        disabledLabelColor = color.primary,
+                        disabledTextColor = getColors().primary,
+                        disabledPlaceholderColor = getColors().primary,
+                        disabledLabelColor = getColors().primary,
                         disabledContainerColor = Color.Transparent
                     )
                 )
+
 
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(bottom = 15.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
-                    value = userData?.phone_number ?: "",
+                    value = profileViewmodel.phone.value,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next
+                        keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done
                     ),
                     label = { Text(text = stringResource(id = R.string.phone_number)) },
-                    onValueChange = {},
+                    onValueChange = { if (it.length <= 10) profileViewmodel.phone.value = it },
                     enabled = profileViewmodel.isMyProfile(),
                     colors = TextFieldDefaults.colors(
-                        disabledTextColor = color.primary,
-                        disabledPlaceholderColor = color.primary,
-                        disabledLabelColor = color.primary,
+                        disabledTextColor = getColors().primary,
+                        disabledPlaceholderColor = getColors().primary,
+                        disabledLabelColor = getColors().primary,
                         disabledContainerColor = Color.Transparent
                     )
                 )
+
 
             }
         }
@@ -225,15 +255,50 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
         context.showToast(txt = state.e)
         profileViewmodel.setIdle()
     }
+
+    if (state is ProfileViewmodel.ProfileUiState.LocalMessage) {
+        context.showToast(intRes = state.msg)
+        profileViewmodel.setIdle()
+    }
+}
+
+fun checkAndRequestPermission(
+    context: Context,
+    galleryLauncher: ManagedActivityResultLauncher<String, Uri?>,
+    permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        // Partial access on Android 14 (API level 34) or higher
+        if (ContextCompat.checkSelfPermission(
+                context,
+                READ_MEDIA_VISUAL_USER_SELECTED
+            ) == PERMISSION_GRANTED
+        )
+            galleryLauncher.launch(IMAGE_MIME)
+        else permissionLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VISUAL_USER_SELECTED))
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Full access on Android 13 (API level 33) or higher
+        if ((ContextCompat.checkSelfPermission(context, READ_MEDIA_IMAGES) == PERMISSION_GRANTED))
+            galleryLauncher.launch(IMAGE_MIME)
+        else permissionLauncher.launch(arrayOf(READ_MEDIA_IMAGES))
+    } else if (ContextCompat.checkSelfPermission(
+            context,
+            READ_EXTERNAL_STORAGE
+        ) == PERMISSION_GRANTED
+    ) {
+        galleryLauncher.launch(IMAGE_MIME)
+    } else {
+        permissionLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
+    }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-private fun ProfilePreview() {
-//    ProfileContent(
-//        ProfileViewmodel(ProfileRepository()), navActions = HomeNavigationActions(
-//            rememberNavController()
-//        )
-//    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun ProfilePreview() {
+////    ProfileContent(
+////        ProfileViewmodel(ProfileRepository()), navActions = HomeNavigationActions(
+////            rememberNavController()
+////        )
+////    )
+//}

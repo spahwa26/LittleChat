@@ -21,6 +21,10 @@ class Constants {
         const val IMAGE = "image"
         const val STATUS = "status"
         const val DUMMY_URL = "https://cdn-icons-png.flaticon.com/512/64/64495.png"
+        const val IMAGE_MIME = "image/*"
+        const val PROFILE_PIC = "profile_pic.jpeg"
+        const val GROUP_ICON = "group_icon.jpeg"
+        const val FIREBASE_STORAGE_PATH = "images/"
 
 
         //Find friends error constants

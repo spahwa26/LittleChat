@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.profile
 
+import android.graphics.Bitmap
 import android.support.annotation.StringRes
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -36,10 +37,18 @@ class ProfileViewmodel @Inject constructor(
 
     private var btnCall = BtnCall.NONE
 
+    val imageUri = mutableStateOf<Bitmap?>(null)
+
+    val name = mutableStateOf("")
+
+    val phone = mutableStateOf("")
+
     init {
         getUserData()
         getButtonText()
     }
+
+    fun getImageName()=userPreferences.profilePic
 
     private fun getUserData() {
         _profileUiState.value = ProfileUiState.Loading
@@ -50,17 +59,49 @@ class ProfileViewmodel @Inject constructor(
                         is CustomResult.Success -> {
                             setIdle()
                             userData.value = it.data
+                            name.value = it.data.name
+                            phone.value = it.data.phone_number
                         }
 
                         is CustomResult.Error -> {
                             _profileUiState.value = ProfileUiState.Error(it.exception.message)
                         }
-                        else->{}
 
                     }
                 }
             }
         }
+    }
+
+    private fun saveProfileData() {
+        if (name.value.isBlank()) {
+            _profileUiState.value = ProfileUiState.LocalMessage(R.string.enter_valid_name)
+            return
+        }
+        if (phone.value.length < 10) {
+            _profileUiState.value = ProfileUiState.LocalMessage(R.string.enter_valid_number)
+            return
+        }
+        userData.value?.let { user ->
+            _profileUiState.value=ProfileUiState.Loading
+            user.name = name.value
+            user.phone_number = phone.value
+            repository.saveProfileChanges(user, imageUri.value != null) {
+                when (it) {
+                    is CustomResult.Success -> {
+                        imageUri.value=null
+                        _profileUiState.value =
+                            ProfileUiState.LocalMessage(R.string.profile_updated)
+                    }
+
+                    is CustomResult.Error -> {
+                        _profileUiState.value = ProfileUiState.Error(it.exception.message)
+                    }
+                }
+            }
+        }
+
+
     }
 
     fun handleButtonClick() {
@@ -71,6 +112,8 @@ class ProfileViewmodel @Inject constructor(
             BtnCall.SEND_MESSAGE -> {
                 _profileUiState.value = ProfileUiState.SendMessage
             }
+
+            BtnCall.SAVE -> saveProfileData()
 
             BtnCall.NONE -> {}
         }
@@ -89,10 +132,8 @@ class ProfileViewmodel @Inject constructor(
                         }
 
                         is CustomResult.Error -> {
-                            _profileUiState.value =
-                                ProfileUiState.Error(it.exception.message)
+                            _profileUiState.value = ProfileUiState.Error(it.exception.message)
                         }
-                        else->{}
                     }
                 }
             }
@@ -113,7 +154,6 @@ class ProfileViewmodel @Inject constructor(
 
                         is CustomResult.Error -> _profileUiState.value =
                             ProfileUiState.Error(it.exception.message)
-                        else->{}
                     }
                 }
             }
@@ -134,7 +174,7 @@ class ProfileViewmodel @Inject constructor(
 
                         is CustomResult.Error -> _profileUiState.value =
                             ProfileUiState.Error(it.exception.message)
-                        else->{}
+
                     }
                 }
             }
@@ -145,7 +185,8 @@ class ProfileViewmodel @Inject constructor(
 
     private fun getButtonText() {
         if (userPreferences.id == userId) {
-            btnText.value = BtnCall.SEND_REQUEST
+            btnText.value = BtnCall.SAVE
+            btnCall = BtnCall.SAVE
         } else {
             repository.findUserInRequestList(userId ?: "", FRIEND_LIST) {
                 when (it) {
@@ -155,7 +196,6 @@ class ProfileViewmodel @Inject constructor(
                     }
 
                     is CustomResult.Error -> btnText.value = BtnCall.NONE
-                    else->{}
                 }
             }
         }
@@ -171,14 +211,14 @@ class ProfileViewmodel @Inject constructor(
         data object Loading : ProfileUiState()
         data object SendMessage : ProfileUiState()
         data class Error(val e: String?) : ProfileUiState()
+        data class LocalMessage(@StringRes val msg: Int) : ProfileUiState()
     }
 
 }
 
 enum class BtnCall(@StringRes var callText: Int) {
-    NONE(callText = R.string.empt),
-    SEND_MESSAGE(R.string.send_message),
-    SEND_REQUEST(R.string.send_request),
-    CANCEL_REQUEST(R.string.cancel_request),
-    ACCEPT_REQUEST(R.string.accept_request)
+    NONE(callText = R.string.empt), SEND_MESSAGE(R.string.send_message), SEND_REQUEST(R.string.send_request), CANCEL_REQUEST(
+        R.string.cancel_request
+    ),
+    ACCEPT_REQUEST(R.string.accept_request), SAVE(R.string.save)
 }

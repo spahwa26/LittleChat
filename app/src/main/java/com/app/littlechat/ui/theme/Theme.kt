@@ -9,7 +9,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -44,15 +46,18 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun LittleChatTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+
+    invertTheme: MutableState<Boolean> = mutableStateOf(false),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true, content: @Composable () -> Unit
+    dynamicColor: MutableState<Boolean> = mutableStateOf(false), content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        dynamicColor.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (!invertTheme.value && darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
+        invertTheme.value -> if (darkTheme) LightColorScheme else DarkColorScheme
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

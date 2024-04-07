@@ -1,19 +1,19 @@
 package com.app.littlechat.ui.settings
 
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import com.app.littlechat.BuildConfig
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
@@ -28,10 +28,12 @@ import com.app.littlechat.utility.finishActivity
 fun SettingsScreen(
     bottomPadding: Dp,
     userPreferences: UserPreferences,
-    navActions: HomeNavigationActions
+    navActions: HomeNavigationActions,
+    enableDisableDynamicColor: MutableState<Boolean>,
+    invertTheme: MutableState<Boolean>
 ) {
 
-    SettingsContent(bottomPadding, userPreferences, navActions)
+    SettingsContent(bottomPadding, userPreferences, navActions, enableDisableDynamicColor, invertTheme)
 
 }
 
@@ -40,11 +42,13 @@ fun SettingsScreen(
 fun SettingsContent(
     bottomPadding: Dp,
     userPreferences: UserPreferences,
-    navActions: HomeNavigationActions
+    navActions: HomeNavigationActions,
+    enableDisableDynamicColor: MutableState<Boolean>,
+    invertTheme: MutableState<Boolean>
 ) {
     val context = LocalContext.current
     val darkThemeToggle = remember {
-        mutableStateOf(userPreferences.isDarkTheme)
+        mutableStateOf(userPreferences.invertTheme)
     }
     val dynamicToggle = remember {
         mutableStateOf(userPreferences.isDynamicTheme)
@@ -63,17 +67,20 @@ fun SettingsContent(
             toggle = darkThemeToggle.value
         ) {
             darkThemeToggle.value = it
-            userPreferences.isDarkTheme = it
+            userPreferences.invertTheme = it
+            invertTheme.value = it
         }
 
-        ToggleCard(
-            text = stringResource(id = R.string.disable_dynamic_theme),
-            toggle = dynamicToggle.value
-        ) {
-            dynamicToggle.value = it
-            userPreferences.isDynamicTheme = it
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ToggleCard(
+                text = stringResource(id = R.string.dynamic_theme),
+                toggle = dynamicToggle.value
+            ) {
+                dynamicToggle.value = it
+                userPreferences.isDynamicTheme = it
+                enableDisableDynamicColor.value = it
+            }
         }
-
         SettingsTextOption(text = stringResource(id = R.string.update_profile)) {
             userPreferences.id?.let {
                 navActions.navigateToProfile(it)
@@ -108,13 +115,13 @@ fun SettingsContent(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-private fun SettingPrev() {
-    val context = LocalContext.current
-    SettingsContent(
-        80.dp, userPreferences = UserPreferences(context = context), HomeNavigationActions(
-            rememberNavController()
-        )
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun SettingPrev() {
+//    val context = LocalContext.current
+//    SettingsContent(
+//        80.dp, userPreferences = UserPreferences(context = context), HomeNavigationActions(
+//            rememberNavController()
+//        )
+//    )
+//}

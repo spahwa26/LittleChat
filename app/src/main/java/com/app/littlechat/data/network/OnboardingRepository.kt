@@ -79,7 +79,7 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
                 db.child("users").child(userId).child("device_token")
                     .setValue(userPreferences.deviceToken)
                 val pojo = data.getValue(User::class.java)
-                setUserData(pojo)
+                userPreferences.setUserData(pojo)
                 onResult.invoke(CustomResult.Success(true))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -88,16 +88,6 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
         } else {
             onResult.invoke(CustomResult.Error(GOTO_PROFILE, LocalisedException(null)))
         }
-    }
-
-    private fun setUserData(pojo: User?) {
-        userPreferences.isLoggedIn = true
-        userPreferences.id = pojo?.id
-        userPreferences.name = pojo?.name
-        userPreferences.email = pojo?.email
-        userPreferences.phone = pojo?.phone_number
-        userPreferences.image = pojo?.image
-        userPreferences.status = pojo?.status
     }
 
     fun signUp(email: String, password: String, onResult: (CustomResult<Boolean>) -> Unit){
