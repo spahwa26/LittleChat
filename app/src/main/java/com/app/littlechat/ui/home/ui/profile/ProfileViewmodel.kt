@@ -48,12 +48,14 @@ class ProfileViewmodel @Inject constructor(
                 repository.getProfileData(userId) {
                     when (it) {
                         is CustomResult.Success -> {
+                            setIdle()
                             userData.value = it.data
                         }
 
                         is CustomResult.Error -> {
                             _profileUiState.value = ProfileUiState.Error(it.exception.message)
                         }
+                        else->{}
 
                     }
                 }
@@ -90,6 +92,7 @@ class ProfileViewmodel @Inject constructor(
                             _profileUiState.value =
                                 ProfileUiState.Error(it.exception.message)
                         }
+                        else->{}
                     }
                 }
             }
@@ -110,6 +113,7 @@ class ProfileViewmodel @Inject constructor(
 
                         is CustomResult.Error -> _profileUiState.value =
                             ProfileUiState.Error(it.exception.message)
+                        else->{}
                     }
                 }
             }
@@ -130,6 +134,7 @@ class ProfileViewmodel @Inject constructor(
 
                         is CustomResult.Error -> _profileUiState.value =
                             ProfileUiState.Error(it.exception.message)
+                        else->{}
                     }
                 }
             }
@@ -150,6 +155,7 @@ class ProfileViewmodel @Inject constructor(
                     }
 
                     is CustomResult.Error -> btnText.value = BtnCall.NONE
+                    else->{}
                 }
             }
         }

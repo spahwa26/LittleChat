@@ -27,17 +27,18 @@ class Constants {
         const val EMPTY_LIST = 6
 
 
-        //ProfileScreen request constant
+        //Request constants
         const val FRIEND_LIST = 7
         const val REQUEST_LIST = 8
         const val GET_USER = 9
         //const val FRIEND_LIST = 7
 
-        //ProfileScreen response constant
+        //Response constant
         const val SHOW_SEND_MESSAGE = 10
         const val SHOW_SEND_REQUEST = 11
         const val SHOW_ACCEPT_REQUEST = 12
         const val SHOW_CANCEL_REQUEST = 13
+        const val SHOW_NO_DATA = 14
     }
 
 

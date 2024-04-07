@@ -46,6 +46,7 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
                     is CustomResult.Error -> {
                         checkError(it)
                     }
+                    else->{}
                 }
             }
         }
@@ -98,6 +99,7 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
                     is CustomResult.Error -> {
                         checkError(it)
                     }
+                    else->{}
                 }
             }
         }

@@ -14,11 +14,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.data.UserPreferences
-import com.app.littlechat.ui.home.ui.firends.FriendsScreen
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.ui.home.ui.chat.FriendChatScreen
 import com.app.littlechat.ui.home.ui.chat.GroupChatScreen
 import com.app.littlechat.ui.home.ui.findfriends.FindFriendsScreen
+import com.app.littlechat.ui.home.ui.firends.FriendsScreen
+import com.app.littlechat.ui.home.ui.friendrequests.FriendsRequestScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.profile.ProfileScreen
 import com.app.littlechat.ui.settings.SettingsScreen
@@ -36,8 +37,8 @@ fun HomeNavGraph(
         HomeNavigationActions(navController)
     }
 ) {
-    val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
+    //val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
+    //val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
     val viewmodel: HomeViewmodel = hiltViewModel()
     NavHost(
         navController = navController,
@@ -66,7 +67,7 @@ fun HomeNavGraph(
                 bottomNavVisibilityState.value = true
                 floatingNavVisibilityState.value = false
             }
-            SettingsScreen(bottomPadding, userPreferences)
+            SettingsScreen(bottomPadding, userPreferences, navActions)
         }
 
         composable(HomeDestinations.CHATS_ROUTE) {
@@ -103,6 +104,14 @@ fun HomeNavGraph(
 
         composable(HomeDestinations.PROFILE_ROUTE) {
             ProfileScreen(navActions = navActions)
+            LaunchedEffect(Unit) {
+                bottomNavVisibilityState.value = false
+                floatingNavVisibilityState.value = false
+            }
+        }
+
+        composable(HomeDestinations.FRIEND_REQUEST_ROUTE) {
+            FriendsRequestScreen(navActions = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
                 floatingNavVisibilityState.value = false

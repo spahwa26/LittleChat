@@ -13,26 +13,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.SettingsTextOption
 import com.app.littlechat.ui.commoncomposables.ToggleCard
+import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.finishActivity
 
 
 @Composable
-fun SettingsScreen(bottomPadding: Dp, userPreferences: UserPreferences) {
+fun SettingsScreen(
+    bottomPadding: Dp,
+    userPreferences: UserPreferences,
+    navActions: HomeNavigationActions
+) {
 
-    SettingsContent(bottomPadding, userPreferences)
+    SettingsContent(bottomPadding, userPreferences, navActions)
 
 }
 
 
 @Composable
-fun SettingsContent(bottomPadding: Dp, userPreferences: UserPreferences) {
-    val context=LocalContext.current
+fun SettingsContent(
+    bottomPadding: Dp,
+    userPreferences: UserPreferences,
+    navActions: HomeNavigationActions
+) {
+    val context = LocalContext.current
     val darkThemeToggle = remember {
         mutableStateOf(userPreferences.isDarkTheme)
     }
@@ -64,12 +74,18 @@ fun SettingsContent(bottomPadding: Dp, userPreferences: UserPreferences) {
             userPreferences.isDynamicTheme = it
         }
 
-        SettingsTextOption(text = stringResource(id = R.string.friend_requests)) {
+        SettingsTextOption(text = stringResource(id = R.string.update_profile)) {
+            userPreferences.id?.let {
+                navActions.navigateToProfile(it)
+            }
+        }
 
+        SettingsTextOption(text = stringResource(id = R.string.friend_requests)) {
+            navActions.navigateToFriendRequests()
         }
 
         SettingsTextOption(text = stringResource(id = R.string.logout)) {
-            showLogoutAlert.value=true
+            showLogoutAlert.value = true
         }
 
     }
@@ -97,6 +113,8 @@ fun SettingsContent(bottomPadding: Dp, userPreferences: UserPreferences) {
 private fun SettingPrev() {
     val context = LocalContext.current
     SettingsContent(
-        80.dp, userPreferences = UserPreferences(context = context)
+        80.dp, userPreferences = UserPreferences(context = context), HomeNavigationActions(
+            rememberNavController()
+        )
     )
 }

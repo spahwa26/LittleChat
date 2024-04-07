@@ -41,6 +41,7 @@ class HomeViewmodel @Inject constructor(private val repository: HomeRepository) 
                     is CustomResult.Error->{
                         _friendsUiState.value= FriendsUiState.Error(it.exception.message)
                     }
+                    else->{}
 
                 }
             }
@@ -59,6 +60,7 @@ class HomeViewmodel @Inject constructor(private val repository: HomeRepository) 
                     is CustomResult.Error -> {
                         _groupsUiState.value = GroupsUiState.Error(it.exception.message)
                     }
+                    else->{}
 
                 }
             }

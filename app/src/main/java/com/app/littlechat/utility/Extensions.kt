@@ -9,6 +9,8 @@ import android.net.NetworkCapabilities
 import android.support.annotation.StringRes
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 
 fun Activity.getActivity() = this
 
@@ -51,3 +53,6 @@ fun Context.isNetworkConnected() : Boolean {
     }
     return false
 }
+
+@Composable
+fun getColors() = MaterialTheme.colorScheme

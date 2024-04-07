@@ -58,6 +58,7 @@ class ChatViewmodel @Inject constructor(
                         is CustomResult.Error -> {
 
                         }
+                        else->{}
                     }
                 }
             }

@@ -68,4 +68,6 @@
     <string name="invert_theme">Invert Theme</string>
     <string name="disable_dynamic_theme">Disable Dynamic Theme</string>
     <string name="yes">Yes</string>
+    <string name="no_requests">No requests found!</string>
+    <string name="update_profile">Update Profile</string>
 </resources>

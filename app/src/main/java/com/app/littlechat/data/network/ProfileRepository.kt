@@ -4,6 +4,7 @@ import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.ui.home.ui.profile.BtnCall
+import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants.Companion.ACCEPTED
 import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.FRIEND_LIST
@@ -11,8 +12,10 @@ import com.app.littlechat.utility.Constants.Companion.RECEIVED
 import com.app.littlechat.utility.Constants.Companion.REQUESTS
 import com.app.littlechat.utility.Constants.Companion.REQUEST_LIST
 import com.app.littlechat.utility.Constants.Companion.SENT
+import com.app.littlechat.utility.Constants.Companion.SHOW_NO_DATA
 import com.app.littlechat.utility.Constants.Companion.USERS
 import com.app.littlechat.utility.setError
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -44,6 +47,51 @@ class ProfileRepository @Inject constructor(private val userPreferences: UserPre
                 setError(resultCallback, databaseError.message)
             }
         })
+    }
+
+    fun getRequests(resultCallback: (CustomResult<List<User>>) -> Unit) {
+        userPreferences.id?.let {
+            val ref = FirebaseDatabase.getInstance().reference.child(REQUESTS).child(it)
+            val requestList = mutableListOf<User>()
+            ref.addListenerForSingleValueEvent(
+                object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        requestList.clear()
+                        if (dataSnapshot.value != null) {
+                            try {
+                                for (user in dataSnapshot.children) {
+                                    user.getValue(User::class.java)?.let { reqUser ->
+                                        if (!user.key.equals(FirebaseAuth.getInstance().currentUser?.uid)) {
+                                            getProfileData(reqUser.id) { result ->
+                                                if (result is CustomResult.Success) {
+                                                    requestList.add(result.data.apply {
+                                                        status=reqUser.status
+                                                    })
+                                                }
+                                                if (user.key.equals(dataSnapshot.children.last().key)) {
+                                                    resultCallback.invoke(CustomResult.Success(requestList))
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                            } catch (e: Exception) {
+                                setError(resultCallback, e.message)
+                            }
+
+                        } else {
+                            resultCallback.invoke(CustomResult.Error(SHOW_NO_DATA))
+                        }
+
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        setError(resultCallback, databaseError.message)
+                    }
+                })
+        }
     }
 
 
@@ -152,6 +200,7 @@ class ProfileRepository @Inject constructor(private val userPreferences: UserPre
                         when (it) {
                             is CustomResult.Success -> resultCallback.invoke(CustomResult.Success(it.data))
                             is CustomResult.Error -> resultCallback.invoke(it)
+                            else->{}
                         }
                     }
                 } else
