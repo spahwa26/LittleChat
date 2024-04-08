@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.commoncomposables
 
+import android.support.annotation.RawRes
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.app.littlechat.R
 import com.app.littlechat.utility.getColors
 
@@ -129,13 +135,18 @@ fun CustomToolbar(
 
 
 @Composable
-fun AppImage(modifier: Modifier = Modifier) {
-    Image(
-        painter = painterResource(R.drawable.app_icon),
-        contentDescription = null,
-        modifier = modifier
-            .width(100.dp)
-            .height(100.dp),
+fun LottieAnimationOnboarding(modifier: Modifier = Modifier, @RawRes anim : Int) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(anim))
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever
+    )
+    LottieAnimation(
+        modifier = modifier,
+        composition = composition,
+        progress = { progress },
+        maintainOriginalImageBounds = true,
+        contentScale = ContentScale.FillBounds,
     )
 }
 

@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -29,8 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.littlechat.R
-import com.app.littlechat.ui.commoncomposables.AppImage
+import com.app.littlechat.ui.commoncomposables.LottieAnimationOnboarding
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
+import com.app.littlechat.utility.getColors
 
 
 @Composable
@@ -45,10 +47,12 @@ fun ParentView(onLoginClick: () -> Unit = {}, onSignupClick: () -> Unit = {}) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 100.dp),
+            .padding(top = 50.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        AppImage()
+        LottieAnimationOnboarding(modifier = Modifier.size(width = 300.dp, height = 350.dp), anim = R.raw.robot_hello)
+
+
 
         BottomView(onLoginClick, onSignupClick)
     }
@@ -72,7 +76,8 @@ fun BottomView(onLoginClick: () -> Unit = {}, onSignupClick: () -> Unit = {}) {
         Image(
             painter = painterResource(R.drawable.ic_chat),
             contentDescription = null,
-            modifier = Modifier.padding(bottom = 10.dp)
+            modifier = Modifier.padding(bottom = 10.dp),
+            colorFilter = ColorFilter.tint(getColors().primary)
         )
 
         Text(

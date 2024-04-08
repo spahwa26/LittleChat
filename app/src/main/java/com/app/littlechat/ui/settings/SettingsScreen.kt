@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.settings
 
+import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import com.app.littlechat.BuildConfig
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
@@ -21,6 +21,7 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.SettingsTextOption
 import com.app.littlechat.ui.commoncomposables.ToggleCard
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
+import com.app.littlechat.ui.onbording.OnboardingActivity
 import com.app.littlechat.utility.finishActivity
 
 
@@ -33,7 +34,13 @@ fun SettingsScreen(
     invertTheme: MutableState<Boolean>
 ) {
 
-    SettingsContent(bottomPadding, userPreferences, navActions, enableDisableDynamicColor, invertTheme)
+    SettingsContent(
+        bottomPadding,
+        userPreferences,
+        navActions,
+        enableDisableDynamicColor,
+        invertTheme
+    )
 
 }
 
@@ -105,6 +112,7 @@ fun SettingsContent(
             onConfirmation = {
                 userPreferences.clearPrefs()
                 showLogoutAlert.value = false
+                context.startActivity(Intent(context, OnboardingActivity::class.java))
                 context.finishActivity()
             },
             dialogTitle = stringResource(id = R.string.alert),

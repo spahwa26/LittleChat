@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.home.HomeActivity
@@ -27,9 +29,16 @@ class OnboardingActivity : ComponentActivity() {
         if (userPreferences.id != null) {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
-        } else
+        } else {
             setContent {
-                LittleChatTheme {
+
+                val dynamicThemeEnabled = rememberSaveable {
+                    mutableStateOf(userPreferences.isDynamicTheme)
+                }
+                val invertTheme = rememberSaveable {
+                    mutableStateOf(userPreferences.invertTheme)
+                }
+                LittleChatTheme(dynamicColor = dynamicThemeEnabled, invertTheme = invertTheme) {
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
@@ -39,6 +48,7 @@ class OnboardingActivity : ComponentActivity() {
                     }
                 }
             }
+        }
     }
 
 }

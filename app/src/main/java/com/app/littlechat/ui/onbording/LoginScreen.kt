@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
 import com.app.littlechat.data.network.OnboardingRepository
-import com.app.littlechat.ui.commoncomposables.AppImage
+import com.app.littlechat.ui.commoncomposables.LottieAnimationOnboarding
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.data.UserPreferences
@@ -80,7 +80,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.animateContentSize()
         ) {
-            AppImage(modifier = Modifier.padding(vertical = 50.dp))
+            LottieAnimationOnboarding(modifier = Modifier.padding(vertical = 30.dp).size(200.dp), anim = R.raw.login_simple)
             EmailField(modifier = Modifier.padding(bottom = 15.dp), emailString)
             PasswordField(
                 modifier = Modifier.padding(bottom = 50.dp),
