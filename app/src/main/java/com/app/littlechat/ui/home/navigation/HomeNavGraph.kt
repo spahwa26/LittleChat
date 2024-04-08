@@ -18,6 +18,7 @@ import com.app.littlechat.ui.home.ui.chat.GroupChatScreen
 import com.app.littlechat.ui.home.ui.findfriends.FindFriendsScreen
 import com.app.littlechat.ui.home.ui.firends.FriendsScreen
 import com.app.littlechat.ui.home.ui.friendrequests.FriendsRequestScreen
+import com.app.littlechat.ui.home.ui.group.CreateGroupScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.profile.ProfileScreen
 import com.app.littlechat.ui.settings.SettingsScreen
@@ -25,7 +26,6 @@ import com.app.littlechat.ui.settings.SettingsScreen
 @Composable
 fun HomeNavGraph(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
     userPreferences: UserPreferences,
     bottomNavVisibilityState: MutableState<Boolean>,
     floatingNavVisibilityState: MutableState<Boolean>,
@@ -33,15 +33,13 @@ fun HomeNavGraph(
     invertTheme: MutableState<Boolean>,
     bottomPadding: Dp,
     startDestination: String = HomeDestinations.FRIENDS_ROUTE,
-    navActions: HomeNavigationActions = remember(navController) {
-        HomeNavigationActions(navController)
-    }
+    navActions: HomeNavigationActions
 ) {
     //val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     //val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
     val viewmodel: HomeViewmodel = hiltViewModel()
     NavHost(
-        navController = navController,
+        navController = navActions.navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
@@ -118,6 +116,14 @@ fun HomeNavGraph(
 
         composable(HomeDestinations.FRIEND_REQUEST_ROUTE) {
             FriendsRequestScreen(navActions = navActions)
+            LaunchedEffect(Unit) {
+                bottomNavVisibilityState.value = false
+                floatingNavVisibilityState.value = false
+            }
+        }
+
+        composable(HomeDestinations.CREATE_GROUP_ROUTE) {
+            CreateGroupScreen(navActions = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
                 floatingNavVisibilityState.value = false

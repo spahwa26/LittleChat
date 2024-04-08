@@ -29,7 +29,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -135,7 +134,7 @@ fun CustomToolbar(
 
 
 @Composable
-fun LottieAnimationOnboarding(modifier: Modifier = Modifier, @RawRes anim : Int) {
+fun LottieAnimationOnboarding(modifier: Modifier = Modifier, @RawRes anim: Int) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(anim))
     val progress by animateLottieCompositionAsState(
         composition,
@@ -150,11 +149,12 @@ fun LottieAnimationOnboarding(modifier: Modifier = Modifier, @RawRes anim : Int)
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CommonAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
+    onDismissClick: () -> Unit = onDismissRequest,
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector? = null,
@@ -168,10 +168,10 @@ fun CommonAlertDialog(
             }
         },
         title = {
-            Text(text = dialogTitle)
+            Text(text = dialogTitle, fontSize = 16.sp)
         },
         text = {
-            Text(text = dialogText)
+            Text(text = dialogText, fontSize = 14.sp)
         },
         onDismissRequest = {
             onDismissRequest()
@@ -189,7 +189,7 @@ fun CommonAlertDialog(
             dismissText?.let {
                 TextButton(
                     onClick = {
-                        onDismissRequest()
+                        onDismissClick.invoke()
                     }
                 ) {
                     Text(it)
@@ -234,7 +234,7 @@ fun ChatText(msg: String, modifier: Modifier, color: Color) {
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier, imageUrl: String, name: String) {
+fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String) {
     AsyncImage(
         modifier = modifier
             .aspectRatio(1 / 1f)
@@ -246,7 +246,8 @@ fun ProfileImage(modifier: Modifier, imageUrl: String, name: String) {
             ),
         model = imageUrl,
         contentDescription = name,
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(id = R.drawable.ic_person)
     )
 }
 

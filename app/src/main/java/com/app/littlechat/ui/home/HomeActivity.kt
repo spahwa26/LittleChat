@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,15 +42,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.BottomNavItem
-import com.app.littlechat.ui.home.navigation.HomeDestinations.FIND_FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.FRIENDS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.GROUPS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeDestinations.SETTINGS_ROUTE
 import com.app.littlechat.ui.home.navigation.HomeNavGraph
+import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.theme.LittleChatTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -83,15 +83,19 @@ fun MainContent(userPreferences: UserPreferences) {
     val invertTheme = rememberSaveable {
         mutableStateOf(userPreferences.invertTheme)
     }
+
+    val navController = rememberNavController()
+    val navActions = remember(navController) {
+        HomeNavigationActions(navController)
+    }
     LittleChatTheme(dynamicColor = dynamicThemeEnabled, invertTheme = invertTheme) {
-        val navController = rememberNavController()
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             Scaffold(floatingActionButton = {
-                FloatingButton(navController, floatingVisibilityState)
+                FloatingButton(navActions, floatingVisibilityState)
             }, bottomBar = {
                 BottomNavigationBar(
                     items = listOf(
@@ -121,10 +125,7 @@ fun MainContent(userPreferences: UserPreferences) {
                     navController = navController,
                     modifier = Modifier,
                     onItemClick = {
-                        navController.navigate(it.route, navOptions = navOptions {
-                            launchSingleTop = true
-                            popUpTo(FRIENDS_ROUTE)
-                        })
+                        navActions.navigateBottomBar(it.route)
                     },
                     bottomBarState = bottomBarVisibilityState
                 )
@@ -135,12 +136,12 @@ fun MainContent(userPreferences: UserPreferences) {
                 HomeNavGraph(
                     modifier = Modifier.padding(0.dp),
                     userPreferences = userPreferences,
-                    navController = navController,
                     bottomNavVisibilityState = bottomBarVisibilityState,
                     floatingNavVisibilityState = floatingVisibilityState,
                     enableDisableDynamicColor = dynamicThemeEnabled,
                     invertTheme = invertTheme,
-                    bottomPadding = (userPreferences.bottomPadding ?: 0f).dp
+                    bottomPadding = (userPreferences.bottomPadding ?: 0f).dp,
+                    navActions = navActions
                 )
             }
         }
@@ -148,8 +149,11 @@ fun MainContent(userPreferences: UserPreferences) {
 }
 
 @Composable
-fun FloatingButton(navController: NavController, floatingVisibilityState: MutableState<Boolean>) {
-    val backStack = navController.currentBackStackEntryAsState()
+fun FloatingButton(
+    navActions: HomeNavigationActions,
+    floatingVisibilityState: MutableState<Boolean>
+) {
+    val backStack = navActions.navController.currentBackStackEntryAsState()
     AnimatedVisibility(
         visible = floatingVisibilityState.value,
         enter = fadeIn(),
@@ -157,7 +161,10 @@ fun FloatingButton(navController: NavController, floatingVisibilityState: Mutabl
     ) {
         androidx.compose.material3.FloatingActionButton(onClick = {
             if (backStack.value?.destination?.route == FRIENDS_ROUTE) {
-                navController.navigate(FIND_FRIENDS_ROUTE)
+                navActions.navigateToFindFriends()
+            }
+            else if (backStack.value?.destination?.route == GROUPS_ROUTE) {
+                navActions.navigateToCreateGroup()
             }
         }) {
             Text(text = "+", fontWeight = FontWeight.Bold, fontSize = 30.sp)

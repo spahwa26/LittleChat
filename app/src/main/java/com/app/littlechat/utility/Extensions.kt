@@ -3,11 +3,13 @@ package com.app.littlechat.utility
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.provider.Settings
 import android.support.annotation.StringRes
 import android.text.TextUtils
 import android.widget.Toast
@@ -126,6 +128,13 @@ fun Context.deleteImageFile(name: String)  {
         if(it.exists())
             it.delete()
     }
+}
+
+fun Context.gotoApplicationSettings() {
+    startActivity(Intent().apply {
+        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        data = Uri.parse("package:${packageName}")
+    })
 }
 
 fun Context.getFIleFromUri(uri: Uri, file: File): File? {

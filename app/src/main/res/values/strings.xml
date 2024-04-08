@@ -75,4 +75,9 @@
     <string name="enter_valid_name">Please enter a valid name.</string>
     <string name="enter_valid_number">Please enter a valid number.</string>
     <string name="profile_updated">Profile Updated Successfully!</string>
+    <string name="require_Storage_permission">Require storage permission!</string>
+    <string name="allow_permission_msg">To upload image you need to allow storage permission, by taping the \"Yes\" button you will be redirected to permission screen where you can allow the storage permssion and then can use the image upload feature.</string>
+    <string name="edit_group">Edit Group</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="group_name">Group Name</string>
 </resources>

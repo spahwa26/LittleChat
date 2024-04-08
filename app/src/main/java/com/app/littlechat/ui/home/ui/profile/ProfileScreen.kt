@@ -32,6 +32,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,12 +52,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.littlechat.R
+import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
 import com.app.littlechat.utility.Constants.Companion.IMAGE_MIME
 import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.getResizedBitmap
+import com.app.littlechat.utility.gotoApplicationSettings
 import com.app.littlechat.utility.showToast
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -74,6 +78,8 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
     val userData = profileViewmodel.userData.value
     val context = LocalContext.current
 
+    val showPermissionSettingsAlert = remember { mutableStateOf(false) }
+
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -91,10 +97,13 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
         ActivityResultContracts.RequestMultiplePermissions()
     ) { pRes ->
         val res = pRes.values.find { !it }
-        if (res == true) {
+        if (res == null) {
             launcher.launch(IMAGE_MIME)
-        } else context.showToast(intRes = R.string.permission_denied)
+        } else {
+            showPermissionSettingsAlert.value = true
+        }
     }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
@@ -122,7 +131,12 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                         .clip(CircleShape)
                         .background(Color.Transparent)
                         .clickable {
-                            checkAndRequestPermission(context, launcher, galleryPermissionLauncher)
+                            if (profileViewmodel.isMyProfile())
+                                checkAndRequestPermission(
+                                    context,
+                                    launcher,
+                                    galleryPermissionLauncher
+                                )
                             //launcher.launch("image/*")
                         },
                     model = if (profileViewmodel.imageUri.value != null) {
@@ -240,6 +254,22 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
             }
         }
     }
+
+    if (showPermissionSettingsAlert.value)
+        CommonAlertDialog(
+            onDismissRequest = {},
+            onDismissClick = {
+                showPermissionSettingsAlert.value = false
+            },
+            onConfirmation = {
+                showPermissionSettingsAlert.value = false
+                context.gotoApplicationSettings()
+            },
+            dialogTitle = stringResource(id = R.string.require_Storage_permission),
+            dialogText = stringResource(id = R.string.allow_permission_msg),
+            confirmText = stringResource(id = R.string.yes),
+            dismissText = stringResource(id = R.string.cancel)
+        )
 
     if (state == ProfileViewmodel.ProfileUiState.SendMessage) {
         userData?.let {

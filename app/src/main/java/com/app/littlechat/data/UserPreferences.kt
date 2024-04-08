@@ -5,6 +5,16 @@ import android.content.Context.MODE_PRIVATE
 import androidx.preference.PreferenceManager
 import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.Constants
+import com.app.littlechat.utility.Constants.Companion.BOTTOM_PADDING
+import com.app.littlechat.utility.Constants.Companion.DARK_THEME_TOGGLE
+import com.app.littlechat.utility.Constants.Companion.DEVICE_TOKEN
+import com.app.littlechat.utility.Constants.Companion.DYNAMIC_THEME_TOGGLE
+import com.app.littlechat.utility.Constants.Companion.EMAIL
+import com.app.littlechat.utility.Constants.Companion.ID
+import com.app.littlechat.utility.Constants.Companion.IMAGE
+import com.app.littlechat.utility.Constants.Companion.NAME
+import com.app.littlechat.utility.Constants.Companion.PHONE
+import com.app.littlechat.utility.Constants.Companion.STATUS
 import javax.inject.Inject
 
 //todo: handle null check wherever the profile params are being used
@@ -17,10 +27,6 @@ class UserPreferences @Inject constructor(val context: Context) {
             MODE_PRIVATE
         )
     }
-
-    var isLoggedIn: Boolean
-        set(value) = prefManager.edit().putBoolean(LOGGED_IN, value).apply()
-        get() = prefManager.getBoolean(LOGGED_IN, false)
 
     var deviceToken: String?
         get() = prefManagerPersist.getString(DEVICE_TOKEN, null)
@@ -67,7 +73,6 @@ class UserPreferences @Inject constructor(val context: Context) {
     val groupPic = "${id}_${Constants.GROUP_ICON}"
 
     fun setUserData(pojo: User?) {
-        isLoggedIn = true
         id = pojo?.id
         name = pojo?.name
         email = pojo?.email
@@ -80,20 +85,5 @@ class UserPreferences @Inject constructor(val context: Context) {
 
     fun clearPrefs() {
         prefManager.edit().clear().apply()
-    }
-
-    companion object {
-        const val LOGGED_IN = "LOGGED_IN"
-        const val DEVICE_TOKEN = "device_token"
-
-        const val ID = "sender_id"
-        const val NAME = "name"
-        const val EMAIL = "email"
-        const val PHONE = "phone"
-        const val IMAGE = "image"
-        const val STATUS = "status"
-        const val BOTTOM_PADDING = "bottom_padding"
-        const val DARK_THEME_TOGGLE = "DARK_THEME_TOGGLE"
-        const val DYNAMIC_THEME_TOGGLE = "DYNAMIC_THEME_TOGGLE"
     }
 }

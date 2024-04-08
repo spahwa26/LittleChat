@@ -1,6 +1,7 @@
 package com.app.littlechat.data.network
 
 import android.util.Log
+import androidx.compose.ui.text.toUpperCase
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.Constants.Companion.EMPTY_LIST
@@ -23,11 +24,11 @@ class FindFriendsRepository @Inject constructor() {
 
     fun searchFriends(name: String, resultCallback: (CustomResult<List<User>>) -> Unit) {
 
-        val queryData =FirebaseDatabase.getInstance().getReference("users").orderByChild("name").startAt(name).endAt(name + "\uf8ff")
+        val queryData =FirebaseDatabase.getInstance().getReference(USERS).orderByChild(NAME).startAt(name.uppercase()).endAt(name.lowercase() + "\uf8ff")
 
         //val queryData = db.orderByChild(NAME).startAt(name).endAt(name + "\uf8ff")
 
-        queryData.addValueEventListener(object : ValueEventListener {
+        queryData.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val usersList = mutableListOf<User>()
                 if (dataSnapshot.value != null) {
@@ -49,7 +50,7 @@ class FindFriendsRepository @Inject constructor() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("", "onCancelled: ")
+                Log.d("", "onCancelled: ")//todo: handle
             }
         })
     }

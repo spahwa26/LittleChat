@@ -4,31 +4,35 @@ import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.GroupDetails
 import com.app.littlechat.data.model.User
-import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
+import com.app.littlechat.utility.Constants.Companion.MY_GROUPS
+import com.app.littlechat.utility.Constants.Companion.USERS
 import com.app.littlechat.utility.LocalisedException
 import com.app.littlechat.utility.SomethingWentWrongException
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor(private val userPreferences: UserPreferences) {
     private val db by lazy {
         FirebaseDatabase.getInstance().getReference()
     }
+    private var friendsRef: DatabaseReference? = null
+    private var friendsListener: ValueEventListener? = null
+    private var groupsRef: DatabaseReference? = null
+    private var groupsListener: ValueEventListener? = null
 
     fun getFriends(resultCallback: (CustomResult<List<User>>) -> Unit) {
         userPreferences.id?.let {
             val friendList = mutableListOf<User>()
-            val ref = db.child(Constants.FRIENDS).child(it)
-            ref.addValueEventListener(
+            friendsRef = db.child(Constants.FRIENDS).child(it)
+            friendsListener = friendsRef?.addValueEventListener(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         if (dataSnapshot.value != null) {
@@ -88,7 +92,7 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
         friendList: MutableList<User>,
         resultCallback: (CustomResult<List<User>>) -> Unit
     ) {
-        db.child("users/$id")
+        db.child(USERS).child(id)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.value != null) {
@@ -121,15 +125,15 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
         userPreferences.id?.let {
             CoroutineScope(IO).launch {
                 val groupList = mutableListOf<GroupDetails>()
-                db.child("users").child(it).child("my_groups").addValueEventListener(
+                groupsRef = db.child(USERS).child(it).child(MY_GROUPS)
+                groupsListener = groupsRef?.addValueEventListener(
                     object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            CommonUtilities.hideProgressWheel()
                             for (ids in dataSnapshot.children) {
                                 val id = ids.getValue(String::class.java) ?: ""
                                 db.child("groups").child(id).child("group_details").get()
                                     .addOnCompleteListener {
-                                        val dataSnapshotIn=it.result
+                                        val dataSnapshotIn = it.result
                                         if (dataSnapshotIn.value != null) {
                                             val group =
                                                 dataSnapshotIn.getValue(GroupDetails::class.java)
@@ -162,6 +166,18 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
                     })
             }
 
+        }
+    }
+
+
+    fun removeListeners() {
+        friendsListener?.let {
+            friendsRef?.removeEventListener(it)
+            friendsListener = null
+        }
+        groupsListener?.let {
+            groupsRef?.removeEventListener(it)
+            groupsListener = null
         }
     }
 

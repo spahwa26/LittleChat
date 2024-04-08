@@ -14,10 +14,10 @@ class Constants {
         const val MESSAGES = "messages"
         const val PARTICIPANTS = "participants"
         const val USERS = "users"
+        const val MY_GROUPS = "my_groups"
         const val ID = "sender_id"
         const val NAME = "name"
         const val EMAIL = "email"
-        const val PHONE = "phone"
         const val IMAGE = "image"
         const val STATUS = "status"
         const val DUMMY_URL = "https://cdn-icons-png.flaticon.com/512/64/64495.png"
@@ -34,15 +34,16 @@ class Constants {
         //Request constants
         const val FRIEND_LIST = 7
         const val REQUEST_LIST = 8
-        const val GET_USER = 9
-        //const val FRIEND_LIST = 7
 
         //Response constant
-        const val SHOW_SEND_MESSAGE = 10
-        const val SHOW_SEND_REQUEST = 11
-        const val SHOW_ACCEPT_REQUEST = 12
-        const val SHOW_CANCEL_REQUEST = 13
         const val SHOW_NO_DATA = 14
+
+        //PREFERENCES
+        const val DEVICE_TOKEN = "device_token"
+        const val PHONE = "phone_number"
+        const val BOTTOM_PADDING = "bottom_padding"
+        const val DARK_THEME_TOGGLE = "DARK_THEME_TOGGLE"
+        const val DYNAMIC_THEME_TOGGLE = "DYNAMIC_THEME_TOGGLE"
     }
 
 

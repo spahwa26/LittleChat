@@ -31,7 +31,6 @@ class OnboardingActivity : ComponentActivity() {
             finish()
         } else {
             setContent {
-
                 val dynamicThemeEnabled = rememberSaveable {
                     mutableStateOf(userPreferences.isDynamicTheme)
                 }

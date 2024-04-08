@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.chat
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.ChatText
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatLayout(viewmodel: ChatViewmodel) {
     Column(
@@ -43,7 +45,7 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
             items(viewmodel.chatList.reversed()) { chat ->
 
                 val isMyMsg = chat.sender_id == viewmodel.getId()
-                Box(Modifier.padding(10.dp)) {
+                Box(Modifier.padding(10.dp).animateItemPlacement()) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -93,10 +95,10 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
                     .weight(1f)
                     .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.onTertiary,
+                        color = MaterialTheme.colorScheme.inversePrimary,
                         shape = RoundedCornerShape(20.dp)
                     )
-                    .padding(10.dp),
+                    .padding(15.dp),
                 value = viewmodel.message.value,
                 onValueChange = {
                     viewmodel.message.value = it

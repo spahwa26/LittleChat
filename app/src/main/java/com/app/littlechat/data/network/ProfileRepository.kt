@@ -2,16 +2,18 @@ package com.app.littlechat.data.network
 
 import android.net.Uri
 import com.app.littlechat.data.UserPreferences
-import com.app.littlechat.data.UserPreferences.Companion.DEVICE_TOKEN
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.ui.home.ui.profile.BtnCall
 import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants.Companion.ACCEPTED
+import com.app.littlechat.utility.Constants.Companion.DEVICE_TOKEN
 import com.app.littlechat.utility.Constants.Companion.FIREBASE_STORAGE_PATH
 import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.FRIEND_LIST
-import com.app.littlechat.utility.Constants.Companion.PROFILE_PIC
+import com.app.littlechat.utility.Constants.Companion.IMAGE
+import com.app.littlechat.utility.Constants.Companion.NAME
+import com.app.littlechat.utility.Constants.Companion.PHONE
 import com.app.littlechat.utility.Constants.Companion.RECEIVED
 import com.app.littlechat.utility.Constants.Companion.REQUESTS
 import com.app.littlechat.utility.Constants.Companion.REQUEST_LIST
@@ -249,7 +251,11 @@ class ProfileRepository @Inject constructor(private val userPreferences: UserPre
 
     private fun updateProfile(user: User, resultCallback: (CustomResult<Unit>) -> Unit) {
         userPreferences.id?.let {
-            db.child(USERS).child(it).setValue(user).addOnCompleteListener { task ->
+            val userMap = mutableMapOf<String, Any>()
+            userMap[NAME] = user.name
+            userMap[PHONE] = user.phone_number
+            userMap[IMAGE] = user.image
+            db.child(USERS).child(it).updateChildren(userMap).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     userPreferences.setUserData(user)
                     db.child(USERS).child(it).child(DEVICE_TOKEN)
