@@ -40,6 +40,9 @@ class ChatViewmodel @Inject constructor(
     val friendImage: String? = savedStateHandle[HomeArgs.IMAGE_ARG]
     private var participant = listOf<User>()
     private var isGroupChat = false
+    @StringRes
+    var warningText: Int = R.string.remove_friend_warning
+    var confirmationCallback: (() -> Unit)? = null
 
 
     private val _chatUiState: MutableState<ChatUiState?> = mutableStateOf(null)
@@ -48,6 +51,7 @@ class ChatViewmodel @Inject constructor(
     val chatList = mutableStateListOf<Chat>()
     val progressBarState = mutableStateOf(false)
     val popupMenuState = mutableStateOf(false)
+    val warningAlert = mutableStateOf(false)
 
 
     fun initChat(isGroup: Boolean = false) {
@@ -94,7 +98,29 @@ class ChatViewmodel @Inject constructor(
             progressBarState.value = false
             when (it) {
                 is CustomResult.Success -> {
-                    _chatUiState.value = ChatUiState.RemovedOrLeftSuccess
+                    _chatUiState.value =
+                        ChatUiState.RemovedOrLeftSuccess(R.string.group_left_success)
+                }
+
+                is CustomResult.Error -> {
+                    _chatUiState.value = ChatUiState.Error(it.exception.message)
+                }
+            }
+        }
+    }
+
+    fun deleteGroup() {
+        if (chatId == null) {
+            _chatUiState.value = ChatUiState.LocalMessage(R.string.something_wrong)
+            return
+        }
+        progressBarState.value = true
+        repository.deleteGroup(chatId, participant) {
+            progressBarState.value = false
+            when (it) {
+                is CustomResult.Success -> {
+                    _chatUiState.value =
+                        ChatUiState.RemovedOrLeftSuccess(R.string.group_delete_success)
                 }
 
                 is CustomResult.Error -> {
@@ -115,7 +141,8 @@ class ChatViewmodel @Inject constructor(
             progressBarState.value = false
             when (it) {
                 is CustomResult.Success -> {
-                    _chatUiState.value = ChatUiState.RemovedOrLeftSuccess
+                    _chatUiState.value =
+                        ChatUiState.RemovedOrLeftSuccess(R.string.group_delete_success)
                 }
 
                 is CustomResult.Error -> {
@@ -173,7 +200,7 @@ class ChatViewmodel @Inject constructor(
 
     sealed class ChatUiState {
         data object Loading : ChatUiState()
-        data object RemovedOrLeftSuccess : ChatUiState()
+        data class RemovedOrLeftSuccess(@StringRes val msg: Int) : ChatUiState()
         data class Error(val msg: String?) : ChatUiState()
         data class LocalMessage(@StringRes val msg: Int) : ChatUiState()
     }

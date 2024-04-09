@@ -15,6 +15,7 @@ import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.data.network.HomeRepository
 import com.app.littlechat.ui.home.navigation.HomeArgs
+import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.haveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -52,14 +53,14 @@ class CreateGroupViewmodel @Inject constructor(
     val progressState = mutableStateOf(false)
 
 
-    init {
+    fun getGroupData(isInfoOnly: Boolean=false) {
         groupName.value = if (name.isNullOrBlank()) "" else name ?: ""
         if (grpId.haveData()) {
             repository.getParticipantsData(grpId!!) { result ->
                 when (result) {
                     is CustomResult.Success -> {
-                        oldMembers = result.data.filter {
-                            it.id != userPreferences.id
+                        oldMembers = if (isInfoOnly) result.data else result.data.filter {
+                            (it.id != userPreferences.id)
                         }
                         selectedMembers.clear()
                         selectedMembers.addAll(oldMembers)
@@ -77,6 +78,7 @@ class CreateGroupViewmodel @Inject constructor(
     }
 
     fun getImageName() = repository.getGroupImageName(getGroupId())
+    fun isMyGroup(id: String) = (grpId?.contains(id) == true)
 
     private fun getGroupId(): String =
         if (grpId.haveData()) grpId!! else "${userPreferences.id}__${currentTime}"
@@ -125,8 +127,9 @@ class CreateGroupViewmodel @Inject constructor(
             return
         }
 
-        if (selectedMembers.size<2) {
-            _createGroupUiState.value = CreateGroupUiState.LocalMessage(R.string.must_be_two_members)
+        if (selectedMembers.size < 2) {
+            _createGroupUiState.value =
+                CreateGroupUiState.LocalMessage(R.string.must_be_two_members)
             return
         }
 

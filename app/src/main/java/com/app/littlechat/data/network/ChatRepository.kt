@@ -3,6 +3,7 @@ package com.app.littlechat.data.network
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.Chat
 import com.app.littlechat.data.model.CustomResult
+import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.Constants.Companion.CHATS
 import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.GROUPS
@@ -117,4 +118,24 @@ class ChatRepository @Inject constructor(private val userPreferences: UserPrefer
         }
     }
 
+
+    fun deleteGroup(
+        groupId: String, members: List<User>,
+        resultCallback: (CustomResult<Unit>) -> Unit
+    ) {
+        userPreferences.id?.let { myId ->
+            db.child(GROUPS).child(groupId).removeValue()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        members.forEach {
+                            db.child(USERS).child(it.id).child(MY_GROUPS).child(groupId).removeValue()
+                        }
+                        resultCallback.invoke(CustomResult.Success(Unit))
+                    } else
+                        setError(resultCallback, task.exception?.message)
+                }.addOnFailureListener { e ->
+                    setError(resultCallback, e.message)
+                }
+        }
+    }
 }

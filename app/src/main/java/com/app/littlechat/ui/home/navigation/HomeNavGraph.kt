@@ -16,6 +16,7 @@ import com.app.littlechat.ui.home.ui.findfriends.FindFriendsScreen
 import com.app.littlechat.ui.home.ui.firends.FriendsScreen
 import com.app.littlechat.ui.home.ui.friendrequests.FriendsRequestScreen
 import com.app.littlechat.ui.home.ui.group.CreateGroupScreen
+import com.app.littlechat.ui.home.ui.group.GroupInfoScreen
 import com.app.littlechat.ui.home.ui.groups.GroupsScreen
 import com.app.littlechat.ui.home.ui.profile.ProfileScreen
 import com.app.littlechat.ui.settings.SettingsScreen
@@ -113,6 +114,14 @@ fun HomeNavGraph(
 
         composable(HomeDestinations.CREATE_GROUP_ROUTE) {
             CreateGroupScreen(navActions = navActions)
+            LaunchedEffect(Unit) {
+                bottomNavVisibilityState.value = false
+                floatingNavVisibilityState.value = false
+            }
+        }
+
+        composable(HomeDestinations.GROUP_INFO_ROUTE) {
+            GroupInfoScreen(navActions = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
                 floatingNavVisibilityState.value = false

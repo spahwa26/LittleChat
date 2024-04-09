@@ -14,6 +14,7 @@ import com.app.littlechat.ui.home.navigation.HomeScreens.FRIENDS_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.FRIEND_REQUEST_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.GROUPS_CHAT_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.GROUPS_SCREEN
+import com.app.littlechat.ui.home.navigation.HomeScreens.GROUP_INFO_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.PROFILE_SCREEN
 import com.app.littlechat.ui.home.navigation.HomeScreens.SETTINGS_SCREEN
 
@@ -27,6 +28,7 @@ private object HomeScreens {
     const val PROFILE_SCREEN = "profile"
     const val FRIEND_REQUEST_SCREEN = "friend_requests"
     const val CREATE_GROUP_SCREEN = "create_group"
+    const val GROUP_INFO_SCREEN = "group_info"
 }
 
 object HomeArgs {
@@ -47,6 +49,7 @@ object HomeDestinations {
     const val PROFILE_ROUTE = "$PROFILE_SCREEN/{$USER_ID_ARG}"
     const val FRIEND_REQUEST_ROUTE = FRIEND_REQUEST_SCREEN
     const val CREATE_GROUP_ROUTE = "$CREATE_GROUP_SCREEN/{$GROUP_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
+    const val GROUP_INFO_ROUTE = "$GROUP_INFO_SCREEN/{$GROUP_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
 }
 
 
@@ -76,8 +79,12 @@ class HomeNavigationActions(val navController: NavHostController) {
         navController.navigate(HomeDestinations.FIND_FRIENDS_ROUTE)
     }
 
-    fun navigateToCreateGroup(groupId: String? = " ", name: String?=" ", image: String?=" ") {
+    fun navigateToCreateGroup(groupId: String? = " ", name: String? = " ", image: String? = " ") {
         navController.navigate("$CREATE_GROUP_SCREEN/$groupId/$name/$image")
+    }
+
+    fun navigateToGroupInfo(groupId: String? = " ", name: String? = " ", image: String? = " ") {
+        navController.navigate("$GROUP_INFO_SCREEN/$groupId/$name/$image")
     }
 
     fun navigateBottomBar(route: String) {
