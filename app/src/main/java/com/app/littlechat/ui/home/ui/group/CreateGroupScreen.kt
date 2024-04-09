@@ -244,7 +244,7 @@ fun MainContent(
     if (state is CreateGroupViewmodel.CreateGroupUiState.Success) {
         if (!state.isEdit) {
             context.showToast(R.string.group_created)
-            navActions.popBack(Pair(REFRESH, true))
+            navActions.popBack()
         }
         viewmodel.setIdle()
     }

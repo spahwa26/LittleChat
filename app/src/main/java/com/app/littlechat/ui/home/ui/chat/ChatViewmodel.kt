@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.chat
 
+import android.support.annotation.StringRes
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -36,12 +37,15 @@ class ChatViewmodel @Inject constructor(
     }
     val name: String? = savedStateHandle[HomeArgs.NAME_ARG]
     private val friendImage: String? = savedStateHandle[HomeArgs.IMAGE_ARG]
+    private var participant = listOf<User>()
+    private var isGroupChat = false
+
+
     private val _chatUiState: MutableState<ChatUiState?> = mutableStateOf(null)
     val chatUiState: State<ChatUiState?> = _chatUiState
     val message = mutableStateOf("")
     val chatList = mutableStateListOf<Chat>()
-    private var participant = listOf<User>()
-    private var isGroupChat = false
+    val progressBarState = mutableStateOf(false)
 
     fun initChat(isGroup: Boolean = false) {
         isGroupChat = isGroup
@@ -75,14 +79,35 @@ class ChatViewmodel @Inject constructor(
         }
     }
 
+    fun removeFriend() {
+        if (chatId == null) {
+            _chatUiState.value = ChatUiState.LocalError(R.string.something_wrong)
+            return
+        }
+
+        progressBarState.value = true
+        repository.removeFriend(chatId) {
+            progressBarState.value = false
+            when (it) {
+                is CustomResult.Success -> {
+                    _chatUiState.value = ChatUiState.FriendRemovedSuccess
+                }
+
+                is CustomResult.Error -> {
+                    _chatUiState.value = ChatUiState.Error(it.exception.message)
+                }
+            }
+        }
+    }
+
     fun sendMessage() {
         val context = userPreferences.context
         if (message.value.trim().isBlank()) {
-            updateChatState(ChatUiState.Error(context.getString(R.string.please_type)))
+            _chatUiState.value = ChatUiState.Error(context.getString(R.string.please_type))
             return
         }
         if (!context.isNetworkConnected()) {
-            updateChatState(ChatUiState.Error(context.getString(R.string.connect_to_internet)))
+            _chatUiState.value = ChatUiState.Error(context.getString(R.string.connect_to_internet))
             return
         }
         val myId = userPreferences.id ?: ""
@@ -99,14 +124,13 @@ class ChatViewmodel @Inject constructor(
         viewModelScope.launch {
             repository.sendMessage(chat, if (isGroupChat) chatId ?: "" else friendChatId) {
                 if (it is CustomResult.Error)
-                    updateChatState(ChatUiState.Error(it.exception.message))
+                    _chatUiState.value = ChatUiState.Error(it.exception.message)
             }
         }
     }
 
-    private fun updateChatState(state: ChatUiState) {
-        _chatUiState.value = state
-        _chatUiState.value = ChatUiState.Idle
+    fun setIdle() {
+        _chatUiState.value = null
     }
 
     fun getUserImage(id: String): String {
@@ -123,10 +147,10 @@ class ChatViewmodel @Inject constructor(
     fun getMyImage() = userPreferences.image ?: ""
 
     sealed class ChatUiState {
-        data object Idle : ChatUiState()
         data object Loading : ChatUiState()
-        data object Success : ChatUiState()
+        data object FriendRemovedSuccess : ChatUiState()
         data class Error(val msg: String?) : ChatUiState()
+        data class LocalError(@StringRes val msg: Int) : ChatUiState()
     }
 
     override fun onCleared() {

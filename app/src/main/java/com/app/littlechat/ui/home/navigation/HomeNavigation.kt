@@ -68,12 +68,7 @@ class HomeNavigationActions(val navController: NavHostController) {
         navController.navigate(FRIEND_REQUEST_SCREEN)
     }
 
-    fun popBack(pair: Pair<String, Any>?=null): Boolean {
-        pair?.let {
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.set(pair.first, pair.second)
-        }
+    fun popBack(): Boolean {
         navController.popBackStack()
         return false
     }
@@ -93,3 +88,10 @@ class HomeNavigationActions(val navController: NavHostController) {
         })
     }
 }
+
+
+//pair?.let {
+//    navController.previousBackStackEntry
+//        ?.savedStateHandle
+//        ?.set(pair.first, pair.second)
+//}

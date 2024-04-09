@@ -1,15 +1,18 @@
 package com.app.littlechat.data.network
 
+import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.Chat
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.Constants.Companion.CHATS
+import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.GROUPS
 import com.app.littlechat.utility.Constants.Companion.MESSAGES
 import com.app.littlechat.utility.Constants.Companion.PARTICIPANTS
 import com.app.littlechat.utility.Constants.Companion.USERS
 import com.app.littlechat.utility.LocalisedException
 import com.app.littlechat.utility.SomethingWentWrongException
+import com.app.littlechat.utility.setError
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,7 +20,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 
-class ChatRepository @Inject constructor() {
+class ChatRepository @Inject constructor(private val userPreferences: UserPreferences) {
     private val db by lazy {
         FirebaseDatabase.getInstance().getReference()
     }
@@ -31,11 +34,11 @@ class ChatRepository @Inject constructor() {
         chatID: String,
         resultCallback: (CustomResult<Chat?>) -> Unit
     ) {
-        if(chatListener!=null){
+        if (chatListener != null) {
             return
         }
         ref = if (isGroupChat) db.child(GROUPS).child(chatID).child(MESSAGES)
-            else db.child(CHATS).child(chatID).child(MESSAGES)
+        else db.child(CHATS).child(chatID).child(MESSAGES)
         chatListener = ref?.addChildEventListener(object :
             ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -118,37 +121,26 @@ class ChatRepository @Inject constructor() {
 
     }
 
-    private fun <T> setError(resultCallback: (CustomResult<List<T>>) -> Unit, e: String? = null) {
-        resultCallback.invoke(
-            CustomResult.Error(
-                exception = LocalisedException(e)
-            )
-        )
-    }
-
     fun removeListeners() {
         chatListener?.let {
             ref?.removeEventListener(it)
-            chatListener=null
+            chatListener = null
         }
     }
 
 
-//    private fun removeFriend(pos: Int) {
-//        CommonUtilities.showProgressWheel(activity)
-//        val id = friendList.get(pos).id
-//        FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(userID)?.child(id)
-//            ?.removeValue()?.addOnCompleteListener { task ->
-//                CommonUtilities.hideProgressWheel()
-//                if (task.isSuccessful) {
-//                    FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(id)
-//                        ?.child(userID)?.removeValue()
-//                } else
-//                    CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
-//            }?.addOnFailureListener { e ->
-//                CommonUtilities.hideProgressWheel()
-//                CommonUtilities.showAlert(activity, e.message, false, true)
-//            }
-//    }
+    fun removeFriend(friendId: String, resultCallback: (CustomResult<Unit>) -> Unit) {
+        userPreferences.id?.let { myId ->
+            db.child(FRIENDS).child(myId).child(friendId).removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    db.child(FRIENDS).child(friendId).child(myId).removeValue()
+                    resultCallback.invoke(CustomResult.Success(Unit))
+                } else
+                    setError(resultCallback, task.exception?.message)
+            }.addOnFailureListener { e ->
+                setError(resultCallback, e.message)
+            }
+        }
+    }
 
 }

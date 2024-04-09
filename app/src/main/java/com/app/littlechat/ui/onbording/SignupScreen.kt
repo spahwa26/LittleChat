@@ -28,7 +28,6 @@ import com.app.littlechat.utility.showToast
 
 @Composable
 fun SignupScreen(
-    onHomeClick: () -> Boolean,
     onBackPress: () -> Boolean?,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
@@ -47,7 +46,6 @@ fun SignupScreen(
     Column {
         CustomToolbar(
             title = stringResource(id = R.string.signup),
-            onRightBtnTap = onHomeClick,
             onBackPress = onBackPress
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -97,7 +95,7 @@ fun SignupScreen(
 @Preview
 @Composable
 fun SignupScreenPreview() {
-    SignupScreen(onHomeClick = { false }, onBackPress = { false }, OnboardingViewModel(
+    SignupScreen( onBackPress = { false }, OnboardingViewModel(
         OnboardingRepository(UserPreferences(LocalContext.current))
     )
     )

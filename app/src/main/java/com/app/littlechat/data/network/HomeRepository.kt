@@ -53,21 +53,9 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
                                 for (user in dataSnapshot.children) {
                                     user.getValue(User::class.java)?.let { friend ->
                                         if (user.key.equals(dataSnapshot.children.last().key))
-                                            getUsersData(
-                                                user.key ?: "",
-                                                true,
-                                                friend.status,
-                                                friendList,
-                                                resultCallback
-                                            )
+                                            getUsersData(user.key ?: "", true, friend.status, friendList, resultCallback)
                                         else
-                                            getUsersData(
-                                                user.key ?: "",
-                                                false,
-                                                friend.status,
-                                                friendList,
-                                                resultCallback
-                                            )
+                                            getUsersData(user.key ?: "", false, friend.status, friendList, resultCallback)
                                     }
                                 }
 
@@ -135,8 +123,8 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
     }
 
     fun getGroups(resultCallback: (CustomResult<List<GroupDetails>>) -> Unit) {
-        userPreferences.id?.let {
-            groupsRef = db.child(USERS).child(it).child(MY_GROUPS)
+        userPreferences.id?.let { myId ->
+            groupsRef = db.child(USERS).child(myId).child(MY_GROUPS)
             groupsListener = groupsRef?.addValueEventListener(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -322,23 +310,5 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
             groupsListener = null
         }
     }
-
-
-//    private fun removeFriend(pos: Int) {
-//        CommonUtilities.showProgressWheel(activity)
-//        val id = friendList.get(pos).id
-//        FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(userID)?.child(id)
-//            ?.removeValue()?.addOnCompleteListener { task ->
-//                CommonUtilities.hideProgressWheel()
-//                if (task.isSuccessful) {
-//                    FirebaseDatabase.getInstance().reference.child(Constants.FRIENDS)?.child(id)
-//                        ?.child(userID)?.removeValue()
-//                } else
-//                    CommonUtilities.showAlert(activity, task.exception!!.message, false, true)
-//            }?.addOnFailureListener { e ->
-//                CommonUtilities.hideProgressWheel()
-//                CommonUtilities.showAlert(activity, e.message, false, true)
-//            }
-//    }
 
 }

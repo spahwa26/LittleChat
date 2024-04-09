@@ -81,4 +81,7 @@
     <string name="upload_image">Upload Image</string>
     <string name="group_name">Group Name</string>
     <string name="group_created">Group created successfully!</string>
+    <string name="unfriend">Unfriend</string>
+    <string name="something_wrong">Something went wrong, please try again.</string>
+    <string name="friend_removed">%s has been removed from your friend list.</string>
 </resources>

@@ -134,7 +134,7 @@ fun MainContent(userPreferences: UserPreferences) {
                     userPreferences.bottomPadding = it.calculateBottomPadding().value
                 }
                 HomeNavGraph(
-                    modifier = Modifier.padding(0.dp),
+                    modifier = Modifier.fillMaxSize(),
                     userPreferences = userPreferences,
                     bottomNavVisibilityState = bottomBarVisibilityState,
                     floatingNavVisibilityState = floatingVisibilityState,

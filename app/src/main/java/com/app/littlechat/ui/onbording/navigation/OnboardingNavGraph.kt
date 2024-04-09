@@ -48,10 +48,7 @@ fun LittleChatNavGraph(
         }
 
         composable(LittleChatDestinations.SIGNUP_ROUTE) {
-            SignupScreen(onHomeClick = {
-                navController.navigateUp()
-            },
-                onBackPress = { navController.navigateUp() })
+            SignupScreen(onBackPress = { navController.navigateUp() })
         }
 
     }

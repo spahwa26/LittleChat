@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.support.annotation.RawRes
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,10 +46,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -72,13 +69,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -89,13 +86,12 @@ import com.app.littlechat.R
 import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.gotoApplicationSettings
-import kotlinx.coroutines.delay
 
 @Composable
 fun CustomToolbar(
     title: String,
     onBackPress: (() -> Boolean?)? = null,
-    onRightBtnTap: (() -> Boolean?)? = null,
+    onRightBtnTap: (() -> Unit)? = null,
     rightButtonIcon: Int = R.drawable.ic_home,
     content: (@Composable ColumnScope.() -> Unit)? = null,
     mutableState: MutableState<Boolean>? = null
@@ -136,49 +132,37 @@ fun CustomToolbar(
             color = MaterialTheme.colorScheme.inversePrimary
         )
         onRightBtnTap?.let {
-            Image(
-                modifier = Modifier
-                    .clickable(
-                        indication = rememberRipple(),
-                        interactionSource = homeInteractionSource
-                    ) {
-                        it.invoke()
-                    }
-                    .size(50.dp)
-                    .padding(10.dp)
-                    .align(Alignment.CenterEnd),
-                painter = painterResource(rightButtonIcon),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
-                contentDescription = stringResource(
-                    id = R.string.back_icon
+            Box (modifier = Modifier.align(Alignment.CenterEnd)){
+                Image(
+                    modifier = Modifier
+                        .clickable(
+                            indication = rememberRipple(),
+                            interactionSource = homeInteractionSource
+                        ) {
+                            it.invoke()
+                        }
+                        .size(50.dp)
+                        .padding(10.dp),
+                    painter = painterResource(rightButtonIcon),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
+                    contentDescription = stringResource(
+                        id = R.string.back_icon
+                    )
                 )
-            )
-        }
-
-        if (content != null && mutableState != null) {
-            DropdownMenu(
-                expanded = mutableState.value,
-                onDismissRequest = { mutableState.value = false }
-            ) {
-                content(this)
+                if (content != null && mutableState != null) {
+                    DropdownMenu(
+                        modifier = Modifier.background(getColors().inversePrimary),
+                        expanded = mutableState.value,
+                        offset = DpOffset(x = (-3).dp, y=(-2).dp),
+                        onDismissRequest = { mutableState.value = false }
+                    ) {
+                        content(this)
+                    }
+                }
             }
         }
     }
 }
-
-//DropdownMenuItem(
-//text = {  Text("Refresh") },
-//onClick = { /* Handle refresh! */ }
-//)
-//DropdownMenuItem(
-//text = { Text("Settings") },
-//onClick = { /* Handle settings! */ }
-//)
-//HorizontalDivider()
-//DropdownMenuItem(
-//text = { Text("Send Feedback") },
-//onClick = { /* Handle send feedback! */ }
-//)
 
 @Composable
 fun ProgressDialog(state: MutableState<Boolean>) {
@@ -325,7 +309,6 @@ private fun ToolbarPreview() {
     val context = LocalContext.current
     CustomToolbar(title = "Title", onRightBtnTap = {
         Toast.makeText(context, "Home Clicked!", Toast.LENGTH_SHORT).show()
-        false
     })
 }
 
