@@ -46,6 +46,7 @@ import com.app.littlechat.ui.commoncomposables.PermissionComposable
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
 import com.app.littlechat.utility.getColors
+import com.app.littlechat.utility.getEncodedUrl
 import com.app.littlechat.utility.getResizedBitmap
 import com.app.littlechat.utility.showToast
 import java.net.URLEncoder
@@ -218,10 +219,7 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
 
     if (state == ProfileViewmodel.ProfileUiState.SendMessage) {
         userData?.let {
-            val encodedUrl = URLEncoder.encode(
-                userData.image.ifBlank { DUMMY_URL }, StandardCharsets.UTF_8.toString()
-            )
-            navActions.navigateToChat(userData.id, userData.name, encodedUrl)
+            navActions.navigateToChat(userData.id, userData.name, userData.image.getEncodedUrl())
             profileViewmodel.setIdle()
         }
     }

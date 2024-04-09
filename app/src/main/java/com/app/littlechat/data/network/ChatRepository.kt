@@ -3,27 +3,23 @@ package com.app.littlechat.data.network
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.Chat
 import com.app.littlechat.data.model.CustomResult
-import com.app.littlechat.data.model.User
 import com.app.littlechat.utility.Constants.Companion.CHATS
 import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.GROUPS
 import com.app.littlechat.utility.Constants.Companion.MESSAGES
+import com.app.littlechat.utility.Constants.Companion.MY_GROUPS
 import com.app.littlechat.utility.Constants.Companion.PARTICIPANTS
 import com.app.littlechat.utility.Constants.Companion.USERS
-import com.app.littlechat.utility.LocalisedException
 import com.app.littlechat.utility.SomethingWentWrongException
 import com.app.littlechat.utility.setError
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 
-class ChatRepository @Inject constructor(private val userPreferences: UserPreferences) {
-    private val db by lazy {
-        FirebaseDatabase.getInstance().getReference()
-    }
+class ChatRepository @Inject constructor(private val userPreferences: UserPreferences) :
+    CommonRepo() {
     var isGroupChat = false
 
     private var chatListener: ChildEventListener? = null
@@ -77,49 +73,6 @@ class ChatRepository @Inject constructor(private val userPreferences: UserPrefer
             }
     }
 
-    fun getParticipantsData(
-        groupId: String,
-        resultCallback: (CustomResult<List<User>>) -> Unit
-    ) {
-
-        val participantsList = mutableListOf<User>()
-        db.child(GROUPS).child(groupId)
-            .child(PARTICIPANTS).get().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val dataSnapshot = task.result
-                    if (dataSnapshot.value != null) {
-                        try {
-                            participantsList.clear()
-                            for (ids in dataSnapshot.children) {
-                                ids.getValue(String::class.java)?.let { id ->
-                                    db.child(USERS).child(id).get().addOnCompleteListener { task1 ->
-                                        if (task1.isSuccessful) {
-                                            val userSnapshot = task1.result
-                                            userSnapshot.getValue(User::class.java)?.let { user ->
-                                                participantsList.add(user)
-                                            }
-                                            if (ids.key.equals(dataSnapshot.children.last().key)) {
-                                                resultCallback.invoke(
-                                                    CustomResult.Success(
-                                                        participantsList
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-
-                        } catch (e: Exception) {
-                            setError(resultCallback, e.message)
-                        }
-
-                    }
-                }
-            }
-
-    }
 
     fun removeListeners() {
         chatListener?.let {
@@ -131,15 +84,36 @@ class ChatRepository @Inject constructor(private val userPreferences: UserPrefer
 
     fun removeFriend(friendId: String, resultCallback: (CustomResult<Unit>) -> Unit) {
         userPreferences.id?.let { myId ->
-            db.child(FRIENDS).child(myId).child(friendId).removeValue().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    db.child(FRIENDS).child(friendId).child(myId).removeValue()
-                    resultCallback.invoke(CustomResult.Success(Unit))
-                } else
-                    setError(resultCallback, task.exception?.message)
-            }.addOnFailureListener { e ->
-                setError(resultCallback, e.message)
-            }
+            db.child(FRIENDS).child(myId).child(friendId).removeValue()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        db.child(FRIENDS).child(friendId).child(myId).removeValue()
+                        resultCallback.invoke(CustomResult.Success(Unit))
+                    } else
+                        setError(resultCallback, task.exception?.message)
+                }.addOnFailureListener { e ->
+                    setError(resultCallback, e.message)
+                }
+        }
+    }
+
+
+    fun leaveGroup(
+        groupId: String,
+        resultCallback: (CustomResult<Unit>) -> Unit
+    ) {
+        userPreferences.id?.let { myId ->
+            db.child(USERS).child(myId).child(MY_GROUPS).child(groupId).removeValue()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        db.child(GROUPS).child(groupId).child(PARTICIPANTS).child(myId)
+                            .removeValue()
+                        resultCallback.invoke(CustomResult.Success(Unit))
+                    } else
+                        setError(resultCallback, task.exception?.message)
+                }.addOnFailureListener { e ->
+                    setError(resultCallback, e.message)
+                }
         }
     }
 

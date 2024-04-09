@@ -28,6 +28,7 @@ import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
+import com.app.littlechat.utility.getEncodedUrl
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -58,11 +59,7 @@ fun GroupsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val encodedUrl = URLEncoder.encode(
-                                        group.image.ifBlank { DUMMY_URL },
-                                        StandardCharsets.UTF_8.toString()
-                                    )
-                                    navActions.navigateToGroupChat(group.id, group.name, encodedUrl)
+                                    navActions.navigateToGroupChat(group.id, group.name, group.image.getEncodedUrl())
                                 },
                             elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
                         ) {

@@ -15,7 +15,7 @@ import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.data.network.HomeRepository
 import com.app.littlechat.ui.home.navigation.HomeArgs
-import com.app.littlechat.utility.Constants.Companion.NULL
+import com.app.littlechat.utility.haveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +29,11 @@ class CreateGroupViewmodel @Inject constructor(
 
     private val currentTime = System.currentTimeMillis()
 
-    var grpId: String? = savedStateHandle[HomeArgs.GROUP_ID_ARG]
+    val grpId: String? = savedStateHandle[HomeArgs.GROUP_ID_ARG]
+
+    var name: String? = savedStateHandle[HomeArgs.NAME_ARG]
+
+    var image: String? = savedStateHandle[HomeArgs.IMAGE_ARG]
 
     private val _createGroupUiState: MutableState<CreateGroupUiState?> = mutableStateOf(null)
 
@@ -39,6 +43,8 @@ class CreateGroupViewmodel @Inject constructor(
 
     var usersList = mutableStateListOf<User>()
 
+    private var oldMembers = listOf<User>()
+
     val selectedMembers = mutableStateListOf<User>()
 
     val imageUri = mutableStateOf<Bitmap?>(null)
@@ -47,13 +53,33 @@ class CreateGroupViewmodel @Inject constructor(
 
 
     init {
-        getFriends()
+        groupName.value = if (name.isNullOrBlank()) "" else name ?: ""
+        if (grpId.haveData()) {
+            repository.getParticipantsData(grpId!!) { result ->
+                when (result) {
+                    is CustomResult.Success -> {
+                        oldMembers = result.data.filter {
+                            it.id != userPreferences.id
+                        }
+                        selectedMembers.clear()
+                        selectedMembers.addAll(oldMembers)
+                        getFriends()
+                    }
+
+                    is CustomResult.Error -> {
+                        _createGroupUiState.value =
+                            CreateGroupUiState.Error(result.exception.message ?: "")
+                    }
+                }
+            }
+        } else
+            getFriends()
     }
 
     fun getImageName() = repository.getGroupImageName(getGroupId())
 
     private fun getGroupId(): String =
-        if (grpId == null || grpId.equals(NULL)) "${userPreferences.id}__${currentTime}" else "${grpId}__${currentTime}"
+        if (grpId.haveData()) grpId!! else "${userPreferences.id}__${currentTime}"
 
     fun updateItem(user: User, index: Int) {
         usersList.removeAt(index)
@@ -73,7 +99,13 @@ class CreateGroupViewmodel @Inject constructor(
             repository.getFriends {
                 when (it) {
                     is CustomResult.Success -> {
-                        usersList.addAll(it.data)
+                        val newList = it.data.map { user ->
+                            val isAvailable =
+                                selectedMembers.find { selectedUser -> selectedUser.id == user.id }
+                            user.isAdded = isAvailable != null
+                            return@map user
+                        }
+                        usersList.addAll(newList)
                     }
 
                     is CustomResult.Error -> {
@@ -93,16 +125,21 @@ class CreateGroupViewmodel @Inject constructor(
             return
         }
 
-        val participantsList = selectedMembers.map {
-            it.id
-        }.toMutableList()
+        if (selectedMembers.size<2) {
+            _createGroupUiState.value = CreateGroupUiState.LocalMessage(R.string.must_be_two_members)
+            return
+        }
+
+        val participantsList = selectedMembers.associateBy({ it.id }, { it.id })
         viewModelScope.launch {
             progressState.value = true
-            repository.createGroup(
-                participantsList,
+            repository.createEditGroup(
+                participantsList.toMutableMap(),
+                oldUsersList = oldMembers,
                 groupName = groupName.value,
                 groupID = getGroupId(),
                 isUploadImage = imageUri.value != null,
+                isEdit = (!grpId.isNullOrBlank()),
             ) {
                 when (it) {
                     is CustomResult.Success -> {

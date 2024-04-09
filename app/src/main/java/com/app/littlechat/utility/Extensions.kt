@@ -15,20 +15,21 @@ import android.text.TextUtils
 import android.widget.Toast
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.app.littlechat.utility.Constants.Companion.NULL
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 fun Activity.getActivity() = this
 
 fun Context.showToast(
-    @StringRes intRes: Int? = null,
-    txt: String? = null,
-    length: Int = Toast.LENGTH_SHORT
+    @StringRes intRes: Int? = null, txt: String? = null, length: Int = Toast.LENGTH_SHORT
 ) {
     val toastMsg = if (intRes != null) getString(intRes) else txt
     if (toastMsg != null) {
@@ -55,8 +56,7 @@ fun Context.isNetworkConnected(): Boolean {
     val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     capabilities.also {
         if (it != null) {
-            if (it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
-                return true
+            if (it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return true
             else if (it.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
                 return true
             }
@@ -69,10 +69,7 @@ fun Context.isNetworkConnected(): Boolean {
 fun getColors() = MaterialTheme.colorScheme
 
 fun Context.getResizedBitmap(
-    uri: Uri,
-    maxSize: Int,
-    fileName: String,
-    isCamera: Boolean = false
+    uri: Uri, maxSize: Int, fileName: String, isCamera: Boolean = false
 ): Bitmap? {
 
     val options = BitmapFactory.Options()
@@ -84,10 +81,11 @@ fun Context.getResizedBitmap(
     var saveBitmap: Bitmap? = null
 
     file?.absolutePath?.let { path ->
-        val image: Bitmap = if (isCamera)
-            CommonUtilities.rotateBitmap(BitmapFactory.decodeFile(path, options), path)
-        else
-            BitmapFactory.decodeFile(path, options)
+        val image: Bitmap = if (isCamera) CommonUtilities.rotateBitmap(
+            BitmapFactory.decodeFile(path, options),
+            path
+        )
+        else BitmapFactory.decodeFile(path, options)
 
         var width = image.width
         var height = image.height
@@ -123,10 +121,9 @@ fun Context.getResizedBitmap(
 
 fun Context.getImageFile(name: String) = File(cacheDir, name)
 
-fun Context.deleteImageFile(name: String)  {
+fun Context.deleteImageFile(name: String) {
     File(cacheDir, name).let {
-        if(it.exists())
-            it.delete()
+        if (it.exists()) it.delete()
     }
 }
 
@@ -154,6 +151,19 @@ fun Context.getFIleFromUri(uri: Uri, file: File): File? {
     } finally {
         inputStream?.close()
     }
+}
+
+fun String?.getEncodedUrl(): String {
+    return URLEncoder.encode(
+        if (isNullOrBlank()) Constants.DUMMY_URL else this, StandardCharsets.UTF_8.toString()
+    )
+}
+
+fun String?.haveData(): Boolean {
+    return if (this == null) false
+    else if (this.isBlank()) false
+    else if (this == NULL) false
+    else true
 }
 
 //fun Context.getRealPathFromURI(contentUri: Uri): String? {

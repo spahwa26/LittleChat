@@ -77,11 +77,17 @@
     <string name="profile_updated">Profile Updated Successfully!</string>
     <string name="require_Storage_permission">Require storage permission!</string>
     <string name="allow_permission_msg">To upload image you need to allow storage permission, by taping the \"Yes\" button you will be redirected to permission screen where you can allow the storage permssion and then can use the image upload feature.</string>
-    <string name="edit_group">Edit Group</string>
+    <string name="update_group">Update Group</string>
+    <string name="group_info">Group Info</string>
+    <string name="delete_group">Delete Group</string>
+    <string name="leave_Group">Leave Group</string>
     <string name="upload_image">Upload Image</string>
     <string name="group_name">Group Name</string>
     <string name="group_created">Group created successfully!</string>
+    <string name="group_updated">Group updated successfully!</string>
     <string name="unfriend">Unfriend</string>
     <string name="something_wrong">Something went wrong, please try again.</string>
     <string name="friend_removed">%s has been removed from your friend list.</string>
+    <string name="must_be_two_members">Please select at-least two members to create or update the group.</string>
+    <string name="group_left_success">Group left successfully!</string>
 </resources>

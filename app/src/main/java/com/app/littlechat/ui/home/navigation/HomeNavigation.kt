@@ -35,7 +35,6 @@ object HomeArgs {
     const val NAME_ARG = "name"
     const val USER_ID_ARG = "userId"
     const val GROUP_ID_ARG = "group_id"
-    const val REFRESH = "refresh"
 }
 
 object HomeDestinations {
@@ -47,7 +46,7 @@ object HomeDestinations {
     const val FIND_FRIENDS_ROUTE = FIND_FRIENDS_SCREEN
     const val PROFILE_ROUTE = "$PROFILE_SCREEN/{$USER_ID_ARG}"
     const val FRIEND_REQUEST_ROUTE = FRIEND_REQUEST_SCREEN
-    const val CREATE_GROUP_ROUTE = "$CREATE_GROUP_SCREEN/{$GROUP_ID_ARG}"
+    const val CREATE_GROUP_ROUTE = "$CREATE_GROUP_SCREEN/{$GROUP_ID_ARG}/{$NAME_ARG}/{$IMAGE_ARG}"
 }
 
 
@@ -77,8 +76,8 @@ class HomeNavigationActions(val navController: NavHostController) {
         navController.navigate(HomeDestinations.FIND_FRIENDS_ROUTE)
     }
 
-    fun navigateToCreateGroup(groupId: String? = null) {
-        navController.navigate("$CREATE_GROUP_SCREEN/$groupId")
+    fun navigateToCreateGroup(groupId: String? = " ", name: String?=" ", image: String?=" ") {
+        navController.navigate("$CREATE_GROUP_SCREEN/$groupId/$name/$image")
     }
 
     fun navigateBottomBar(route: String) {

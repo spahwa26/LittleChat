@@ -28,6 +28,7 @@ import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.utility.Constants
+import com.app.littlechat.utility.getEncodedUrl
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -58,11 +59,8 @@ fun FriendsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val encodedUrl = URLEncoder.encode(
-                                        user.image.ifBlank { Constants.DUMMY_URL },
-                                        StandardCharsets.UTF_8.toString()
-                                    )
-                                    navActions.navigateToChat(user.id, user.name, encodedUrl)
+
+                                    navActions.navigateToChat(user.id, user.name, user.image.getEncodedUrl())
 
                                 },
                             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)

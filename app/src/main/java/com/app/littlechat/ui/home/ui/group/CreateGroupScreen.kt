@@ -54,7 +54,6 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.PermissionComposable
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.ProgressDialog
-import com.app.littlechat.ui.home.navigation.HomeArgs.REFRESH
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.NULL
 import com.app.littlechat.utility.getResizedBitmap
@@ -85,7 +84,7 @@ fun MainContent(
                 .animateContentSize()
                 .fillMaxSize()
         ) {
-            CustomToolbar(title = stringResource(id = if (viewmodel.grpId.equals(NULL)) R.string.create_group else R.string.edit_group),
+            CustomToolbar(title = stringResource(id = if (viewmodel.grpId.equals(NULL)) R.string.create_group else R.string.update_group),
                 onBackPress = {
                     navActions.popBack()
                 })
@@ -98,7 +97,9 @@ fun MainContent(
                         .clickable { triggerPermissionComposable.value = true },
                     imageUrl = if (viewmodel.imageUri.value != null) ImageRequest.Builder(
                         LocalContext.current
-                    ).data(viewmodel.imageUri.value).build() else R.drawable.ic_upload_placeholder,
+                    ).data(viewmodel.imageUri.value).build()
+                    else if (!viewmodel.image.isNullOrBlank()) viewmodel.image ?: ""
+                    else R.drawable.ic_upload_placeholder,
                     name = stringResource(
                         id = R.string.upload_image
                     )
@@ -242,7 +243,9 @@ fun MainContent(
     ProgressDialog(state = viewmodel.progressState)
 
     if (state is CreateGroupViewmodel.CreateGroupUiState.Success) {
-        if (!state.isEdit) {
+        if (state.isEdit) {
+            context.showToast(R.string.group_updated)
+        } else {
             context.showToast(R.string.group_created)
             navActions.popBack()
         }
