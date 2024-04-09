@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.groups
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +36,7 @@ import java.nio.charset.StandardCharsets
 fun GroupsScreen(
     viewmodel: HomeViewmodel,
     bottomPadding: Dp,
-    navActions: HomeNavigationActions,
+    navActions: HomeNavigationActions
 ) {
     val state = viewmodel.groupsUiState.value
     Column(
@@ -46,6 +47,7 @@ fun GroupsScreen(
         CustomToolbar(title = stringResource(id = R.string.app_name))
         if (state is HomeViewmodel.GroupsUiState.Success) {
             LazyColumn {
+                Log.d("getGroups: ", "Item count ${state.groupList.size}")
                 items(state.groupList) { group ->
                     Box(Modifier.padding(10.dp)) {
                         Card(
@@ -80,4 +82,8 @@ fun GroupsScreen(
             }
         }
     }
+
+//    navActions.navController.GetOnceResult<Boolean>(keyResult = REFRESH) {
+//        viewmodel.getGroups()
+//    }
 }

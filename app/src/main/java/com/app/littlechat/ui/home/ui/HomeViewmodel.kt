@@ -75,6 +75,8 @@ class HomeViewmodel @Inject constructor(private val repository: HomeRepository) 
         data class Error(val e: String?) : FriendsUiState()
     }
 
+
+
     override fun onCleared() {
         super.onCleared()
         repository.removeListeners()

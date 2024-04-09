@@ -47,7 +47,7 @@ fun SignupScreen(
     Column {
         CustomToolbar(
             title = stringResource(id = R.string.signup),
-            onHomePress = onHomeClick,
+            onRightBtnTap = onHomeClick,
             onBackPress = onBackPress
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

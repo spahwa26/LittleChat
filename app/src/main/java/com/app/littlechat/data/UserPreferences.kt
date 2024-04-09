@@ -70,8 +70,6 @@ class UserPreferences @Inject constructor(val context: Context) {
 
     val profilePic = "${id}_${Constants.PROFILE_PIC}"
 
-    val groupPic = "${id}_${Constants.GROUP_ICON}"
-
     fun setUserData(pojo: User?) {
         id = pojo?.id
         name = pojo?.name

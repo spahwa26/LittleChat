@@ -1,7 +1,15 @@
 package com.app.littlechat.ui.commoncomposables
 
+import android.Manifest
+import android.content.Context
+import android.net.Uri
+import android.os.Build
 import android.support.annotation.RawRes
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +18,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -29,6 +38,8 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -36,8 +47,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +74,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -67,13 +86,19 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.app.littlechat.R
+import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.getColors
+import com.app.littlechat.utility.gotoApplicationSettings
+import kotlinx.coroutines.delay
 
 @Composable
 fun CustomToolbar(
     title: String,
     onBackPress: (() -> Boolean?)? = null,
-    onHomePress: (() -> Boolean?)? = null
+    onRightBtnTap: (() -> Boolean?)? = null,
+    rightButtonIcon: Int = R.drawable.ic_home,
+    content: (@Composable ColumnScope.() -> Unit)? = null,
+    mutableState: MutableState<Boolean>? = null
 ) {
     val backInteractionSource = remember { MutableInteractionSource() }
     val homeInteractionSource = remember { MutableInteractionSource() }
@@ -110,7 +135,7 @@ fun CustomToolbar(
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.inversePrimary
         )
-        onHomePress?.let {
+        onRightBtnTap?.let {
             Image(
                 modifier = Modifier
                     .clickable(
@@ -122,12 +147,54 @@ fun CustomToolbar(
                     .size(50.dp)
                     .padding(10.dp)
                     .align(Alignment.CenterEnd),
-                painter = painterResource(id = R.drawable.ic_home),
+                painter = painterResource(rightButtonIcon),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
                 contentDescription = stringResource(
                     id = R.string.back_icon
                 )
             )
+        }
+
+        if (content != null && mutableState != null) {
+            DropdownMenu(
+                expanded = mutableState.value,
+                onDismissRequest = { mutableState.value = false }
+            ) {
+                content(this)
+            }
+        }
+    }
+}
+
+//DropdownMenuItem(
+//text = {  Text("Refresh") },
+//onClick = { /* Handle refresh! */ }
+//)
+//DropdownMenuItem(
+//text = { Text("Settings") },
+//onClick = { /* Handle settings! */ }
+//)
+//HorizontalDivider()
+//DropdownMenuItem(
+//text = { Text("Send Feedback") },
+//onClick = { /* Handle send feedback! */ }
+//)
+
+@Composable
+fun ProgressDialog(state: MutableState<Boolean>) {
+    if (state.value) {
+        Dialog(
+            onDismissRequest = {},
+            DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(getColors().inversePrimary, shape = RoundedCornerShape(8.dp))
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -256,10 +323,10 @@ fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String) {
 @Composable
 private fun ToolbarPreview() {
     val context = LocalContext.current
-    CustomToolbar(title = "Title") {
+    CustomToolbar(title = "Title", onRightBtnTap = {
         Toast.makeText(context, "Home Clicked!", Toast.LENGTH_SHORT).show()
         false
-    }
+    })
 }
 
 @Composable
@@ -369,3 +436,115 @@ fun NoDataView(text: String, modifier: Modifier = Modifier) {
         )
     }
 }
+
+@Composable
+fun PermissionComposable(state: MutableState<Boolean>, uriCallback: (uri: Uri) -> Unit) {
+    val context = LocalContext.current
+
+    val showPermissionSettingsAlert = remember { mutableStateOf(false) }
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            uriCallback.invoke(uri)
+        }
+    }
+
+
+    val galleryPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { pRes ->
+        val res = pRes.values.find { !it }
+        if (res == null) {
+            launcher.launch(Constants.IMAGE_MIME)
+        } else {
+            showPermissionSettingsAlert.value = true
+        }
+    }
+
+    if (state.value) {
+        checkAndRequestPermission(
+            context,
+            launcher,
+            galleryPermissionLauncher
+        )
+        state.value = false
+    }
+
+    if (showPermissionSettingsAlert.value)
+        CommonAlertDialog(
+            onDismissRequest = {},
+            onDismissClick = {
+                showPermissionSettingsAlert.value = false
+            },
+            onConfirmation = {
+                showPermissionSettingsAlert.value = false
+                context.gotoApplicationSettings()
+            },
+            dialogTitle = stringResource(id = R.string.require_Storage_permission),
+            dialogText = stringResource(id = R.string.allow_permission_msg),
+            confirmText = stringResource(id = R.string.yes),
+            dismissText = stringResource(id = R.string.cancel)
+        )
+}
+
+fun checkAndRequestPermission(
+    context: Context,
+    galleryLauncher: ManagedActivityResultLauncher<String, Uri?>,
+    permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        // Partial access on Android 14 (API level 34) or higher
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            ) == PermissionChecker.PERMISSION_GRANTED
+        )
+            galleryLauncher.launch(Constants.IMAGE_MIME)
+        else permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            )
+        )
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Full access on Android 13 (API level 33) or higher
+        if ((ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PermissionChecker.PERMISSION_GRANTED)
+        )
+            galleryLauncher.launch(Constants.IMAGE_MIME)
+        else permissionLauncher.launch(arrayOf(Manifest.permission.READ_MEDIA_IMAGES))
+    } else if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PermissionChecker.PERMISSION_GRANTED
+    ) {
+        galleryLauncher.launch(Constants.IMAGE_MIME)
+    } else {
+        permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+    }
+}
+
+//@Composable
+//fun <T> NavController.GetOnceResult(keyResult: String, onResult: (T) -> Unit){
+//    val valueScreenResult =  currentBackStackEntry
+//        ?.savedStateHandle
+//        ?.get<T>(keyResult)
+//
+//    valueScreenResult?.let {
+//        currentBackStackEntry
+//            ?.savedStateHandle
+//            ?.remove<T>(keyResult)
+//
+//        LaunchedEffect(it) {
+//            delay(1000)
+//            onResult.invoke(it)
+//            Log.d("getGroups: ", "GetOnceResult")
+//        }
+//    }
+//}
+

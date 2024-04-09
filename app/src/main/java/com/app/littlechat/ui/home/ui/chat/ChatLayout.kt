@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.littlechat.R
@@ -48,7 +50,7 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
                 Box(Modifier.padding(10.dp).animateItemPlacement()) {
 
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = if (isMyMsg) Arrangement.End else Arrangement.Start,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -100,6 +102,7 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
                     )
                     .padding(15.dp),
                 value = viewmodel.message.value,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 onValueChange = {
                     viewmodel.message.value = it
                 },

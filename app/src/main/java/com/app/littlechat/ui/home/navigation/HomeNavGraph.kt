@@ -3,14 +3,11 @@ package com.app.littlechat.ui.home.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.ui.home.ui.chat.FriendChatScreen
@@ -75,7 +72,7 @@ fun HomeNavGraph(
         }
 
         composable(HomeDestinations.CHATS_ROUTE) {
-            FriendChatScreen()
+            FriendChatScreen(navAction = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
                 floatingNavVisibilityState.value = false
@@ -83,15 +80,7 @@ fun HomeNavGraph(
         }
 
         composable(HomeDestinations.GROUP_CHAT_ROUTE) {
-            GroupChatScreen()
-            LaunchedEffect(Unit) {
-                bottomNavVisibilityState.value = false
-                floatingNavVisibilityState.value = false
-            }
-        }
-
-        composable(HomeDestinations.GROUP_CHAT_ROUTE) {
-            GroupChatScreen()
+            GroupChatScreen(navAction = navActions)
             LaunchedEffect(Unit) {
                 bottomNavVisibilityState.value = false
                 floatingNavVisibilityState.value = false

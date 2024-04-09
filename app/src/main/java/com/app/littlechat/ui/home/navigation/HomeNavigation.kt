@@ -35,6 +35,7 @@ object HomeArgs {
     const val NAME_ARG = "name"
     const val USER_ID_ARG = "userId"
     const val GROUP_ID_ARG = "group_id"
+    const val REFRESH = "refresh"
 }
 
 object HomeDestinations {
@@ -67,7 +68,12 @@ class HomeNavigationActions(val navController: NavHostController) {
         navController.navigate(FRIEND_REQUEST_SCREEN)
     }
 
-    fun popBack(): Boolean {
+    fun popBack(pair: Pair<String, Any>?=null): Boolean {
+        pair?.let {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set(pair.first, pair.second)
+        }
         navController.popBackStack()
         return false
     }

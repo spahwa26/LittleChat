@@ -11,6 +11,8 @@ class Constants {
         const val FRIENDS = "friends"
         const val CHATS = "chats"
         const val GROUPS = "groups"
+        const val NULL = "null"
+        const val GROUP_DETAILS = "group_details"
         const val MESSAGES = "messages"
         const val PARTICIPANTS = "participants"
         const val USERS = "users"

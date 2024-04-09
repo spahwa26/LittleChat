@@ -32,7 +32,7 @@ class LittleChatApp : Application(), ImageLoaderFactory {
                     .maxSizePercent(0.2)
                     .strongReferencesEnabled(true)
                     .build()
-            }
+            }.respectCacheHeaders(false)
             .logger(DebugLogger())
             .build()
     }

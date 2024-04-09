@@ -80,4 +80,5 @@
     <string name="edit_group">Edit Group</string>
     <string name="upload_image">Upload Image</string>
     <string name="group_name">Group Name</string>
+    <string name="group_created">Group created successfully!</string>
 </resources>

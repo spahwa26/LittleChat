@@ -1,14 +1,5 @@
 package com.app.littlechat.ui.home.ui.profile
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-import android.content.Context
-import android.net.Uri
-import android.os.Build
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -46,20 +37,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.littlechat.R
-import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
+import com.app.littlechat.ui.commoncomposables.PermissionComposable
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
-import com.app.littlechat.utility.Constants.Companion.IMAGE_MIME
 import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.getResizedBitmap
-import com.app.littlechat.utility.gotoApplicationSettings
 import com.app.littlechat.utility.showToast
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -77,31 +64,8 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
     val state = profileViewmodel.profileUiState.value
     val userData = profileViewmodel.userData.value
     val context = LocalContext.current
-
-    val showPermissionSettingsAlert = remember { mutableStateOf(false) }
-
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            profileViewmodel.imageUri.value = context.getResizedBitmap(
-                uri = uri,
-                maxSize = 600,
-                fileName = profileViewmodel.getImageName()
-            )
-        }
-    }
-
-    val galleryPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { pRes ->
-        val res = pRes.values.find { !it }
-        if (res == null) {
-            launcher.launch(IMAGE_MIME)
-        } else {
-            showPermissionSettingsAlert.value = true
-        }
+    val triggerPermissionComposable = remember {
+        mutableStateOf(false)
     }
 
     Column(
@@ -131,12 +95,9 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                         .clip(CircleShape)
                         .background(Color.Transparent)
                         .clickable {
-                            if (profileViewmodel.isMyProfile())
-                                checkAndRequestPermission(
-                                    context,
-                                    launcher,
-                                    galleryPermissionLauncher
-                                )
+                            if (profileViewmodel.isMyProfile()) {
+                                triggerPermissionComposable.value = true
+                            }
                             //launcher.launch("image/*")
                         },
                     model = if (profileViewmodel.imageUri.value != null) {
@@ -255,22 +216,6 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
         }
     }
 
-    if (showPermissionSettingsAlert.value)
-        CommonAlertDialog(
-            onDismissRequest = {},
-            onDismissClick = {
-                showPermissionSettingsAlert.value = false
-            },
-            onConfirmation = {
-                showPermissionSettingsAlert.value = false
-                context.gotoApplicationSettings()
-            },
-            dialogTitle = stringResource(id = R.string.require_Storage_permission),
-            dialogText = stringResource(id = R.string.allow_permission_msg),
-            confirmText = stringResource(id = R.string.yes),
-            dismissText = stringResource(id = R.string.cancel)
-        )
-
     if (state == ProfileViewmodel.ProfileUiState.SendMessage) {
         userData?.let {
             val encodedUrl = URLEncoder.encode(
@@ -290,35 +235,13 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
         context.showToast(intRes = state.msg)
         profileViewmodel.setIdle()
     }
-}
 
-fun checkAndRequestPermission(
-    context: Context,
-    galleryLauncher: ManagedActivityResultLauncher<String, Uri?>,
-    permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
-) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        // Partial access on Android 14 (API level 34) or higher
-        if (ContextCompat.checkSelfPermission(
-                context,
-                READ_MEDIA_VISUAL_USER_SELECTED
-            ) == PERMISSION_GRANTED
+    PermissionComposable(triggerPermissionComposable) {
+        profileViewmodel.imageUri.value = context.getResizedBitmap(
+            uri = it,
+            maxSize = 600,
+            fileName = profileViewmodel.getImageName()
         )
-            galleryLauncher.launch(IMAGE_MIME)
-        else permissionLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VISUAL_USER_SELECTED))
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        // Full access on Android 13 (API level 33) or higher
-        if ((ContextCompat.checkSelfPermission(context, READ_MEDIA_IMAGES) == PERMISSION_GRANTED))
-            galleryLauncher.launch(IMAGE_MIME)
-        else permissionLauncher.launch(arrayOf(READ_MEDIA_IMAGES))
-    } else if (ContextCompat.checkSelfPermission(
-            context,
-            READ_EXTERNAL_STORAGE
-        ) == PERMISSION_GRANTED
-    ) {
-        galleryLauncher.launch(IMAGE_MIME)
-    } else {
-        permissionLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
     }
 }
 
