@@ -31,7 +31,8 @@ fun HomeNavGraph(
     invertTheme: MutableState<Boolean>,
     bottomPadding: Dp,
     startDestination: String = HomeDestinations.FRIENDS_ROUTE,
-    navActions: HomeNavigationActions
+    navActions: HomeNavigationActions,
+    preferences: UserPreferences
 ) {
     //val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     //val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
@@ -47,7 +48,7 @@ fun HomeNavGraph(
                 bottomNavVisibilityState.value = true
                 floatingNavVisibilityState.value = true
             }
-            FriendsScreen(viewmodel, navActions, bottomPadding)
+            FriendsScreen(viewmodel, navActions, bottomPadding, preferences.name?:"")
         }
 
         composable(HomeDestinations.GROUPS_ROUTE) {

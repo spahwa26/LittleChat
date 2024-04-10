@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -38,38 +40,31 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.app.littlechat.R
+import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.network.OnboardingRepository
-import com.app.littlechat.ui.commoncomposables.LottieAnimationOnboarding
 import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
-import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.ui.commoncomposables.EmailField
+import com.app.littlechat.ui.commoncomposables.LottieAnimationOnboarding
+import com.app.littlechat.ui.commoncomposables.ProgressDialog
 import com.app.littlechat.ui.home.HomeActivity
+import com.app.littlechat.ui.onbording.navigation.OnboardingNavigationActions
 import com.app.littlechat.utility.finishActivity
 import com.app.littlechat.utility.showToast
 
 @Composable
 fun LoginScreen(
-    onHomeClick: () -> Boolean,
     onBackPress: () -> Boolean?,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    navActions: OnboardingNavigationActions
 ) {
     val context = LocalContext.current
     val forgotIndication = remember { MutableInteractionSource() }
     val emailString = remember { mutableStateOf("") }
     val passwordString = remember { mutableStateOf("") }
     val state = viewModel.uiState.value
-    if (state is OnboardingViewModel.OnboardingState.Error) {
-        context.showToast(txt = state.e)
-    }
-    if (state is OnboardingViewModel.OnboardingState.LocalError) {
-        context.showToast(state.e)
-    }
-    if (state is OnboardingViewModel.OnboardingState.Success) {
-        context.startActivity(Intent(context, HomeActivity::class.java))
-        context.finishActivity()
-    }
     EmailAlert(viewModel)
     Column {
         CustomToolbar(
@@ -80,12 +75,17 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.animateContentSize()
         ) {
-            LottieAnimationOnboarding(modifier = Modifier.padding(vertical = 30.dp).size(200.dp), anim = R.raw.login_simple)
+            LottieAnimationOnboarding(
+                modifier = Modifier
+                    .padding(vertical = 30.dp)
+                    .size(200.dp), anim = R.raw.login_simple
+            )
             EmailField(modifier = Modifier.padding(bottom = 15.dp), emailString)
             PasswordField(
                 modifier = Modifier.padding(bottom = 50.dp),
                 passwordString,
-                label = R.string.password
+                label = R.string.password,
+                onDone = { viewModel.loginUser(emailString.value, passwordString.value) }
             )
             Box(
                 contentAlignment = Alignment.Center, modifier = Modifier
@@ -110,7 +110,7 @@ fun LoginScreen(
                         indication = rememberRipple(),
                         interactionSource = forgotIndication
                     ) {
-
+                        viewModel.showEmailDialog.value = true
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -122,6 +122,39 @@ fun LoginScreen(
         }
     }
 
+    if (viewModel.showEmailDialog.value) {
+        CommonAlertDialog(
+            onDismissRequest = { viewModel.showEmailDialog.value = false },
+            onConfirmation = {
+                viewModel.showEmailDialog.value = false
+                viewModel.resetPassword()
+            },
+            dialogTitle = stringResource(id = R.string.reset_password),
+            dialogText = stringResource(id = R.string.reset_email_msg),
+            resetEmailTxt = viewModel.resetEmailTxt
+        )
+    }
+
+    ProgressDialog(state = viewModel.showMainDialog)
+
+    if (state is OnboardingViewModel.OnboardingState.Error) {
+        context.showToast(txt = state.e)
+        viewModel.setIdle()
+    }
+    if (state is OnboardingViewModel.OnboardingState.LocalError) {
+        context.showToast(state.e)
+        viewModel.setIdle()
+    }
+    if (state is OnboardingViewModel.OnboardingState.GotoProfile) {
+        navActions.navigateToProfile(state.userId)
+        context.showToast(intRes = R.string.create_profile)
+        viewModel.setIdle()
+    }
+    if (state is OnboardingViewModel.OnboardingState.Success) {
+        context.startActivity(Intent(context, HomeActivity::class.java))
+        context.finishActivity()
+    }
+
 }
 
 @Composable
@@ -129,8 +162,10 @@ fun PasswordField(
     modifier: Modifier = Modifier,
     passwordString: MutableState<String>,
     @StringRes label: Int = R.string.password,
+    onDone: (() -> Unit)? = null,
     action: ImeAction? = null
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         modifier = modifier,
         value = passwordString.value,
@@ -140,6 +175,10 @@ fun PasswordField(
             keyboardType = KeyboardType.Password,
             imeAction = action ?: ImeAction.Done
         ),
+        keyboardActions = KeyboardActions(onDone = {
+            onDone?.invoke()
+            keyboardController?.hide()
+        }),
         label = { Text(text = stringResource(id = label)) },
         onValueChange = {
             passwordString.value = it
@@ -202,7 +241,7 @@ fun SocialLoginIcons(context: Context) {
 }
 
 @Composable
-fun EmailAlert(viewModel: OnboardingViewModel, onDismiss:()->Boolean?={false}) {
+fun EmailAlert(viewModel: OnboardingViewModel, onDismiss: () -> Boolean? = { false }) {
     val state = viewModel.uiState.value
     if (state is OnboardingViewModel.OnboardingState.EmailSent) {
         val emailString = stringResource(id = R.string.email_sent, state.email)
@@ -225,8 +264,9 @@ fun EmailAlert(viewModel: OnboardingViewModel, onDismiss:()->Boolean?={false}) {
 @Preview
 @Composable
 fun LoginLayout() {
-    LoginScreen(onHomeClick = { false }, onBackPress = { false }, OnboardingViewModel(
-        OnboardingRepository(UserPreferences(LocalContext.current))
-    )
+    LoginScreen(
+        onBackPress = { false }, OnboardingViewModel(
+            OnboardingRepository(UserPreferences(LocalContext.current))
+        ), navActions = OnboardingNavigationActions(rememberNavController())
     )
 }

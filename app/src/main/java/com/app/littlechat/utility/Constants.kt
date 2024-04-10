@@ -17,7 +17,8 @@ class Constants {
         const val PARTICIPANTS = "participants"
         const val USERS = "users"
         const val MY_GROUPS = "my_groups"
-        const val ID = "sender_id"
+        const val SENDER_ID = "sender_id"
+        const val ID = "id"
         const val NAME = "name"
         const val EMAIL = "email"
         const val IMAGE = "image"
@@ -27,7 +28,8 @@ class Constants {
         const val PROFILE_PIC = "profile_pic.jpeg"
         const val GROUP_ICON = "group_icon.jpeg"
         const val FIREBASE_STORAGE_PATH = "images/"
-
+        const val SEPARATOR = "SEPARATOR"
+        fun getPicName(id: String?) = "${id}__${PROFILE_PIC}"
 
         //Find friends error constants
         const val EMPTY_LIST = 6
@@ -42,7 +44,7 @@ class Constants {
 
         //PREFERENCES
         const val DEVICE_TOKEN = "device_token"
-        const val PHONE = "phone_number"
+        const val PHONE_NUMBER = "phone_number"
         const val BOTTOM_PADDING = "bottom_padding"
         const val DARK_THEME_TOGGLE = "DARK_THEME_TOGGLE"
         const val DYNAMIC_THEME_TOGGLE = "DYNAMIC_THEME_TOGGLE"

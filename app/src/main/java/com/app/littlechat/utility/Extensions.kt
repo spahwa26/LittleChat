@@ -12,6 +12,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.support.annotation.StringRes
 import android.text.TextUtils
+import android.util.TypedValue
 import android.widget.Toast
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -166,6 +167,10 @@ fun String?.haveData(): Boolean {
     else true
 }
 
+fun Context.toPx(dp: Int): Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    dp.toFloat(),
+    resources.displayMetrics)
 //fun Context.getRealPathFromURI(contentUri: Uri): String? {
 //    var cursor: Cursor? = null
 //    return try {

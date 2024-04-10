@@ -64,7 +64,14 @@ fun SignupScreen(
             PasswordField(
                 modifier = Modifier.padding(bottom = 50.dp),
                 confirmPasswordString,
-                R.string.confirm_password
+                R.string.confirm_password,
+                onDone = {
+                    viewModel.signupUser(
+                        emailString.value,
+                        passwordString.value,
+                        confirmPasswordString.value
+                    )
+                }
             )
             Box(
                 contentAlignment = Alignment.Center,
@@ -95,8 +102,9 @@ fun SignupScreen(
 @Preview
 @Composable
 fun SignupScreenPreview() {
-    SignupScreen( onBackPress = { false }, OnboardingViewModel(
-        OnboardingRepository(UserPreferences(LocalContext.current))
-    )
+    SignupScreen(
+        onBackPress = { false }, OnboardingViewModel(
+            OnboardingRepository(UserPreferences(LocalContext.current))
+        )
     )
 }

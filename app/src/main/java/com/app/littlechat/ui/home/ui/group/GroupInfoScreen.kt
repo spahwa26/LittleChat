@@ -101,9 +101,7 @@ fun GroupInfoScreen(
                 )
             )
 
-            AnimatedVisibility(viewmodel.selectedMembers.isNotEmpty(),modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)) {
+            AnimatedVisibility(viewmodel.selectedMembers.isNotEmpty()) {
                 LazyColumn(modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 10.dp)) {

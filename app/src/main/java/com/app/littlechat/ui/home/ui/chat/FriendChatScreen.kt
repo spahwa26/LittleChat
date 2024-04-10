@@ -37,7 +37,9 @@ fun FriendChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: Home
                     text = { Text(text = stringResource(id = R.string.unfriend)) },
                     onClick = {
                         viewmodel.popupMenuState.value = false
-                        viewmodel.removeFriend()
+                        viewmodel.warningText = R.string.remove_friend_warning
+                        viewmodel.confirmationCallback = { viewmodel.removeFriend() }
+                        viewmodel.warningAlert.value = true
                     }
                 )
             }
@@ -47,6 +49,8 @@ fun FriendChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: Home
         ProgressDialog(state = viewmodel.progressBarState)
     }
 
+
+    WarningAlert(viewmodel = viewmodel)
 
     if (state is ChatViewmodel.ChatUiState.Error) {
         context.showToast(txt = state.msg)

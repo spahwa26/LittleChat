@@ -48,7 +48,9 @@ fun FriendsRequestScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        CustomToolbar(title = stringResource(id = R.string.friend_requests))
+        CustomToolbar(
+            title = stringResource(id = R.string.friend_requests),
+            onBackPress = { navActions.popBack() })
         PullToRefreshLazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -93,7 +95,8 @@ fun FriendsRequestScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 5.dp)
-                            .padding(horizontal = 10.dp).defaultMinSize(minHeight = 45.dp)
+                            .padding(horizontal = 10.dp)
+                            .defaultMinSize(minHeight = 45.dp)
                     ) {
                         if (state is RequestViewmodel.RequestUiState.ActionLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(25.dp))

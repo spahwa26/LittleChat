@@ -18,8 +18,13 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(private val repository: OnboardingRepository) :
     ViewModel() {
 
+    val showEmailDialog = mutableStateOf(false)
     private val _uiState: MutableState<OnboardingState?> = mutableStateOf(null)
     val uiState: State<OnboardingState?> = _uiState
+
+    val resetEmailTxt = mutableStateOf("")
+
+    val showMainDialog = mutableStateOf(false)
 
     fun loginUser(email: String, password: String) {
         if (email.isBlank()) {
@@ -46,7 +51,7 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
                     is CustomResult.Error -> {
                         checkError(it)
                     }
-                    else->{}
+
                 }
             }
         }
@@ -58,10 +63,27 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
                 OnboardingState.EmailSent(it.exception.message ?: "")
 
             GOTO_PROFILE -> _uiState.value =
-                OnboardingState.GotoProfile
+                OnboardingState.GotoProfile(it.exception.message ?: "")
 
             else -> _uiState.value =
                 OnboardingState.Error(it.exception.message ?: "")
+        }
+    }
+
+
+    fun resetPassword() {
+        showMainDialog.value = true
+        repository.resetPassword(resetEmailTxt.value) { result ->
+            when (result) {
+                is CustomResult.Success -> {
+                    _uiState.value = OnboardingState.LocalError(R.string.we_have_sent_link)
+                }
+
+                is CustomResult.Error -> {
+                    _uiState.value = OnboardingState.Error(result.exception.message?:"")
+                }
+            }
+            showMainDialog.value = false
         }
     }
 
@@ -99,14 +121,14 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
                     is CustomResult.Error -> {
                         checkError(it)
                     }
-                    else->{}
+
                 }
             }
         }
     }
 
     fun setIdle() {
-        _uiState.value= OnboardingState.Idle
+        _uiState.value = OnboardingState.Idle
     }
 
     sealed class OnboardingState {
@@ -115,7 +137,7 @@ class OnboardingViewModel @Inject constructor(private val repository: Onboarding
         data object Success : OnboardingState()
         data class Error(val e: String) : OnboardingState()
         data class LocalError(@StringRes val e: Int) : OnboardingState()
-        data object GotoProfile : OnboardingState()
+        data class GotoProfile(val userId: String) : OnboardingState()
         data class EmailSent(val email: String) : OnboardingState()
     }
 

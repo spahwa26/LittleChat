@@ -1,11 +1,15 @@
 package com.app.littlechat.ui.home.ui.group
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,11 +40,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,8 +66,11 @@ import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.ProgressDialog
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.NULL
+import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.getResizedBitmap
 import com.app.littlechat.utility.showToast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreateGroupScreen(navActions: HomeNavigationActions) {
@@ -74,6 +86,10 @@ fun MainContent(
     val context = LocalContext.current
 
     val state = viewmodel.createGroupUiState.value
+
+
+    val selectedMembersState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     val triggerPermissionComposable = remember {
         mutableStateOf(false)
@@ -133,38 +149,73 @@ fun MainContent(
                         modifier = Modifier
                             .padding(vertical = 5.dp)
                             .height(60.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        state = selectedMembersState
                     ) {
-                        items(viewmodel.selectedMembers, key = {
+                        itemsIndexed(viewmodel.selectedMembers, key = { _, it ->
                             it.id
-                        }) {
-                            Box(modifier = Modifier.animateItemPlacement()) {
-                                AsyncImage(
-                                    model = it.image,
-                                    contentDescription = it.name,
+                        }) { index, user ->
+                            Box(modifier = Modifier
+                                .animateItemPlacement()
+                                .onSizeChanged { size ->
+                                    viewmodel.itemSize = size.width
+                                }) {
+                                val showImage = remember { mutableStateOf(false) }
+
+                                val scale = animateFloatAsState(
+                                    if (showImage.value) 1f else 0f,
+                                    label = stringResource(id = R.string.app_name)
+                                )
+                                Box(
                                     modifier = Modifier
                                         .padding(horizontal = 10.dp)
                                         .size(60.dp)
-                                        .clip(CircleShape),
-                                    placeholder = painterResource(id = R.drawable.ic_person),
-                                    error = painterResource(id = R.drawable.ic_person),
-                                    contentScale = ContentScale.Crop,
-                                    alignment = Alignment.Center
-                                )
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .scale(scale.value)
+                                    ) {
+                                        AsyncImage(
+                                            model = user.image,
+                                            contentDescription = user.name,
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                                .clip(CircleShape),
+                                            placeholder = painterResource(id = R.drawable.ic_person),
+                                            error = painterResource(id = R.drawable.ic_person),
+                                            contentScale = ContentScale.Crop,
+                                            alignment = Alignment.Center,
+                                            onSuccess = {
+                                                coroutineScope.launch {
+                                                    delay(400)
+                                                    showImage.value = true
+                                                }
+                                            }
+                                        )
 
-                                Image(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .offset((-10).dp)
-                                        .size(20.dp)
-                                        .background(
-                                            Color.White, CircleShape
-                                        ),
-                                    painter = painterResource(id = R.drawable.ic_cross),
-                                    contentDescription = stringResource(
-                                        id = R.string.cancel
-                                    )
-                                )
+                                        Image(
+                                            modifier = Modifier
+                                                .align(Alignment.BottomEnd)
+                                                .offset(0.dp)
+                                                .size(20.dp)
+                                                .background(
+                                                    Color.White, CircleShape
+                                                )
+                                                .clickable {
+                                                    coroutineScope.launch {
+                                                        showImage.value = false
+                                                        delay(500)
+                                                        user.isAdded = false
+                                                        viewmodel.removeItem(user, index)
+                                                    }
+                                                },
+                                            painter = painterResource(id = R.drawable.ic_cross),
+                                            contentDescription = stringResource(
+                                                id = R.string.cancel
+                                            )
+                                        )
+                                    }
+                                }
 
                             }
                         }
@@ -175,7 +226,7 @@ fun MainContent(
 
             }
 
-            if (viewmodel.usersList.isNotEmpty()) {
+            AnimatedVisibility(viewmodel.usersList.isNotEmpty()) {
                 LazyColumn {
                     itemsIndexed(viewmodel.usersList, key = { _, user ->
                         user.id
@@ -229,7 +280,8 @@ fun MainContent(
                     painter = painterResource(id = R.drawable.checked),
                     contentDescription = stringResource(
                         id = R.string.create_group
-                    )
+                    ),
+                    colorFilter = ColorFilter.tint(getColors().primary)
                 )
             }
         }
@@ -263,7 +315,34 @@ fun MainContent(
         viewmodel.setIdle()
     }
 
+    LaunchedEffect(viewmodel.scrollToLast.value) {
+        if (viewmodel.scrollToLast.value) {
+            coroutineScope.launch {
+                val viewportWidth = selectedMembersState.layoutInfo.viewportSize.width
+                val startingPoint =
+                    viewportWidth - selectedMembersState.firstVisibleItemScrollOffset
+                val totalTravel: Int =
+                    (((viewmodel.selectedMembers.lastIndex - selectedMembersState.firstVisibleItemIndex) * viewmodel.itemSize)
+                            + viewmodel.itemSize) - (startingPoint)
 
+                Log.i(
+                    "Scroll valuess: ",
+                    "viewportWidth: $viewportWidth, startingPoint: $startingPoint, totalTravel: $totalTravel"
+                )
+                if (totalTravel > 0)
+                    selectedMembersState.animateScrollBy(
+                        totalTravel.toFloat(),
+                        tween(1000)
+                    )
+                //selectedMembersState.animateScrollToItem(index = viewmodel.selectedMembers.lastIndex)
+            }
+            viewmodel.scrollToLast.value = false
+            Log.d(
+                "MainContent: ",
+                "${selectedMembersState.layoutInfo}_${selectedMembersState.firstVisibleItemScrollOffset}"
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewmodel.getGroupData()

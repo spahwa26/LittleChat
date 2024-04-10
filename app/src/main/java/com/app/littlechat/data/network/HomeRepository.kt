@@ -15,7 +15,6 @@ import com.app.littlechat.utility.Constants.Companion.NAME
 import com.app.littlechat.utility.Constants.Companion.PARTICIPANTS
 import com.app.littlechat.utility.Constants.Companion.USERS
 import com.app.littlechat.utility.LocalisedException
-import com.app.littlechat.utility.SomethingWentWrongException
 import com.app.littlechat.utility.deleteImageFile
 import com.app.littlechat.utility.getImageFile
 import com.app.littlechat.utility.setError
@@ -40,6 +39,7 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
 
     fun getFriends(resultCallback: (CustomResult<List<User>>) -> Unit) {
         userPreferences.id?.let {
+            removeFriendsListeners()
             friendsRef = db.child(Constants.FRIENDS).child(it)
             friendsListener = friendsRef?.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -70,11 +70,7 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
                         }
 
                     } else {
-                        resultCallback.invoke(
-                            CustomResult.Error(
-                                exception = SomethingWentWrongException()
-                            )
-                        )
+                        resultCallback.invoke(CustomResult.Success(friendList))
                     }
 
                 }
@@ -128,22 +124,26 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
 
     fun getGroups(resultCallback: (CustomResult<List<GroupDetails>>) -> Unit) {
         userPreferences.id?.let { myId ->
+            removeGroupListeners()
             groupsRef = db.child(USERS).child(myId).child(MY_GROUPS)
             groupsListener = groupsRef?.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val groupList = mutableListOf<GroupDetails>()
-                    for (ids in dataSnapshot.children) {
-                        val id = ids.getValue(String::class.java) ?: ""
-                        getGroupDetails(id) {
-                            if (it is CustomResult.Success) {
-                                groupList.add(it.data)
-                                if (ids.key.equals(dataSnapshot.children.last().key)) resultCallback.invoke(
-                                    CustomResult.Success(groupList)
-                                )
+                    if (dataSnapshot.value != null) {
+                        for (ids in dataSnapshot.children) {
+                            val id = ids.getValue(String::class.java) ?: ""
+                            getGroupDetails(id) {
+                                if (it is CustomResult.Success) {
+                                    groupList.add(it.data)
+                                    if (ids.key.equals(dataSnapshot.children.last().key)) resultCallback.invoke(
+                                        CustomResult.Success(groupList)
+                                    )
+                                }
                             }
                         }
+                    } else {
+                        resultCallback.invoke(CustomResult.Success(groupList))
                     }
-
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
@@ -311,12 +311,14 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
         }
     }
 
-
-    fun removeListeners() {
+    fun removeFriendsListeners() {
         friendsListener?.let {
             friendsRef?.removeEventListener(it)
             friendsListener = null
         }
+    }
+
+    fun removeGroupListeners() {
         groupsListener?.let {
             groupsRef?.removeEventListener(it)
             groupsListener = null

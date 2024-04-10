@@ -57,7 +57,7 @@ fun GroupChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: HomeN
                                 viewmodel.popupMenuState.value = false
                                 viewmodel.warningText = R.string.leave_group_warning
                                 viewmodel.confirmationCallback = { viewmodel.leaveGroup() }
-                                viewmodel.warningAlert.value=true
+                                viewmodel.warningAlert.value = true
                             }
                         )
                     if (viewmodel.isMyGroup()) {
@@ -78,7 +78,7 @@ fun GroupChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: HomeN
                                 viewmodel.popupMenuState.value = false
                                 viewmodel.warningText = R.string.delete_group_warning
                                 viewmodel.confirmationCallback = { viewmodel.deleteGroup() }
-                                viewmodel.warningAlert.value=true
+                                viewmodel.warningAlert.value = true
                             }
                         )
                     }
@@ -90,19 +90,9 @@ fun GroupChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: HomeN
 
 
         ProgressDialog(state = viewmodel.progressBarState)
-
-        if (viewmodel.warningAlert.value)
-            CommonAlertDialog(
-                onDismissRequest = {
-                    viewmodel.warningAlert.value = false
-                },
-                onConfirmation = { viewmodel.confirmationCallback?.invoke() },
-                dialogTitle = stringResource(id = R.string.alert),
-                dialogText = stringResource(id = viewmodel.warningText),
-                confirmText = stringResource(id = R.string.yes),
-                dismissText = stringResource(id = R.string.cancel)
-            )
     }
+
+    WarningAlert(viewmodel = viewmodel)
 
 
     if (state is ChatViewmodel.ChatUiState.Error) {
@@ -118,6 +108,24 @@ fun GroupChatScreen(viewmodel: ChatViewmodel = hiltViewModel(), navAction: HomeN
         viewmodel.setIdle()
         navAction.popBack()
     }
+}
+
+@Composable
+fun WarningAlert(viewmodel: ChatViewmodel) {
+    if (viewmodel.warningAlert.value)
+        CommonAlertDialog(
+            onDismissRequest = {
+                viewmodel.warningAlert.value = false
+            },
+            onConfirmation = {
+                viewmodel.warningAlert.value = false
+                viewmodel.confirmationCallback?.invoke()
+            },
+            dialogTitle = stringResource(id = R.string.alert),
+            dialogText = stringResource(id = viewmodel.warningText),
+            confirmText = stringResource(id = R.string.yes),
+            dismissText = stringResource(id = R.string.cancel)
+        )
 }
 
 

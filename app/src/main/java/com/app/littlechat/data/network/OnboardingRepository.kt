@@ -1,6 +1,7 @@
 package com.app.littlechat.data.network
 
 import android.util.Log
+import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.AUTH_FAIL
@@ -8,9 +9,12 @@ import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.FAILURE_ERR
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.GOTO_PROFILE
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.VERIFICATION_EMAIL
 import com.app.littlechat.utility.CommonUtilities
+import com.app.littlechat.utility.Constants.Companion.DEVICE_TOKEN
+import com.app.littlechat.utility.Constants.Companion.SEPARATOR
+import com.app.littlechat.utility.Constants.Companion.USERS
 import com.app.littlechat.utility.LocalisedException
 import com.app.littlechat.utility.SomethingWentWrongException
-import com.app.littlechat.data.UserPreferences
+import com.app.littlechat.utility.setError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -42,7 +46,7 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
                 CoroutineScope(IO).launch {
                     mAuth.currentUser?.let {
                         when (mAuth.currentUser?.isEmailVerified) {
-                            true -> checkNameNumber(it.uid, onResult)
+                            true -> checkNameNumber(it.uid, email, onResult)
 
                             false -> sendVerificationEmail(it, onResult)
 
@@ -71,12 +75,13 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
 
     private suspend fun checkNameNumber(
         userId: String,
+        email: String,
         onResult: (CustomResult<Boolean>) -> Unit
     ) {
-        val data = db.child("users/$userId").get().await()
+        val data = db.child(USERS).child(userId).get().await()
         if (data.value != null) {
             try {
-                db.child("users").child(userId).child("device_token")
+                db.child(USERS).child(userId).child(DEVICE_TOKEN)
                     .setValue(userPreferences.deviceToken)
                 val pojo = data.getValue(User::class.java)
                 userPreferences.setUserData(pojo)
@@ -86,12 +91,17 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
             }
 
         } else {
-            onResult.invoke(CustomResult.Error(GOTO_PROFILE, LocalisedException(null)))
+            onResult.invoke(
+                CustomResult.Error(
+                    GOTO_PROFILE,
+                    LocalisedException("$userId$SEPARATOR$email")
+                )
+            )
         }
     }
 
-    fun signUp(email: String, password: String, onResult: (CustomResult<Boolean>) -> Unit){
-        mAuth.createUserWithEmailAndPassword(email, password )
+    fun signUp(email: String, password: String, onResult: (CustomResult<Boolean>) -> Unit) {
+        mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in groupDetails's information
@@ -144,6 +154,16 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
                     )
                 )
             }
+    }
+
+    fun resetPassword(email: String, onResult: (CustomResult<Boolean>) -> Unit) {
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener {
+            if(it.isSuccessful){
+                onResult.invoke(CustomResult.Success(true))
+            }else{
+                setError(onResult, it.exception?.message)
+            }
+        }
     }
 
 }

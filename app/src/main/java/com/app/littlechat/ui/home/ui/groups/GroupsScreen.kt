@@ -1,6 +1,5 @@
 package com.app.littlechat.ui.home.ui.groups
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +22,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
+import com.app.littlechat.ui.commoncomposables.NoDataView
 import com.app.littlechat.ui.commoncomposables.ProfileImage
+import com.app.littlechat.ui.commoncomposables.PullToRefreshLazyColumn
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
-import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
 import com.app.littlechat.utility.getEncodedUrl
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 
 @Composable
@@ -46,33 +43,43 @@ fun GroupsScreen(
             .padding(bottom = bottomPadding)
     ) {
         CustomToolbar(title = stringResource(id = R.string.app_name))
-        if (state is HomeViewmodel.GroupsUiState.Success) {
-            LazyColumn {
-                Log.d("getGroups: ", "Item count ${state.groupList.size}")
-                items(state.groupList) { group ->
-                    Box(Modifier.padding(10.dp)) {
-                        Card(
-                            shape = RoundedCornerShape(10.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navActions.navigateToGroupChat(group.id, group.name, group.image.getEncodedUrl())
-                                },
-                            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp)
-                            ) {
-                                ProfileImage(modifier = Modifier.size(50.dp), group.image, group.name)
-                                Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                    Text(text = group.name)
-                                }
-                            }
+        PullToRefreshLazyColumn(modifier = Modifier
+            .fillMaxSize(),
+            items = viewmodel.groupsData,
+            isRefreshing = viewmodel.isRefreshing.value,
+            onRefresh = {
+                viewmodel.getGroups(true)
+            })
+        { group ->
+            Box(Modifier.padding(10.dp)) {
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navActions.navigateToGroupChat(
+                                group.id,
+                                group.name,
+                                group.image.getEncodedUrl()
+                            )
+                        },
+                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        ProfileImage(
+                            modifier = Modifier.size(50.dp),
+                            group.image,
+                            group.name
+                        )
+                        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                            Text(text = group.name)
                         }
                     }
                 }
@@ -80,7 +87,18 @@ fun GroupsScreen(
         }
     }
 
-//    navActions.navController.GetOnceResult<Boolean>(keyResult = REFRESH) {
-//        viewmodel.getGroups()
-//    }
+
+    if (state is HomeViewmodel.GroupsUiState.Loading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+    }
+
+
+    if (state is HomeViewmodel.GroupsUiState.NoData) {
+        NoDataView(text = stringResource(id = R.string.no_groups))
+    }
 }

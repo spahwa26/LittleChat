@@ -13,7 +13,6 @@ import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.UnderlineSpan
@@ -270,10 +269,10 @@ class CommonUtilities {
 
         fun getUserData(activity: Activity): User {
             return User(
-                getString(activity, Constants.ID),
+                getString(activity, Constants.SENDER_ID),
                 getString(activity, Constants.NAME),
                 getString(activity, Constants.EMAIL),
-                getString(activity, Constants.PHONE),
+                getString(activity, Constants.PHONE_NUMBER),
                 getString(activity, Constants.IMAGE),
                 getString(activity, Constants.STATUS)
             )

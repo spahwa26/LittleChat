@@ -15,7 +15,6 @@ import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.data.network.HomeRepository
 import com.app.littlechat.ui.home.navigation.HomeArgs
-import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.haveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -52,8 +51,12 @@ class CreateGroupViewmodel @Inject constructor(
 
     val progressState = mutableStateOf(false)
 
+    val scrollToLast = mutableStateOf(false)
 
-    fun getGroupData(isInfoOnly: Boolean=false) {
+    var itemSize = 0
+
+
+    fun getGroupData(isInfoOnly: Boolean = false) {
         groupName.value = if (name.isNullOrBlank()) "" else name ?: ""
         if (grpId.haveData()) {
             repository.getParticipantsData(grpId!!) { result ->
@@ -86,13 +89,26 @@ class CreateGroupViewmodel @Inject constructor(
     fun updateItem(user: User, index: Int) {
         usersList.removeAt(index)
         usersList.add(index, user)
-        if (user.isAdded) selectedMembers.add(user)
-        else {
+        if (user.isAdded) {
+            selectedMembers.add(user)
+            if (selectedMembers.size > 5) scrollToLast.value = true
+        } else {
             selectedMembers.removeIf {
                 it.id == user.id
             }
         }
 
+    }
+
+    fun removeItem(user: User, index: Int) {
+        val foundIndex=usersList.indexOfFirst {
+            it.id==user.id
+        }
+        if(foundIndex>=0){
+            usersList.removeAt(foundIndex)
+            usersList.add(foundIndex, user)
+        }
+        selectedMembers.removeAt(index)
     }
 
     private fun getFriends() {

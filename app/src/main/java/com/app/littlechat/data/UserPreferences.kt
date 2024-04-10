@@ -4,16 +4,15 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import androidx.preference.PreferenceManager
 import com.app.littlechat.data.model.User
-import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.Constants.Companion.BOTTOM_PADDING
 import com.app.littlechat.utility.Constants.Companion.DARK_THEME_TOGGLE
 import com.app.littlechat.utility.Constants.Companion.DEVICE_TOKEN
 import com.app.littlechat.utility.Constants.Companion.DYNAMIC_THEME_TOGGLE
 import com.app.littlechat.utility.Constants.Companion.EMAIL
-import com.app.littlechat.utility.Constants.Companion.ID
+import com.app.littlechat.utility.Constants.Companion.SENDER_ID
 import com.app.littlechat.utility.Constants.Companion.IMAGE
 import com.app.littlechat.utility.Constants.Companion.NAME
-import com.app.littlechat.utility.Constants.Companion.PHONE
+import com.app.littlechat.utility.Constants.Companion.PHONE_NUMBER
 import com.app.littlechat.utility.Constants.Companion.STATUS
 import javax.inject.Inject
 
@@ -33,8 +32,8 @@ class UserPreferences @Inject constructor(val context: Context) {
         set(value) = prefManagerPersist.edit().putString(DEVICE_TOKEN, value).apply()
 
     var id: String?
-        get() = prefManager.getString(ID, null)
-        set(value) = prefManager.edit().putString(ID, value).apply()
+        get() = prefManager.getString(SENDER_ID, null)
+        set(value) = prefManager.edit().putString(SENDER_ID, value).apply()
 
     var name: String?
         get() = prefManager.getString(NAME, null)
@@ -45,8 +44,8 @@ class UserPreferences @Inject constructor(val context: Context) {
         set(value) = prefManager.edit().putString(EMAIL, value).apply()
 
     var phone: String?
-        get() = prefManager.getString(PHONE, null)
-        set(value) = prefManager.edit().putString(PHONE, value).apply()
+        get() = prefManager.getString(PHONE_NUMBER, null)
+        set(value) = prefManager.edit().putString(PHONE_NUMBER, value).apply()
 
     var image: String?
         get() = prefManager.getString(IMAGE, null)
@@ -67,8 +66,6 @@ class UserPreferences @Inject constructor(val context: Context) {
     var isDynamicTheme: Boolean
         get() = prefManagerPersist.getBoolean(DYNAMIC_THEME_TOGGLE, true)
         set(value) = prefManagerPersist.edit().putBoolean(DYNAMIC_THEME_TOGGLE, value).apply()
-
-    val profilePic = "${id}_${Constants.PROFILE_PIC}"
 
     fun setUserData(pojo: User?) {
         id = pojo?.id

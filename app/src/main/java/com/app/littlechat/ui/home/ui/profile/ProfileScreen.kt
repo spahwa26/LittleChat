@@ -1,5 +1,6 @@
 package com.app.littlechat.ui.home.ui.profile
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -43,8 +44,10 @@ import coil.request.ImageRequest
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.PermissionComposable
+import com.app.littlechat.ui.home.HomeActivity
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
+import com.app.littlechat.utility.finishActivity
 import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.getEncodedUrl
 import com.app.littlechat.utility.getResizedBitmap
@@ -54,14 +57,14 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun ProfileScreen(
-    profileViewmodel: ProfileViewmodel = hiltViewModel(), navActions: HomeNavigationActions
+    profileViewmodel: ProfileViewmodel = hiltViewModel(), navActions: HomeNavigationActions? = null
 ) {
     ProfileContent(profileViewmodel = profileViewmodel, navActions = navActions)
 }
 
 
 @Composable
-fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigationActions) {
+fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigationActions?) {
     val state = profileViewmodel.profileUiState.value
     val userData = profileViewmodel.userData.value
     val context = LocalContext.current
@@ -74,9 +77,11 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
             .fillMaxSize()
             .imePadding()
     ) {
-        CustomToolbar(title = stringResource(id = R.string.profile), onBackPress = {
-            navActions.popBack()
-        })
+        navActions?.let {
+            CustomToolbar(title = stringResource(id = R.string.profile), onBackPress = {
+                navActions.popBack()
+            })
+        }
         if (profileViewmodel.userData.value != null) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -219,7 +224,7 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
 
     if (state == ProfileViewmodel.ProfileUiState.SendMessage) {
         userData?.let {
-            navActions.navigateToChat(userData.id, userData.name, userData.image.getEncodedUrl())
+            navActions?.navigateToChat(userData.id, userData.name, userData.image.getEncodedUrl())
             profileViewmodel.setIdle()
         }
     }
@@ -232,6 +237,11 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
     if (state is ProfileViewmodel.ProfileUiState.LocalMessage) {
         context.showToast(intRes = state.msg)
         profileViewmodel.setIdle()
+    }
+
+    if (state is ProfileViewmodel.ProfileUiState.ProfileCreated) {
+        context.startActivity(Intent(context, HomeActivity::class.java))
+        context.finishActivity()
     }
 
     PermissionComposable(triggerPermissionComposable) {

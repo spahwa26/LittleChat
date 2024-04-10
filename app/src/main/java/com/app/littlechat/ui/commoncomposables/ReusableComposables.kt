@@ -116,7 +116,7 @@ fun CustomToolbar(
                         it.invoke()
                     }
                     .size(50.dp)
-                    .padding(10.dp)
+                    .padding(13.dp)
                     .align(Alignment.CenterStart),
                 painter = painterResource(id = R.drawable.back),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary),
@@ -209,6 +209,7 @@ fun CommonAlertDialog(
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector? = null,
+    resetEmailTxt : MutableState<String>?=null,
     confirmText: String = stringResource(id = R.string.ok),
     dismissText: String? = stringResource(id = R.string.cancel),
 ) {
@@ -222,7 +223,13 @@ fun CommonAlertDialog(
             Text(text = dialogTitle, fontSize = 16.sp)
         },
         text = {
-            Text(text = dialogText, fontSize = 14.sp)
+            Column {
+                if(resetEmailTxt!=null)
+                {
+                    EmailField(emailString = resetEmailTxt)
+                }
+                Text(text = dialogText, fontSize = 14.sp)
+            }
         },
         onDismissRequest = {
             onDismissRequest()
@@ -285,7 +292,7 @@ fun ChatText(msg: String, modifier: Modifier, color: Color) {
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String) {
+fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String, onSuccess:(()->Unit)?=null) {
     AsyncImage(
         modifier = modifier
             .aspectRatio(1 / 1f)
@@ -298,7 +305,11 @@ fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String) {
         model = imageUrl,
         contentDescription = name,
         contentScale = ContentScale.Crop,
-        placeholder = painterResource(id = R.drawable.ic_person)
+        placeholder = painterResource(id = R.drawable.ic_person),
+        onSuccess = {
+            onSuccess?.invoke()
+        },
+
     )
 }
 
@@ -410,12 +421,14 @@ fun NoDataView(text: String, modifier: Modifier = Modifier) {
         )
         Text(
             text = text,
-            fontSize = 25.sp,
+            fontSize = 22.sp,
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 shadow = Shadow(offset = Offset(1f, 1f), blurRadius = 3.5f),
                 color = getColors().primary
-            )
+            ),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 30.dp)
         )
     }
 }

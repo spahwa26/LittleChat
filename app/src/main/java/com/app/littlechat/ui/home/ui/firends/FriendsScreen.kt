@@ -4,16 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,20 +22,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
+import com.app.littlechat.ui.commoncomposables.NoDataView
 import com.app.littlechat.ui.commoncomposables.ProfileImage
+import com.app.littlechat.ui.commoncomposables.PullToRefreshLazyColumn
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
-import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.getEncodedUrl
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 
 @Composable
 fun FriendsScreen(
     viewmodel: HomeViewmodel,
     navActions: HomeNavigationActions,
-    bottomPadding: Dp
+    bottomPadding: Dp,
+    name: String
 ) {
     val state = viewmodel.friendsUiState.value
 
@@ -47,41 +45,69 @@ fun FriendsScreen(
             .padding(bottom = bottomPadding)
     ) {
         CustomToolbar(title = stringResource(id = R.string.app_name))
-        if (state is HomeViewmodel.FriendsUiState.Success) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.friendList) { user ->
-                    Box(Modifier.padding(10.dp)) {
-                        Card(
-                            shape = RoundedCornerShape(10.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                            ),
+
+        PullToRefreshLazyColumn(modifier = Modifier
+            .fillMaxSize(),
+            items = viewmodel.userData,
+            isRefreshing = viewmodel.isRefreshing.value,
+            onRefresh = {
+                viewmodel.getFriendList(true)
+            })
+        { user ->
+            Box(Modifier.padding(10.dp)) {
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+
+                            navActions.navigateToChat(
+                                user.id,
+                                user.name,
+                                user.image.getEncodedUrl()
+                            )
+
+                        },
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        ProfileImage(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .size(50.dp)
                                 .clickable {
-
-                                    navActions.navigateToChat(user.id, user.name, user.image.getEncodedUrl())
-
-                                },
-                            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp)
-                            ) {
-                                ProfileImage(modifier = Modifier.size(50.dp).clickable {
                                     navActions.navigateToProfile(user.id)
-                                }, user.image, user.name)
-                                Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                    Text(text = user.name)
-                                    Text(text = user.email)
-                                }
-                            }
+                                }, user.image, user.name
+                        )
+                        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                            Text(text = user.name)
+                            Text(text = user.email)
                         }
                     }
                 }
             }
         }
+    }
+
+
+
+    if (state is HomeViewmodel.FriendsUiState.Loading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+    }
+
+
+    if (state is HomeViewmodel.FriendsUiState.NoData) {
+        NoDataView(text = stringResource(id = R.string.no_friends, name))
     }
 }

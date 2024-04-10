@@ -141,7 +141,8 @@ fun MainContent(userPreferences: UserPreferences) {
                     enableDisableDynamicColor = dynamicThemeEnabled,
                     invertTheme = invertTheme,
                     bottomPadding = (userPreferences.bottomPadding ?: 0f).dp,
-                    navActions = navActions
+                    navActions = navActions,
+                    preferences = userPreferences
                 )
             }
         }

@@ -14,7 +14,9 @@ import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.data.network.ProfileRepository
 import com.app.littlechat.ui.home.navigation.HomeArgs
+import com.app.littlechat.ui.onbording.navigation.OnboardingArgs
 import com.app.littlechat.utility.Constants.Companion.FRIEND_LIST
+import com.app.littlechat.utility.Constants.Companion.getPicName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +29,8 @@ class ProfileViewmodel @Inject constructor(
 ) : ViewModel() {
 
     private val userId: String? = savedStateHandle[HomeArgs.USER_ID_ARG]
+
+    private val email: String? = savedStateHandle[OnboardingArgs.EMAIL_ARGS]
 
     private val _profileUiState: MutableState<ProfileUiState?> = mutableStateOf(null)
     val profileUiState: State<ProfileUiState?> = _profileUiState
@@ -48,9 +52,16 @@ class ProfileViewmodel @Inject constructor(
         getButtonText()
     }
 
-    fun getImageName()=userPreferences.profilePic
+    fun getImageName() = getPicName(userId ?: "")
+    fun isMyProfile() = if (email != null) true else userPreferences.id == userId
 
     private fun getUserData() {
+        if (email != null && userId != null) {
+            userData.value = User(id = userId, email = email)
+            btnText.value = BtnCall.SAVE
+            btnCall = BtnCall.SAVE
+            return
+        }
         _profileUiState.value = ProfileUiState.Loading
         viewModelScope.launch {
             userId?.let {
@@ -83,15 +94,19 @@ class ProfileViewmodel @Inject constructor(
             return
         }
         userData.value?.let { user ->
-            _profileUiState.value=ProfileUiState.Loading
+            _profileUiState.value = ProfileUiState.Loading
             user.name = name.value
             user.phone_number = phone.value
-            repository.saveProfileChanges(user, imageUri.value != null) {
+            repository.saveProfileChanges(user, imageUri.value != null, !email.isNullOrBlank()) {
                 when (it) {
                     is CustomResult.Success -> {
-                        imageUri.value=null
-                        _profileUiState.value =
-                            ProfileUiState.LocalMessage(R.string.profile_updated)
+                        imageUri.value = null
+                        if (email.isNullOrBlank())
+                            _profileUiState.value =
+                                ProfileUiState.LocalMessage(R.string.profile_updated)
+                        else
+                            _profileUiState.value =
+                                ProfileUiState.ProfileCreated
                     }
 
                     is CustomResult.Error -> {
@@ -184,7 +199,7 @@ class ProfileViewmodel @Inject constructor(
 
 
     private fun getButtonText() {
-        if (userPreferences.id == userId) {
+        if (isMyProfile()) {
             btnText.value = BtnCall.SAVE
             btnCall = BtnCall.SAVE
         } else {
@@ -205,11 +220,11 @@ class ProfileViewmodel @Inject constructor(
         _profileUiState.value = null
     }
 
-    fun isMyProfile() = userPreferences.id == userId
 
     sealed class ProfileUiState {
         data object Loading : ProfileUiState()
         data object SendMessage : ProfileUiState()
+        data object ProfileCreated : ProfileUiState()
         data class Error(val e: String?) : ProfileUiState()
         data class LocalMessage(@StringRes val msg: Int) : ProfileUiState()
     }

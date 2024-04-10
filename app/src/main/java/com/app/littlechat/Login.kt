@@ -175,10 +175,10 @@ class Login : ComponentActivity() {
     }
 
     private fun setUserData(pojo: User?) {
-        CommonUtilities.putString(activity, Constants.ID, pojo?.id)
+        CommonUtilities.putString(activity, Constants.SENDER_ID, pojo?.id)
         CommonUtilities.putString(activity, Constants.NAME, pojo?.name)
         CommonUtilities.putString(activity, Constants.EMAIL, pojo?.email)
-        CommonUtilities.putString(activity, Constants.PHONE, pojo?.phone_number)
+        CommonUtilities.putString(activity, Constants.PHONE_NUMBER, pojo?.phone_number)
         CommonUtilities.putString(activity, Constants.IMAGE, pojo?.image)
         CommonUtilities.putString(activity, Constants.STATUS, pojo?.status)
     }
