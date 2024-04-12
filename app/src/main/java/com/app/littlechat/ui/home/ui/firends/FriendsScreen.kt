@@ -13,7 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,7 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.NoDataView
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.PullToRefreshLazyColumn
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.utility.getEncodedUrl
@@ -86,8 +86,8 @@ fun FriendsScreen(
                                 }, user.image, user.name
                         )
                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                            Text(text = user.name)
-                            Text(text = user.email)
+                            SingleLineText(text = user.name)
+                            SingleLineText(text = user.email)
                         }
                     }
                 }

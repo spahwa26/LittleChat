@@ -15,6 +15,7 @@ import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.User
 import com.app.littlechat.data.network.ChatRepository
 import com.app.littlechat.ui.home.navigation.HomeArgs
+import com.app.littlechat.utility.Constants.Companion.DELETED_USER
 import com.app.littlechat.utility.Constants.Companion.DUMMY_URL
 import com.app.littlechat.utility.isNetworkConnected
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,7 @@ class ChatViewmodel @Inject constructor(
     val friendImage: String? = savedStateHandle[HomeArgs.IMAGE_ARG]
     private var participant = listOf<User>()
     private var isGroupChat = false
+
     @StringRes
     var warningText: Int = R.string.remove_friend_warning
     var confirmationCallback: (() -> Unit)? = null
@@ -193,7 +195,7 @@ class ChatViewmodel @Inject constructor(
                     image = user.image
             }
         else image = friendImage ?: ""
-        return image
+        return image.ifBlank { DELETED_USER }
     }
 
     fun getMyImage() = userPreferences.image ?: ""

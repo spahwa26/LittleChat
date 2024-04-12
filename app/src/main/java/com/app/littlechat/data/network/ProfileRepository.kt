@@ -12,7 +12,6 @@ import com.app.littlechat.utility.Constants.Companion.FIREBASE_STORAGE_PATH
 import com.app.littlechat.utility.Constants.Companion.FRIENDS
 import com.app.littlechat.utility.Constants.Companion.FRIEND_LIST
 import com.app.littlechat.utility.Constants.Companion.ID
-import com.app.littlechat.utility.Constants.Companion.SENDER_ID
 import com.app.littlechat.utility.Constants.Companion.IMAGE
 import com.app.littlechat.utility.Constants.Companion.NAME
 import com.app.littlechat.utility.Constants.Companion.PHONE_NUMBER
@@ -217,7 +216,12 @@ class ProfileRepository @Inject constructor(private val userPreferences: UserPre
                         })
                     cancelRequest(friendData.id) {
                         when (it) {
-                            is CustomResult.Success -> resultCallback.invoke(CustomResult.Success(it.data))
+                            is CustomResult.Success -> resultCallback.invoke(
+                                CustomResult.Success(
+                                    BtnCall.SEND_MESSAGE
+                                )
+                            )
+
                             is CustomResult.Error -> resultCallback.invoke(it)
                         }
                     }
@@ -262,7 +266,7 @@ class ProfileRepository @Inject constructor(private val userPreferences: UserPre
         userMap[NAME] = user.name
         userMap[PHONE_NUMBER] = user.phone_number
         userMap[IMAGE] = user.image
-        if(isCreate){
+        if (isCreate) {
             userMap[EMAIL] = user.email
             userMap[ID] = user.id
         }

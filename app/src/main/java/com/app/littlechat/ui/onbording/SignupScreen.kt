@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -48,7 +50,11 @@ fun SignupScreen(
             title = stringResource(id = R.string.signup),
             onBackPress = onBackPress
         )
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.verticalScroll(
+                rememberScrollState()
+            )
+        ) {
             LottieAnimationOnboarding(
                 modifier = Modifier
                     .padding(vertical = 30.dp)

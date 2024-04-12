@@ -68,8 +68,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -125,14 +127,16 @@ fun CustomToolbar(
                 )
             )
         }
-        Text(
-            modifier = Modifier.align(Alignment.Center),
+        SingleLineText(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 10.dp),
             text = title,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.inversePrimary
         )
         onRightBtnTap?.let {
-            Box (modifier = Modifier.align(Alignment.CenterEnd)){
+            Box(modifier = Modifier.align(Alignment.CenterEnd)) {
                 Image(
                     modifier = Modifier
                         .clickable(
@@ -153,7 +157,7 @@ fun CustomToolbar(
                     DropdownMenu(
                         modifier = Modifier.background(getColors().inversePrimary),
                         expanded = mutableState.value,
-                        offset = DpOffset(x = (-3).dp, y=(-2).dp),
+                        offset = DpOffset(x = (-3).dp, y = (-2).dp),
                         onDismissRequest = { mutableState.value = false }
                     ) {
                         content(this)
@@ -209,7 +213,7 @@ fun CommonAlertDialog(
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector? = null,
-    resetEmailTxt : MutableState<String>?=null,
+    resetEmailTxt: MutableState<String>? = null,
     confirmText: String = stringResource(id = R.string.ok),
     dismissText: String? = stringResource(id = R.string.cancel),
 ) {
@@ -224,8 +228,7 @@ fun CommonAlertDialog(
         },
         text = {
             Column {
-                if(resetEmailTxt!=null)
-                {
+                if (resetEmailTxt != null) {
                     EmailField(emailString = resetEmailTxt)
                 }
                 Text(text = dialogText, fontSize = 14.sp)
@@ -292,7 +295,7 @@ fun ChatText(msg: String, modifier: Modifier, color: Color) {
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String, onSuccess:(()->Unit)?=null) {
+fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String, onSuccess: (() -> Unit)? = null) {
     AsyncImage(
         modifier = modifier
             .aspectRatio(1 / 1f)
@@ -310,7 +313,7 @@ fun ProfileImage(modifier: Modifier, imageUrl: Any, name: String, onSuccess:(()-
             onSuccess?.invoke()
         },
 
-    )
+        )
 }
 
 
@@ -523,6 +526,20 @@ fun checkAndRequestPermission(
     } else {
         permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
     }
+}
+
+@Composable
+fun SingleLineText(
+    modifier: Modifier = Modifier, text: String, fontSize: TextUnit? = null, color: Color? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        fontSize = fontSize ?: TextUnit.Unspecified,
+        color = color ?: Color.Unspecified
+    )
 }
 
 //@Composable

@@ -64,6 +64,7 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.PermissionComposable
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.ProgressDialog
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants.Companion.NULL
 import com.app.littlechat.utility.getColors
@@ -256,8 +257,8 @@ fun MainContent(
                                             modifier = Modifier.size(50.dp), user.image, user.name
                                         )
                                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                            Text(text = user.name)
-                                            Text(text = user.email)
+                                            SingleLineText(text = user.name)
+                                            SingleLineText(text = user.email)
                                         }
                                     }
 

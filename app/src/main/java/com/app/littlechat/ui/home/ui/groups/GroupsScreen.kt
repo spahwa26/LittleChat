@@ -25,6 +25,7 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.NoDataView
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.PullToRefreshLazyColumn
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.home.ui.HomeViewmodel
 import com.app.littlechat.utility.getEncodedUrl
@@ -79,7 +80,7 @@ fun GroupsScreen(
                             group.name
                         )
                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                            Text(text = group.name)
+                            SingleLineText(text = group.name)
                         }
                     }
                 }

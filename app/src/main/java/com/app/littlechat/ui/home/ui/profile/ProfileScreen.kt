@@ -52,8 +52,6 @@ import com.app.littlechat.utility.getColors
 import com.app.littlechat.utility.getEncodedUrl
 import com.app.littlechat.utility.getResizedBitmap
 import com.app.littlechat.utility.showToast
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun ProfileScreen(
@@ -82,140 +80,149 @@ fun ProfileContent(profileViewmodel: ProfileViewmodel, navActions: HomeNavigatio
                 navActions.popBack()
             })
         }
-        if (profileViewmodel.userData.value != null) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-
-
-                AsyncImage(
-                    modifier = Modifier
-                        .padding(top = 50.dp)
-                        .size(240.dp)
-                        .shadow(20.dp, shape = CircleShape, clip = true)
-                        .padding(10.dp)
-                        .clip(CircleShape)
-                        .background(Color.Transparent)
-                        .clickable {
-                            if (profileViewmodel.isMyProfile()) {
-                                triggerPermissionComposable.value = true
-                            }
-                            //launcher.launch("image/*")
-                        },
-                    model = if (profileViewmodel.imageUri.value != null) {
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(profileViewmodel.imageUri.value).build()
-                    } else if (userData?.image.isNullOrBlank()) DUMMY_URL else userData?.image,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "",
-
-                    )
-
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(bottom = 15.dp, top = 30.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
-                    value = profileViewmodel.name.value,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next
-                    ),
-                    label = { Text(text = stringResource(id = R.string.name)) },
-                    onValueChange = { profileViewmodel.name.value = it },
-                    enabled = profileViewmodel.isMyProfile(),
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = getColors().primary,
-                        disabledPlaceholderColor = getColors().primary,
-                        disabledLabelColor = getColors().primary,
-                        disabledContainerColor = Color.Transparent
-                    ),
-                )
-
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(bottom = 15.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
-                    value = userData?.email ?: "",
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
-                    ),
-                    enabled = false,
-                    label = { Text(text = stringResource(id = R.string.email)) },
-                    onValueChange = {},
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = getColors().primary,
-                        disabledPlaceholderColor = getColors().primary,
-                        disabledLabelColor = getColors().primary,
-                        disabledContainerColor = Color.Transparent
-                    )
-                )
-
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(bottom = 15.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
-                    value = profileViewmodel.phone.value,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done
-                    ),
-                    label = { Text(text = stringResource(id = R.string.phone_number)) },
-                    onValueChange = { if (it.length <= 10) profileViewmodel.phone.value = it },
-                    enabled = profileViewmodel.isMyProfile(),
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = getColors().primary,
-                        disabledPlaceholderColor = getColors().primary,
-                        disabledLabelColor = getColors().primary,
-                        disabledContainerColor = Color.Transparent
-                    )
-                )
-
-
-            }
-        }
-
-        Box(
-            contentAlignment = Alignment.Center,
+        Column(
             modifier = Modifier
-                .padding(bottom = 50.dp, top = 30.dp)
-                .height(45.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            if (profileViewmodel.btnText.value == null || state == ProfileViewmodel.ProfileUiState.Loading) CircularProgressIndicator()
-            else Row {
-                Button(modifier = Modifier.weight(1f, false), onClick = {
-                    profileViewmodel.handleButtonClick()
-                }) {
-                    Text(
-                        text = stringResource(
-                            id = profileViewmodel.btnText.value?.callText ?: R.string.empt
+            if (profileViewmodel.userData.value != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp)
+                ) {
+
+
+                    AsyncImage(
+                        modifier = Modifier
+                            .padding(top = 50.dp)
+                            .size(240.dp)
+                            .shadow(20.dp, shape = CircleShape, clip = true)
+                            .padding(10.dp)
+                            .clip(CircleShape)
+                            .background(Color.Transparent)
+                            .clickable {
+                                if (profileViewmodel.isMyProfile()) {
+                                    triggerPermissionComposable.value = true
+                                }
+                                //launcher.launch("image/*")
+                            },
+                        model = if (profileViewmodel.imageUri.value != null) {
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(profileViewmodel.imageUri.value).build()
+                        } else if (userData?.image.isNullOrBlank()) DUMMY_URL else userData?.image,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "",
+
+                        )
+
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(bottom = 15.dp, top = 30.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                        value = profileViewmodel.name.value,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
+                        ),
+                        label = { Text(text = stringResource(id = R.string.name)) },
+                        onValueChange = { profileViewmodel.name.value = it },
+                        enabled = profileViewmodel.isMyProfile(),
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = getColors().primary,
+                            disabledPlaceholderColor = getColors().primary,
+                            disabledLabelColor = getColors().primary,
+                            disabledContainerColor = Color.Transparent
+                        ),
+                    )
+
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(bottom = 15.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                        value = userData?.email ?: "",
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
+                        ),
+                        enabled = false,
+                        label = { Text(text = stringResource(id = R.string.email)) },
+                        onValueChange = {},
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = getColors().primary,
+                            disabledPlaceholderColor = getColors().primary,
+                            disabledLabelColor = getColors().primary,
+                            disabledContainerColor = Color.Transparent
                         )
                     )
+
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(bottom = 15.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                        value = profileViewmodel.phone.value,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done
+                        ),
+                        label = { Text(text = stringResource(id = R.string.phone_number)) },
+                        onValueChange = {
+                            if (it.length <= 10) profileViewmodel.phone.value = it
+                        },
+                        enabled = profileViewmodel.isMyProfile(),
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = getColors().primary,
+                            disabledPlaceholderColor = getColors().primary,
+                            disabledLabelColor = getColors().primary,
+                            disabledContainerColor = Color.Transparent
+                        )
+                    )
+
+
                 }
-                if (profileViewmodel.btnText.value == BtnCall.ACCEPT_REQUEST) {
-                    Spacer(
-                        modifier = Modifier.width(
-                            10.dp
-                        )
-                    )
+            }
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(bottom = 50.dp, top = 30.dp)
+                    .height(45.dp)
+                    .fillMaxWidth()
+            ) {
+                if (profileViewmodel.btnText.value == null || state == ProfileViewmodel.ProfileUiState.Loading) CircularProgressIndicator()
+                else Row {
                     Button(modifier = Modifier.weight(1f, false), onClick = {
-                        profileViewmodel.cancelRequest()
+                        profileViewmodel.handleButtonClick()
                     }) {
                         Text(
                             text = stringResource(
-                                id = R.string.reject_request
+                                id = profileViewmodel.btnText.value?.callText ?: R.string.empt
                             )
                         )
+                    }
+                    if (profileViewmodel.btnText.value == BtnCall.ACCEPT_REQUEST) {
+                        Spacer(
+                            modifier = Modifier.width(
+                                10.dp
+                            )
+                        )
+                        Button(modifier = Modifier.weight(1f, false), onClick = {
+                            profileViewmodel.cancelRequest()
+                        }) {
+                            Text(
+                                text = stringResource(
+                                    id = R.string.reject_request
+                                )
+                            )
+                        }
                     }
                 }
             }

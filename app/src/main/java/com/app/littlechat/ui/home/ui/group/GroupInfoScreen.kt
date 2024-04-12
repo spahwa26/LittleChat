@@ -44,15 +44,12 @@ import coil.compose.AsyncImage
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.ProfileImage
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.getColors
+import com.app.littlechat.utility.getEncodedUrl
 import com.app.littlechat.utility.showToast
-
-@Composable
-fun ViewGroupScreen(navActions: HomeNavigationActions) {
-    MainContent(navActions = navActions)
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -102,16 +99,19 @@ fun GroupInfoScreen(
             )
 
             AnimatedVisibility(viewmodel.selectedMembers.isNotEmpty()) {
-                LazyColumn(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 10.dp)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 10.dp)
+                ) {
                     itemsIndexed(viewmodel.selectedMembers, key = { _, user ->
                         user.id
                     }) { _, user ->
                         Box(
                             Modifier
                                 .padding(10.dp)
-                                .animateItemPlacement()) {
+                                .animateItemPlacement()
+                        ) {
                             Card(
                                 shape = RoundedCornerShape(10.dp),
                                 colors = CardDefaults.cardColors(
@@ -119,7 +119,13 @@ fun GroupInfoScreen(
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable {},
+                                    .clickable {
+                                        navActions.navigateToChat(
+                                            user.id,
+                                            user.name,
+                                            user.image.getEncodedUrl()
+                                        )
+                                    },
                                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                             ) {
                                 Row(
@@ -129,23 +135,27 @@ fun GroupInfoScreen(
                                         .fillMaxWidth()
                                         .padding(10.dp)
                                 ) {
-                                    Row {
+                                    Row(modifier = Modifier.weight(1f, true)) {
                                         ProfileImage(
                                             modifier = Modifier.size(50.dp), user.image, user.name
                                         )
                                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                            Text(text = user.name)
-                                            Text(text = user.email)
+                                            SingleLineText(text = user.name)
+                                            SingleLineText(
+                                                text = user.email
+                                            )
                                         }
                                     }
                                     if (viewmodel.isMyGroup(user.id)) {
                                         Text(
                                             text = stringResource(id = R.string.admin),
-                                            modifier = Modifier.background(
-                                                Color(22, 200, 22, 120), shape = CircleShape
-                                            ).padding(horizontal = 6.dp),
+                                            modifier = Modifier
+                                                .background(
+                                                    Color(22, 200, 22, 120), shape = CircleShape
+                                                )
+                                                .padding(horizontal = 6.dp),
                                             color = Color.White,
-                                            fontSize = 12.sp
+                                            fontSize = 12.sp,
                                         )
                                     }
                                 }

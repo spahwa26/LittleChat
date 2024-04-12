@@ -18,18 +18,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.ChatText
 import com.app.littlechat.ui.commoncomposables.ProfileImage
@@ -47,7 +49,11 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
             items(viewmodel.chatList.reversed()) { chat ->
 
                 val isMyMsg = chat.sender_id == viewmodel.getId()
-                Box(Modifier.padding(10.dp).animateItemPlacement()) {
+                Box(
+                    Modifier
+                        .padding(10.dp)
+                        .animateItemPlacement()
+                ) {
 
                     Row(
                         verticalAlignment = Alignment.Bottom,
@@ -92,25 +98,26 @@ fun ChatLayout(viewmodel: ChatViewmodel) {
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            BasicTextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.inversePrimary,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(15.dp),
+            TextField(
                 value = viewmodel.message.value,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 onValueChange = {
                     viewmodel.message.value = it
                 },
-                textStyle = TextStyle.Default.copy(
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                placeholder = { Text(text = stringResource(id = R.string.write_a_message)) })
+
 
             Image(
                 modifier = Modifier

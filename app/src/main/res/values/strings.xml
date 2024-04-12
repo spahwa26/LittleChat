@@ -101,4 +101,5 @@
     <string name="reset_password">Reset your password!</string>
     <string name="reset_email_msg">We will send you a link to reset the password on the email above.</string>
     <string name="we_have_sent_link">We have sent you a link to change password, please change and retry login!</string>
+    <string name="write_a_message">Write a message...</string>
 </resources>

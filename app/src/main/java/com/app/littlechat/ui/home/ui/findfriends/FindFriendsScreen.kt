@@ -32,12 +32,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.littlechat.R
 import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.ProfileImage
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -116,8 +118,8 @@ fun FindFriendsScreen(
                             ) {
                                 ProfileImage(modifier = Modifier.size(50.dp), user.image, user.name)
                                 Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                                    Text(text = user.name)
-                                    Text(text = user.email)
+                                    SingleLineText(text = user.name)
+                                    SingleLineText(text = user.email)
                                 }
                             }
                         }

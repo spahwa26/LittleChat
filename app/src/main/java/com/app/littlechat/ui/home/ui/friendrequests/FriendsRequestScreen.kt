@@ -33,6 +33,7 @@ import com.app.littlechat.ui.commoncomposables.CustomToolbar
 import com.app.littlechat.ui.commoncomposables.NoDataView
 import com.app.littlechat.ui.commoncomposables.ProfileImage
 import com.app.littlechat.ui.commoncomposables.PullToRefreshLazyColumn
+import com.app.littlechat.ui.commoncomposables.SingleLineText
 import com.app.littlechat.ui.home.navigation.HomeNavigationActions
 import com.app.littlechat.ui.theme.RedCustom
 import com.app.littlechat.utility.Constants.Companion.SENT
@@ -83,8 +84,8 @@ fun FriendsRequestScreen(
                                 }, user.image, user.name
                         )
                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                            Text(text = user.name)
-                            Text(text = user.email)
+                            SingleLineText(text = user.name)
+                            SingleLineText(text = user.email)
                         }
                     }
 

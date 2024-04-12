@@ -54,7 +54,11 @@ fun LittleChatTheme(
     val colorScheme = when {
         dynamicColor.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (!invertTheme.value && darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            when {
+                invertTheme.value -> if (darkTheme) dynamicLightColorScheme(context) else dynamicDarkColorScheme(context)
+                darkTheme -> dynamicDarkColorScheme(context)
+                else -> dynamicLightColorScheme(context)
+            }
         }
 
         invertTheme.value -> if (darkTheme) LightColorScheme else DarkColorScheme
