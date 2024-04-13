@@ -9,7 +9,6 @@
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="profile">Profile</string>
-    <string name="submit">Submit</string>
     <string name="logout">Logout</string>
     <string name="name">Name</string>
     <string name="phone_number">Phone Number</string>
@@ -19,21 +18,16 @@
     <string name="accept_request">Accept Request</string>
     <string name="send_message">Send Message</string>
     <string name="friend_requests">Friend Requests</string>
-    <string name="home">Home</string>
     <string name="signup">SignUp</string>
     <string name="create_group">Create Group</string>
-    <string name="my_groups">My Groups</string>
-    <string name="group_chat">Group Chat</string>
     <string name="groups">Groups</string>
     <string name="logout_alert">Are you sure you want to logout?</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="I_agree">I Agree With</string>
     <string name="back_icon">Back icon</string>
     <string name="google_icon">Google login icon</string>
     <string name="Implementation_in_progress">Implementation in progress!</string>
-    <string name="confirm">Confirm</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="alert">Alert</string>
@@ -44,7 +38,6 @@
     <string name="enter_confirm_password">Enter your password again in confirm password field</string>
     <string name="password_not_match">Passwords do not match.</string>
     <string name="email_sent">A verification email has been sent to <b>%s</b>, please verify the email then login></string>
-    <string name="title_activity_home">HomeActivity</string>
     <string name="friends">Friends</string>
     <string name="settings">Settings</string>
     <string name="please_type">Please type any message.</string>
@@ -52,25 +45,15 @@
     <string name="empt">.</string>
     <string name="reject_request">Reject Request</string>
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="invert_theme">Invert Theme</string>
     <string name="dynamic_theme">Dynamic Theme</string>
     <string name="yes">Yes</string>
     <string name="no_requests">No requests found!</string>
     <string name="update_profile">Update Profile</string>
-    <string name="permission_denied">Permission Denied!</string>
     <string name="save">Save</string>
     <string name="enter_valid_name">Please enter a valid name.</string>
     <string name="enter_valid_number">Please enter a valid number.</string>

@@ -123,19 +123,18 @@ class ChatRepository @Inject constructor(private val userPreferences: UserPrefer
         groupId: String, members: List<User>,
         resultCallback: (CustomResult<Unit>) -> Unit
     ) {
-        userPreferences.id?.let { myId ->
-            db.child(GROUPS).child(groupId).removeValue()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        members.forEach {
-                            db.child(USERS).child(it.id).child(MY_GROUPS).child(groupId).removeValue()
-                        }
-                        resultCallback.invoke(CustomResult.Success(Unit))
-                    } else
-                        setError(resultCallback, task.exception?.message)
-                }.addOnFailureListener { e ->
-                    setError(resultCallback, e.message)
-                }
-        }
+        db.child(GROUPS).child(groupId).removeValue()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    members.forEach {
+                        db.child(USERS).child(it.id).child(MY_GROUPS).child(groupId).removeValue()
+                    }
+                    resultCallback.invoke(CustomResult.Success(Unit))
+                } else
+                    setError(resultCallback, task.exception?.message)
+            }.addOnFailureListener { e ->
+                setError(resultCallback, e.message)
+            }
     }
+
 }

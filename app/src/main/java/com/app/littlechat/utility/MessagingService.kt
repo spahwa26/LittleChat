@@ -1,4 +1,4 @@
-package com.app.littlechat.firebase
+package com.app.littlechat.utility
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,11 +12,9 @@ import android.os.Build
 import android.os.Build.VERSION_CODES.O
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.app.littlechat.FriendRequests
-import com.app.littlechat.HomeScreen
 import com.app.littlechat.R
 import com.app.littlechat.data.UserPreferences
-import com.app.littlechat.utility.CommonUtilities
+import com.app.littlechat.ui.home.HomeActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -43,10 +41,12 @@ class MessagingService : FirebaseMessagingService() {
         val intent: Intent
 
         if (isMessage) {
-            intent = Intent(applicationContext, HomeScreen::class.java)
+            //todo: handle chat messages
+            intent = Intent(applicationContext, HomeActivity::class.java)
         } else {
             id = (0..1000).random()
-            intent = Intent(applicationContext, FriendRequests::class.java)
+            intent = Intent(applicationContext, HomeActivity::class.java)
+            //todo: handle friend requests
         }
 
 
@@ -87,7 +87,6 @@ class MessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        CommonUtilities.putToken(applicationContext, token)
         UserPreferences(applicationContext).deviceToken = token
         Log.e("token", token)
     }

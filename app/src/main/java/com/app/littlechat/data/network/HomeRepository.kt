@@ -5,7 +5,6 @@ import com.app.littlechat.data.UserPreferences
 import com.app.littlechat.data.model.CustomResult
 import com.app.littlechat.data.model.GroupDetails
 import com.app.littlechat.data.model.User
-import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants
 import com.app.littlechat.utility.Constants.Companion.GROUPS
 import com.app.littlechat.utility.Constants.Companion.GROUP_DETAILS
@@ -301,7 +300,6 @@ class HomeRepository @Inject constructor(private val userPreferences: UserPrefer
             }
             return@Continuation riversRef.downloadUrl
         }).addOnCompleteListener { task ->
-            CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
                 userPreferences.context.deleteImageFile(getGroupImageName(groupID))
                 resultCallback.invoke(CustomResult.Success(task.result.toString()))

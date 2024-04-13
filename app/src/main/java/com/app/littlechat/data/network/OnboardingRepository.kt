@@ -8,7 +8,6 @@ import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.AUTH_FAIL
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.FAILURE_ERROR
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.GOTO_PROFILE
 import com.app.littlechat.ui.onbording.OnboardingViewModel.Companion.VERIFICATION_EMAIL
-import com.app.littlechat.utility.CommonUtilities
 import com.app.littlechat.utility.Constants.Companion.DEVICE_TOKEN
 import com.app.littlechat.utility.Constants.Companion.SEPARATOR
 import com.app.littlechat.utility.Constants.Companion.USERS
@@ -41,7 +40,6 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
         onResult: (CustomResult<Boolean>) -> Unit
     ) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            CommonUtilities.hideProgressWheel()
             if (task.isSuccessful) {
                 CoroutineScope(IO).launch {
                     mAuth.currentUser?.let {
@@ -127,7 +125,6 @@ class OnboardingRepository @Inject constructor(private val userPreferences: User
     ) {
         user.sendEmailVerification()
             .addOnCompleteListener { task ->
-                CommonUtilities.hideProgressWheel()
                 if (task.isSuccessful) {
                     //CommonUtilities.showToast(activity,"A verification email has been sent to "+groupDetails.getEmail()+", please verify the email then login.");
                     //startActivity(new Intent(activity,Login.class));

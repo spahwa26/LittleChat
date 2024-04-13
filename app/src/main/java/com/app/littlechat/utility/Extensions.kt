@@ -6,13 +6,14 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.provider.Settings
 import android.support.annotation.StringRes
+import android.support.media.ExifInterface
 import android.text.TextUtils
-import android.util.TypedValue
 import android.widget.Toast
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,8 +27,6 @@ import java.io.OutputStream
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-
-fun Activity.getActivity() = this
 
 fun Context.showToast(
     @StringRes intRes: Int? = null, txt: String? = null, length: Int = Toast.LENGTH_SHORT
@@ -82,7 +81,7 @@ fun Context.getResizedBitmap(
     var saveBitmap: Bitmap? = null
 
     file?.absolutePath?.let { path ->
-        val image: Bitmap = if (isCamera) CommonUtilities.rotateBitmap(
+        val image: Bitmap = if (isCamera) rotateBitmap(
             BitmapFactory.decodeFile(path, options),
             path
         )
@@ -118,6 +117,40 @@ fun Context.getResizedBitmap(
 
 
     return saveBitmap
+}
+
+fun rotateBitmap(realImage: Bitmap, imagePath: String): Bitmap {
+    var image = realImage
+    try {
+        val exif = ExifInterface(imagePath)
+        if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equals("6", ignoreCase = true)) {
+
+            image = rotate(image, 90)
+        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION)
+                .equals("8", ignoreCase = true)
+        ) {
+            image = rotate(image, 270)
+        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION)
+                .equals("3", ignoreCase = true)
+        ) {
+            image = rotate(image, 180)
+        }
+        return image
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    return image
+}
+
+fun rotate(bitmap: Bitmap, degree: Int): Bitmap {
+    val w = bitmap.width
+    val h = bitmap.height
+
+    val mtx = Matrix()
+    mtx.postRotate(degree.toFloat())
+
+    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true)
 }
 
 fun Context.getImageFile(name: String) = File(cacheDir, name)
@@ -167,10 +200,11 @@ fun String?.haveData(): Boolean {
     else true
 }
 
-fun Context.toPx(dp: Int): Float = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    dp.toFloat(),
-    resources.displayMetrics)
+//fun Context.toPx(dp: Int): Float = TypedValue.applyDimension(
+//    TypedValue.COMPLEX_UNIT_DIP,
+//    dp.toFloat(),
+//    resources.displayMetrics
+//)
 //fun Context.getRealPathFromURI(contentUri: Uri): String? {
 //    var cursor: Cursor? = null
 //    return try {

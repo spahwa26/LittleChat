@@ -58,7 +58,6 @@ class FindFriendsViewmodel @Inject constructor(private val repository: FindFrien
                     is CustomResult.Error -> {
                         _friendsUiState.value = FriendsUiState.Error(it.exception.message)
                     }
-                    else->{}
 
                 }
             }
