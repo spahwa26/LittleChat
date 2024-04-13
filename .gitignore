@@ -5,4 +5,6 @@
 .DS_Store
 /build
 /captures
+/app/google-services.json
+/app/little_chat_keystores
 .externalNativeBuild
