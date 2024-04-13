@@ -17,11 +17,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -32,8 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.littlechat.R
-import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
 import com.app.littlechat.ui.commoncomposables.LottieAnimationOnboarding
+import com.app.littlechat.ui.commoncomposables.CommonAlertDialog
+import com.app.littlechat.utility.getColors
 
 
 @Composable
@@ -77,7 +78,8 @@ fun BottomView(onLoginClick: () -> Unit = {}, onSignupClick: () -> Unit = {}) {
         Image(
             painter = painterResource(R.drawable.ic_chat),
             contentDescription = null,
-            modifier = Modifier.padding(bottom = 10.dp).size(80.dp)
+            modifier = Modifier.padding(bottom = 10.dp),
+            colorFilter = ColorFilter.tint(getColors().primary)
         )
 
         Text(
