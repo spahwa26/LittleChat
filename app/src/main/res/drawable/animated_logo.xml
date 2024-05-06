@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_chat_splash">
+
+    <target
+        android:animation="@animator/foreground_animator"
+        android:name="foregroundLogo"/>
+
+    <target
+        android:animation="@animator/background_animator"
+        android:name="backgroundLogo"/>
+
+
+    <target
+        android:animation="@animator/whole_logo_animator"
+        android:name="wholeLogo"/>
+</animated-vector>

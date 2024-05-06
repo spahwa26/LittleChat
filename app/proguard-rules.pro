@@ -21,3 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 #-keep class androidx.appcompat.widget.** { *; }
+
+-keep class com.app.littlechat.data.model.** {*;}
