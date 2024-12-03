@@ -51,10 +51,10 @@
 
 | Screen Name           | Screenshot |  
 |-----------------------|------------|  
-| **Login Screen**      | <img src="readmescreens/login.png" width="300"/> |  
-| **Chat Screen**       | <img src="readmescreens/one_to_one_chat.png" width="300"/> |  
-| **Settings Screen**   | <img src="readmescreens/settings.png" width="300"/> |  
-| **Group Chat Screen** | <img src="readmescreens/group_chat.png" width="300"/> |  
+| **Login Screen**      | <img src="readmescreens/login.png" width="200"/> |  
+| **Chat Screen**       | <img src="readmescreens/one_to_one_chat.png" width="200"/> |  
+| **Settings Screen**   | <img src="readmescreens/settings.png" width="200"/> |  
+| **Group Chat Screen** | <img src="readmescreens/group_chat.png" width="200"/> |  
 
 ---
 
