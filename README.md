@@ -77,13 +77,13 @@
 
 4. Build and run the app on an emulator or physical device.
 
-### 🎯 Firebase Cloud Functions - #### Custom Cloud Functions are deployed to handle:
+### 🎯 Firebase Cloud Functions -> Custom Cloud Functions are deployed to handle:
 - Sending friend requests.
 - Managing group chats and data synchronization.
 - Sending push notifications via FCM.
 
 
-### 💡 About - #### LittleChat is designed as a personal project to demonstrate expertise in:
+### 💡 About -> LittleChat is designed as a personal project to demonstrate expertise in:
 - Building scalable Android apps with Jetpack Compose.
 - Integrating Firebase for backend services.
 - Implementing dynamic themes and real-time messaging.
