@@ -51,10 +51,10 @@
 
 | Screen Name           | Screenshot |  
 |-----------------------|------------|  
-| **Login Screen**      | ![Login](screenshots/login_screen.jpeg) |  
-| **Chat Screen**       | ![Chat](screenshots/chat_screen.jpeg) |  
-| **Settings Screen**   | ![Settings](screenshots/settings_screen.jpeg) |  
-| **Group Chat Screen** | ![Group](screenshots/group_chat_screen.jpeg) |  
+| **Login Screen**      | ![Login](screenshots/login_screen.png) |  
+| **Chat Screen**       | ![Chat](screenshots/chat_screen.png) |  
+| **Settings Screen**   | ![Settings](screenshots/settings_screen.png) |  
+| **Group Chat Screen** | ![Group](screenshots/group_chat_screen.png) |  
 
 ---
 
