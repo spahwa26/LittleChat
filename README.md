@@ -12,7 +12,7 @@
 
 ### 👫 **Friend Management**  
 - View and manage your friend list on the **Friends Screen**.  
-- Check detailed information on the **Friend's Profile Screen**.  
+- Check detailed information on the **Friend's Profile Screen**.   
 - Search for friends by name or email.  
 - Send and manage friend requests easily.  
 
