@@ -1,7 +1,7 @@
 # LittleChat 📱💬  
 
 **LittleChat** is a sleek and feature-rich chat application built for Android using **Jetpack Compose** and the **MVVM architecture**. This app leverages **Firebase** services to provide a real-time messaging experience with modern UI features and robust functionality.  
-
+[APK Link](https://www.dropbox.com/scl/fi/xhkawg8if1xagp275nsgg/LittleChat-v9.apk?rlkey=y2oty7w1bdrcyi9ko9smkg78b&e=1&dl=0)
 ---
 
 ## 🌟 Features  
@@ -62,7 +62,7 @@
 
 ### Prerequisites  
 - Android Studio **Arctic Fox** or newer.  
-- Minimum SDK: **21**.  
+- Minimum SDK: **24**.  
 - A Firebase project with required services enabled.  
 
 ### Steps  
